@@ -52,7 +52,7 @@
             formData.append('password', password);
 
             $.ajax({
-                url: 'http://localhost:8080/Auth/LoginAdmin',
+                url: 'AdminLogin.php',
                 type: 'POST',
                 data: formData, // Gửi dữ liệu dưới dạng form-data
                 contentType: false, // Không yêu cầu định dạng JSON
