@@ -111,7 +111,7 @@ class BrandModel
         $query = "DELETE FROM `brand` WHERE `Id` = :id";
 
         try {
-            $statement = $->connection->prepare($query);
+            $statement = $this->connection->prepare($query);
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
             $statement->execute();
             return (object) [
@@ -126,4 +126,3 @@ class BrandModel
         }
     }
 }
-?>
