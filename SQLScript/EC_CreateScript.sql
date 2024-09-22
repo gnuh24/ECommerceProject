@@ -36,7 +36,6 @@ CREATE TABLE IF NOT EXISTS `Token`(
     `Token`             CHAR(36)                                NOT NULL         UNIQUE,
     `CreateTime`	    DATETIME		                        NOT NULL         DEFAULT NOW(),
     `Expiration`    	DATETIME                                NOT NULL        ,
-    `Type`              ENUM("Registration", "ResetPassword")   NOT NULL,         
     `AccountId`         INT UNSIGNED                            NOT NULL,
     FOREIGN KEY (`AccountId`) REFERENCES `Account`(`Id`)
 );

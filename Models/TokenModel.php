@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . '/../Configure/MysqlConfig.php';
 
 class TokenModel
 {
@@ -54,7 +54,7 @@ class TokenModel
                 $id = $this->connection->lastInsertId();
                 return (object) [
                     "status" => 201,
-                    "message" => "Token created successfully",
+                    "message" => "Tạo token xác thực thành công !",
                     "data" => $id
                 ];
             } else {

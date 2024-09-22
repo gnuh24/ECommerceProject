@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . '/../Configure/MysqlConfig.php';
 
 class InventoryReportModel
 {
