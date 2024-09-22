@@ -162,7 +162,48 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //         'detailMessage' => 'Phương thức không được hỗ trợ'
 //     ]);
 // }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Kiểm tra xem action có phải là loginAdmin không
+    if (isset($_POST['action']) && $_POST['action'] === "loginAdmin") {
+        $email = $_POST['email'] ?? null;
+        $password = $_POST['password'] ?? null;
 
+        if ($email && $password) {
+            $accountController = new AccountController();
+            $response = $accountController->LoginAdmin($email, $password);
+
+            // Xử lý phản hồi từ phía controller
+            if ($response->status === 200) {
+                echo json_encode([
+                    'status' => 200,
+                    'message' => "Đăng nhập thành công!",
+                    'data' => [
+                        'id' => $response->data['Id'],
+                        'role' => $response->data['Role'],
+                        'email' => $response->data['Email'],
+                        'token' => 'dummyToken', 
+                        'refreshToken' => 'dummyRefreshToken'
+                    ]
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => $response->status,
+                    'message' => $response->message
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Vui lòng nhập email và mật khẩu!'
+            ]);
+        }
+    }
+} else {
+    echo json_encode([
+        'status' => 405,
+        'message' => 'Phương thức không được hỗ trợ!'
+    ]);
+}
 class AccountController
 {
     private $accountModel;
@@ -173,45 +214,43 @@ class AccountController
     }
 
     // Hàm xử lý đăng nhập Admin
-    public function LoginAdmin($userInformationId, $password)
+    public function LoginAdmin($email, $password)
     {
         // Kiểm tra xem tài khoản có tồn tại không
-        $accountExists = $this->accountModel->isAccountExists($userInformationId);
+        $accountExists = $this->accountModel->getAccountByEmail($email);
 
-        if ($accountExists->status === 200 && $accountExists->isExists) {
-
+        if ($accountExists->status === 200 && !empty($accountExists->data)) {
             // Lấy thông tin tài khoản
-            $accountData = $this->accountModel->getAccountById($userInformationId);
-            if ($accountData->status === 200 && !empty($accountData->data)) {
-                $account = $accountData->data[0];
+            $account = $accountExists->data[0];
 
+            // Kiểm tra vai trò của tài khoản có phải là Admin không
+            if ($account['Role'] === "Admin") {
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
                     return (object)[
                         "status" => 200,
-                        "message" => "Đăng nhập thành công",
+                        "message" => "Đăng nhập Admin thành công",
                         "data" => $account
                     ];
                 } else {
                     return (object)[
-                        "status" => 404,
-                        "message" => "Tài khoản không tồn tại"
+                        "status" => 401,
+                        "message" => "Mật khẩu không đúng"
                     ];
                 }
             } else {
                 return (object)[
-                    "status" => 404,
-                    "message" => "Tài khoản không tồn tại"
+                    "status" => 403,
+                    "message" => "Tài khoản không phải là Admin"
                 ];
             }
-        } else {
-            return (object)[
-                "status" => 404,
-                "message" => "Tài khoản không tồn tại"
-            ];
         }
+        // Nếu không tìm thấy tài khoản
+        return (object)[
+            "status" => 404,
+            "message" => "Không tìm thấy tài khoản Admin"
+        ];
     }
-
     // Hàm xử lý đăng nhập User
     public function LoginUser($email, $password)
     {
