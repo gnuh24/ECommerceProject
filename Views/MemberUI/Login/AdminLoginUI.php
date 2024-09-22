@@ -27,65 +27,85 @@
 
 
 
-<script>
+<<script>
     $(document).ready(function() {
+        // Bắt sự kiện click cho nút đăng nhập
         $('#adminLoginButton').click(function(e) {
-            e.preventDefault(); // Ngăn hành động mặc định của nút submit
+            e.preventDefault(); // Ngăn chặn hành động mặc định của form
 
-            var email = $('#adminEmail').val();
-            var password = $('#adminPassword').val();
+            var email = $('#adminEmail').val().trim();  // Lấy giá trị email và xóa khoảng trắng
+            var password = $('#adminPassword').val().trim();  // Lấy giá trị mật khẩu và xóa khoảng trắng
 
-            // Kiểm tra trường email và password không được để trống
-            if (!email || !password) {
+            // Kiểm tra xem email và mật khẩu có được nhập hay không
+            if (!email) {
                 Swal.fire({
                     title: 'Lỗi!',
-                    text: 'Vui lòng nhập email và mật khẩu!',
+                    text: 'Email không được để trống!',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
+                $('#adminEmail').focus();
                 return;
             }
 
-            // Tạo đối tượng FormData
-            var formData = new FormData();
-            formData.append('email', email);
-            formData.append('password', password);
+            if (!password) {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Mật khẩu không được để trống!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                $('#adminPassword').focus();
+                return;
+            }
 
+            // Gọi AJAX để xử lý yêu cầu đăng nhập
             $.ajax({
-                url: 'AdminLogin.php',
+                url: '../../../Controllers/AccountController.php',
                 type: 'POST',
-                data: formData, // Gửi dữ liệu dưới dạng form-data
-                contentType: false, // Không yêu cầu định dạng JSON
-                processData: false, // Không xử lý dữ liệu thành chuỗi query
+                dataType: 'json',  // Định dạng dữ liệu phản hồi là JSON
+                data: {
+                    "email": email,
+                    "password": password,
+                    "action": "loginAdmin"  // Thêm action để xác định yêu cầu đăng nhập admin
+                },
                 success: function(response) {
-                    // Kiểm tra nếu response có trường code và code = 8
-                    if (response.code && response.code === 8) {
+                    // Kiểm tra phản hồi từ server
+                    if (response.status === 200) {  // Nếu đăng nhập thành công
+                        Swal.fire({
+                            title: 'Thành công!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result) {
+                   
+
+                                // Lưu các thông tin vào sessionStorage
+                                sessionStorage.setItem('id', response.id);
+                                sessionStorage.setItem('token', response.token);
+                                sessionStorage.setItem('refreshToken', response.refreshToken);
+
+                                window.location.href = `../../ManagerUI/QLTaiKhoan/QLTaiKhoan.php`;
+                  
+                            }
+                        });
+                    } else {
+                        // Trường hợp đăng nhập thất bại
                         Swal.fire({
                             title: 'Lỗi!',
-                            text: response.detailMessage || 'Đăng nhập thất bại!',
+                            text: response.message,
                             icon: 'error',
                             confirmButtonText: 'OK'
                         });
-                    } else {
-                        sessionStorage.setItem('id', response.id);
-                        sessionStorage.setItem('token', response.token);
-                        sessionStorage.setItem('refreshToken', response.refreshToken);
-
-                        Swal.fire({
-                            title: 'Thành công!',
-                            text: 'Đăng nhập thành công!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            // Chuyển hướng sau khi đăng nhập thành công
-                            window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
-                        });
                     }
                 },
-                error: function(xhr) {
+                error: function(xhr, status, error) {
+                    console.error('Lỗi:', error);
+                    console.error('Lỗi chi tiết:', xhr.responseText); // In ra nội dung phản hồi
                     Swal.fire({
                         title: 'Lỗi!',
-                        text: xhr.responseJSON.detailMessage || 'Đăng nhập thất bại!',
+                        text: 'Đã xảy ra lỗi khi đăng nhập!',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
