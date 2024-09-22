@@ -42,4 +42,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'detailMessage' => 'Phương thức không được hỗ trợ'
     ]);
 }
-?>

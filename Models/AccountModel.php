@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once "..\Configure\MysqlConfig.php";
 
 class AccountModel
 {
@@ -24,7 +24,7 @@ class AccountModel
                 $isExists = !empty($result);
                 return (object) [
                     "status" => 200,
-                    "message" => "Query successful",
+                    "message" => "Truy vấn thành công",
                     "isExists" => $isExists
                 ];
             } else {
@@ -33,7 +33,7 @@ class AccountModel
         } catch (PDOException $e) {
             return (object) [
                 "status" => 400,
-                "message" => "Database query failed",
+                "message" => "Truy vấn cơ sở dữ liệu thất bại",
                 "isExists" => false
             ];
         }
@@ -52,7 +52,7 @@ class AccountModel
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 return (object) [
                     "status" => 200,
-                    "message" => "Success",
+                    "message" => "Thành công",
                     "data" => $result,
                 ];
             } else {
@@ -61,7 +61,40 @@ class AccountModel
         } catch (PDOException $e) {
             return (object) [
                 "status" => 400,
-                "message" => "Unable to fetch account",
+                "message" => "Không thể lấy thông tin tài khoản",
+            ];
+        }
+    }
+
+    // Lấy thông tin tài khoản theo email từ UserInformation
+    function getAccountByEmail($email)
+    {
+        $query = "
+            SELECT a.*, u.* 
+            FROM `Account` a
+            JOIN `UserInformation` u 
+            ON a.UserInformationId = u.Id
+            WHERE u.Email = :email
+        ";
+
+        try {
+            $statement = $this->connection->prepare($query);
+            if ($statement !== false) {
+                $statement->bindValue(':email', $email, PDO::PARAM_STR);
+                $statement->execute();
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                return (object) [
+                    "status" => 200,
+                    "message" => "Thành công",
+                    "data" => $result,
+                ];
+            } else {
+                throw new PDOException();
+            }
+        } catch (PDOException $e) {
+            return (object) [
+                "status" => 400,
+                "message" => "Không thể lấy thông tin tài khoản",
             ];
         }
     }
@@ -83,7 +116,7 @@ class AccountModel
                 $id = $this->connection->lastInsertId();
                 return (object) [
                     "status" => 201,
-                    "message" => "Account created successfully",
+                    "message" => "Tài khoản đã được tạo thành công",
                     "data" => $id
                 ];
             } else {
@@ -118,10 +151,10 @@ class AccountModel
                 if ($statement->rowCount() > 0) {
                     return (object) [
                         "status" => 200,
-                        "message" => "Account updated successfully",
+                        "message" => "Tài khoản đã được cập nhật thành công",
                     ];
                 } else {
-                    throw new PDOException("No record was updated");
+                    throw new PDOException("Không có bản ghi nào được cập nhật");
                 }
             }
         } catch (PDOException $e) {

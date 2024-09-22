@@ -8,7 +8,7 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="stylesheet" href="LoginUI.css" />
-    <link rel="stylesheet" href="../../../Resources/bootstrap-5.3.2-dist\css\bootstrap.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Login</title>
@@ -112,6 +112,7 @@
             event.preventDefault();
             return;
         }
+
         if (matKhau.value !== xacNhanMatKhau.value) {
             Swal.fire({
                 title: 'Lỗi!',
@@ -249,6 +250,7 @@
     const loginButton = document.getElementById("signInButton");
     const tenDangNhap = document.getElementById("tenDangNhapLogin");
     const matKhau = document.getElementById("passwordLogin");
+
     loginButton.addEventListener("click", (event) => {
         event.preventDefault();
         if (tenDangNhap.value.trim() === "") {
@@ -272,36 +274,27 @@
             return
         }
 
-        checkTaiKhoan(tenDangNhap.value, matKhau.value)
+        login(tenDangNhap.value, matKhau.value)
     });
 
 
 
     // Hàm xử lý kiểm tra tài khoản
-    function checkTaiKhoan(email, password) {
-        // Tạo đối tượng FormData
-        var formData = new FormData();
-        formData.append('email', email);
-        formData.append('password', password);
+    function login(email, password) {
 
         $.ajax({
-            url: 'http://localhost:8080/Auth/SignIn',
+            url: '../../../Controllers/AccountController.php',
             type: 'POST',
-            data: formData, // Gửi FormData
-            processData: false, // Ngăn jQuery tự động xử lý dữ liệu
-            contentType: false, // Đảm bảo tiêu đề nội dung là multipart/form-data
+            dataType: 'json',
+            data: {
+                "email": email,
+                "password": password,
+                "action": "loginUser"
+            },
             success: function(response) {
                 // Kiểm tra xem phản hồi có thành công hay không
-                if (response.code === 8) {
-                    Swal.fire({
-                        title: response.message,
-                        text: response.detailMessage,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
-                if (response.statusCode === 200) {
+
+                if (response.status === 200) {
                     Swal.fire({
                         title: 'Thành công!',
                         text: response.message,
@@ -311,27 +304,28 @@
                         if (result) {
                             const quyen = response.role;
 
-                            sessionStorage.setItem('id', response.id);
-                            sessionStorage.setItem('token', response.token);
-                            sessionStorage.setItem('refreshToken', response.refreshToken);
-                            switch (quyen) {
-                                case 'Admin':
-                                    window.location.href = `../../AdminUI/QLTaiKhoan.php`;
-                                    break;
-                                case 'Manager':
-                                    window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
-                                    break;
-                                default:
-                                    window.location.href = `../SignedPage/SignedHomePage.php`;
-                                    break;
-                            }
+                            // sessionStorage.setItem('id', response.id);
+                            // sessionStorage.setItem('token', response.token);
+                            // sessionStorage.setItem('refreshToken', response.refreshToken);
+                            // switch (quyen) {
+                            //     case 'Admin':
+                            //         window.location.href = `../../AdminUI/QLTaiKhoan.php`;
+                            //         break;
+                            //     case 'Manager':
+                            //         window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
+                            //         break;
+                            //     default:
+                            //         window.location.href = `../SignedPage/SignedHomePage.php`;
+                            //         break;
+                            // }
                         }
                     });
                 } else {
+                    console.log(response);
                     // Trường hợp đăng nhập thất bại
                     Swal.fire({
                         title: 'Lỗi!',
-                        text: 'Đăng nhập thất bại, hãy kiểm tra lại tên đăng nhập và mật khẩu !!',
+                        text: response.message,
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
