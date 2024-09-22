@@ -149,9 +149,12 @@
             event.preventDefault();
             return;
         }
+
+
         try {
             const emailExists = await checkEmail(email.value); // đợi kết quả
-            if (emailExists === true) {
+
+            if (emailExists.data.isExists === true) {
                 Swal.fire({
                     title: 'Lỗi!',
                     text: 'Email tồn tại',
@@ -169,15 +172,18 @@
                 confirmButtonText: 'OK'
             });
         }
-        var formData = new FormData();
-        formData.append('email', email.value.trim());
-        formData.append('password', matKhau.value);
+
+
         $.ajax({
-            url: 'http://localhost:8080/Auth/Registration',
+            url: '../../../Controllers/AccountController.php',
             type: 'POST',
-            data: formData, // Gửi FormData
-            processData: false, // Ngăn jQuery tự động xử lý dữ liệu
-            contentType: false, // Đảm bảo tiêu đề nội dung là multipart/form-data
+            dataType: 'json',
+
+            data: {
+                "email": email.value,
+                "password": matKhau.value,
+                "action": "registration"
+            },
             beforeSend: function() {
                 // Hiện thông báo "Đang xử lý"
                 Swal.fire({
@@ -191,6 +197,8 @@
             success: function(response) {
                 // Đóng thông báo "Đang xử lý"
                 Swal.close();
+
+                console.log(response);
 
                 // Kiểm tra xem phản hồi có thành công hay không
                 Swal.fire({
@@ -226,10 +234,13 @@
     async function checkEmail(email) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: 'http://localhost:8080/Account/isThisEmailExists',
+                url: '../../../Controllers/AccountController.php',
                 type: 'GET',
+                dataType: 'json',
                 data: {
-                    email: email
+                    email: email,
+                    action: "isThisEmailExists"
+
                 },
                 success: function(response) {
                     resolve(response); // Resolve the promise with the response

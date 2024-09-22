@@ -7,7 +7,7 @@ USE `SGU_E_Commerce`;
 DROP TABLE IF EXISTS `UserInformation`;
 CREATE TABLE IF NOT EXISTS `UserInformation`(
     `Id`            INT UNSIGNED       PRIMARY KEY    AUTO_INCREMENT,
-    `Email`         NVARCHAR(255)                   UNIQUE,
+    `Email`         NVARCHAR(255)                      UNIQUE,
     `Address`       NVARCHAR(255),
     `Birthday`      DATE,
     `Fullname`      NVARCHAR(255),

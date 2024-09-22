@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . '/../Configure/MysqlConfig.php';
 
 class UserInformationModel
 {
@@ -66,20 +66,15 @@ class UserInformationModel
         }
     }
 
-    function createUserInformation($fullname, $birthday, $gender, $phone_number, $email, $address)
+    function createUserInformation($email)
     {
-        $query = "INSERT INTO `user_information` (`fullname`, `birthday`, `gender`, `phone_number`, `email`, `address`) 
-                                    VALUES (:fullname, :birthday, :gender, :phone_number, :email, :address)";
+        $query = "INSERT INTO `UserInformation`(`email`) 
+                                    VALUES (:email)";
 
         try {
             $statement = $this->connection->prepare($query);
             if ($statement !== false) {
-                $statement->bindValue(':fullname', $fullname, PDO::PARAM_STR);
-                $statement->bindValue(':birthday', $birthday, PDO::PARAM_STR);
-                $statement->bindValue(':gender', $gender, PDO::PARAM_STR);
-                $statement->bindValue(':phone_number', $phone_number, PDO::PARAM_STR);
                 $statement->bindValue(':email', $email, PDO::PARAM_STR);
-                $statement->bindValue(':address', $address, PDO::PARAM_STR);
                 $statement->execute();
                 $id = $this->connection->lastInsertId();
                 return (object) [

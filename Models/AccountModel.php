@@ -1,5 +1,5 @@
 <?php
-require_once "..\Configure\MysqlConfig.php";
+require_once __DIR__ . '/../Configure/MysqlConfig.php';
 
 class AccountModel
 {
@@ -66,6 +66,23 @@ class AccountModel
         }
     }
 
+    // Kiểm tra xem email đã tồn tại hay chưa
+    function isEmailExists($email)
+    {
+        // Gọi hàm getAccountByEmail để lấy thông tin tài khoản theo email
+        $response = $this->getAccountByEmail($email);
+
+        // Kiểm tra trạng thái và dữ liệu trả về
+        if ($response->status === 200 && !empty($response->data)) {
+            // Email đã tồn tại trong cơ sở dữ liệu
+            return true;
+        } else {
+            // Email không tồn tại hoặc có lỗi xảy ra
+            return false;
+        }
+    }
+
+
     // Lấy thông tin tài khoản theo email từ UserInformation
     function getAccountByEmail($email)
     {
@@ -100,17 +117,17 @@ class AccountModel
     }
 
     // Tạo tài khoản mới
-    function createAccount($password, $userInformationId, $role = "User", $type = "Standard")
+    function createAccount($password, $userInformationId,  $type = "Standard")
     {
-        $query = "INSERT INTO `account` (`Password`, `UserInformationId`, `Role`, `Type`) 
-                  VALUES (:password, :userInformationId, :role, :type)";
+
+        $query = "INSERT INTO `account` (`Password`, `UserInformationId`,  `Type`) 
+                  VALUES (:password, :userInformationId,  :type)";
 
         try {
             $statement = $this->connection->prepare($query);
             if ($statement !== false) {
                 $statement->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
                 $statement->bindValue(':userInformationId', $userInformationId, PDO::PARAM_INT);
-                $statement->bindValue(':role', $role, PDO::PARAM_STR);
                 $statement->bindValue(':type', $type, PDO::PARAM_STR);
                 $statement->execute();
                 $id = $this->connection->lastInsertId();

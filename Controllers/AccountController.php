@@ -1,8 +1,41 @@
 <?php
 require_once __DIR__ . "/../Models/AccountModel.php";
+require_once __DIR__ . "/../Models/UserInformationModel.php";
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Login User
+    if (isset($_GET['action']) && $_GET['action'] === "isThisEmailExists") {
+        // Lấy dữ liệu từ form
+        $email = $_GET['email'] ?? null;
+
+        // Kiểm tra dữ liệu hợp lệ
+        if ($email) {
+            $accountController = new AccountController();
+
+            // Gọi hàm login trong AccountController với email và password
+            $response = $accountController->isEmailExists($email);
+
+            // Trả về kết quả cho client (JavaScript)
+            echo json_encode([
+                'status' => 200,
+                'message' => "Kiểm tra thành công !",
+                'data' => [
+                    'isExists' => $response,
+                ]
+            ]);
+        }
+    } else {
+        // Trả về lỗi khi không có email hoặc mật khẩu
+        echo json_encode([
+            'status' => 400,
+            'message' => 'Không tìm thấy tham số `action` !'
+        ]);
+    }
+}
 
 // Kiểm tra yêu cầu POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Login User
     if (isset($_POST['action']) && $_POST['action'] === "loginUser") {
@@ -29,6 +62,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'token' => 'dummyToken', // You can generate a real token here
                         'refreshToken' => 'dummyRefreshToken'
                     ]
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => $response->status,
+                    'message' => $response->message
+                ]);
+            }
+        } else {
+            // Trả về lỗi khi không có email hoặc mật khẩu
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Vui lòng nhập email và mật khẩu!'
+            ]);
+        }
+    }
+
+
+    // Login User
+    if (isset($_POST['action']) && $_POST['action'] === "registration") {
+        // Lấy dữ liệu từ form
+        $email = $_POST['email'] ?? null;
+        $password = $_POST['password'] ?? null;
+
+        // Kiểm tra dữ liệu hợp lệ
+        if ($email && $password) {
+            $accountController = new AccountController();
+
+            // Gọi hàm login trong AccountController với email và password
+            $response = $accountController->registration($email, $password);
+
+            // Trả về kết quả cho client (JavaScript)
+            if ($response->status === 201) {
+                echo json_encode([
+                    'status' => $response->status,
+                    'message' => $response->message
+
+                    // 'data' => [
+                    //     'id' => $response->data['Id'],
+                    //     'role' => $response->data['Role'],
+                    //     'email' => $response->data['Email'],
+                    //     'token' => 'dummyToken', // You can generate a real token here
+                    //     'refreshToken' => 'dummyRefreshToken'
+                    // ]
                 ]);
             } else {
                 echo json_encode([
@@ -176,6 +252,35 @@ class AccountController
         return (object)[
             "status" => 404,
             "message" => "Không tìm thấy tài khoản"
+        ];
+    }
+
+    function isEmailExists($email)
+    {
+        return $this->accountModel->isEmailExists($email);
+    }
+
+    function registration($email, $password)
+    {
+
+        $userInformationModel = new UserInformationModel();
+
+        $id = $userInformationModel->createUserInformation($email);
+
+        if ($id->status === 201) {
+            $response = $this->accountModel->createAccount($password, $id->data);
+
+            if ($response->status === 201) {
+                return (object)[
+                    "status" => 201,
+                    "message" => "Tạo tài khoản thành công"
+                ];
+            }
+        }
+
+        return (object)[
+            "status" => 400,
+            "message" => "Tạo tài khoản thất bại !"
         ];
     }
 }
