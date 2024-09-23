@@ -426,27 +426,78 @@ class ProductModel
         }
     }
 
-    // Cập nhật sản phẩm
     public function updateProduct($id, $productName, $status, $image, $origin, $capacity, $abv, $description, $brandId, $categoryId)
     {
-        $query = "UPDATE `product` 
-                  SET `ProductName` = :productName, `Status` = :status, `Image` = :image, 
-                      `Origin` = :origin, `Capacity` = :capacity, `ABV` = :abv, `Description` = :description, 
-                      `BrandId` = :brandId, `CategoryId` = :categoryId 
-                  WHERE `Id` = :id";
+        // Tạo mảng để lưu các phần của câu lệnh SQL
+        $fieldsToUpdate = [];
+        $params = [];
+
+        // Kiểm tra các trường và thêm vào mảng nếu có giá trị
+        if (!empty($productName)) {
+            $fieldsToUpdate[] = "`ProductName` = :productName";
+            $params[':productName'] = $productName;
+        }
+
+        if ($status !== null) {
+            $fieldsToUpdate[] = "`Status` = :status";
+            $params[':status'] = $status;
+        }
+
+        if (!empty($image)) {
+            $fieldsToUpdate[] = "`Image` = :image";
+            $params[':image'] = $image;
+        }
+
+        if (!empty($origin)) {
+            $fieldsToUpdate[] = "`Origin` = :origin";
+            $params[':origin'] = $origin;
+        }
+
+        if (!empty($capacity)) {
+            $fieldsToUpdate[] = "`Capacity` = :capacity";
+            $params[':capacity'] = $capacity;
+        }
+
+        if (!empty($abv)) {
+            $fieldsToUpdate[] = "`ABV` = :abv";
+            $params[':abv'] = $abv;
+        }
+
+        if (!empty($description)) {
+            $fieldsToUpdate[] = "`Description` = :description";
+            $params[':description'] = $description;
+        }
+
+        if (!empty($brandId)) {
+            $fieldsToUpdate[] = "`BrandId` = :brandId";
+            $params[':brandId'] = $brandId;
+        }
+
+        if (!empty($categoryId)) {
+            $fieldsToUpdate[] = "`CategoryId` = :categoryId";
+            $params[':categoryId'] = $categoryId;
+        }
+
+        // Nếu không có trường nào để cập nhật, trả về thông báo lỗi
+        if (empty($fieldsToUpdate)) {
+            return (object) [
+                "status" => 400,
+                "message" => "No valid fields to update"
+            ];
+        }
+
+        // Ghép câu lệnh SQL với các trường cần cập nhật
+        $query = "UPDATE `product` SET " . implode(", ", $fieldsToUpdate) . " WHERE `Id` = :id";
 
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
-            $statement->bindValue(':productName', $productName, PDO::PARAM_STR);
-            $statement->bindValue(':status', $status, PDO::PARAM_BOOL);
-            $statement->bindValue(':image', $image, PDO::PARAM_STR);
-            $statement->bindValue(':origin', $origin, PDO::PARAM_STR);
-            $statement->bindValue(':capacity', $capacity, PDO::PARAM_INT);
-            $statement->bindValue(':abv', $abv, PDO::PARAM_INT);
-            $statement->bindValue(':description', $description, PDO::PARAM_STR);
-            $statement->bindValue(':brandId', $brandId, PDO::PARAM_INT);
-            $statement->bindValue(':categoryId', $categoryId, PDO::PARAM_INT);
+
+            // Gắn các giá trị vào statement
+            foreach ($params as $param => $value) {
+                $statement->bindValue($param, $value);
+            }
+
             $statement->execute();
 
             if ($statement->rowCount() > 0) {
