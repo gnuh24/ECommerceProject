@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="stylesheet" href="LoginUI.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -22,14 +20,9 @@
                 <input type="email" placeholder="Email" id="email" name="Email" />
                 <input type="password" placeholder="Mật khẩu" id="matKhau" name="MatKhau" />
                 <input type="password" placeholder="Xác thực mật khẩu" id="xacNhanMatKhau" name="XacThucMatKhau" />
-
-
                 <button type="button" class="btn btn-danger" id="signUpButton">Đăng kí</button>
             </form>
-
         </div>
-
-
 
         <div class="form-container sign-in">
             <form>
@@ -37,6 +30,7 @@
                 <input type="email" placeholder="Tên đăng nhập" id="tenDangNhapLogin" />
                 <input type="password" placeholder="Password" id="passwordLogin" />
                 <button type="button" class="btn btn-danger" id="signInButton">Đăng nhập</button>
+                <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
             </form>
         </div>
         <div class="toggle-container">
@@ -44,24 +38,40 @@
                 <div class="toggle-panel toggle-left">
                     <h1>Welcome Back!</h1>
                     <p>Enter your personal details to use all of site features</p>
-                    <button type="button" class="btn btn-light" id="login">
-                        Đăng nhập
-                    </button>
+                    <button type="button" class="btn btn-light" id="login">Đăng nhập</button>
                 </div>
                 <div class="toggle-panel toggle-right">
                     <h1>Hello, Friend!</h1>
-                    <p>
-                        Register with your personal details to use all of site features
-                    </p>
-                    <button type="button" class="btn btn-light" id="register">
-                        Đăng kí
-                    </button>
+                    <p>Register with your personal details to use all of site features</p>
+                    <button type="button" class="btn btn-light" id="register">Đăng kí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Quên Mật Khẩu -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Quên Mật Khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="email" placeholder="Nhập email của bạn" id="forgotEmail" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="sendEmailButton">Gửi</button>
                 </div>
             </div>
         </div>
     </div>
 </body>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
 
 
@@ -70,6 +80,8 @@
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
     const loginBtn = document.getElementById("login");
+    const forgotPasswordBtn = document.getElementById("forgotPasswordButton");
+    const sendEmailButton = document.getElementById("sendEmailButton");
 
     registerBtn.addEventListener("click", () => {
         container.classList.add("active");
@@ -78,7 +90,12 @@
     loginBtn.addEventListener("click", () => {
         container.classList.remove("active");
     });
+    forgotPasswordBtn.addEventListener("click", (event) => {
+    event.preventDefault(); // Ngăn chặn sự chuyển đổi
+    $('#forgotPasswordModal').modal('show');
+});
 
+   
     const signUpButton = document.getElementById("signUpButton");
 
     signUpButton.addEventListener('click', async function check(event) {
@@ -313,22 +330,12 @@
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result) {
-                            const quyen = response.role;
+                     
 
-                            // sessionStorage.setItem('id', response.id);
-                            // sessionStorage.setItem('token', response.token);
-                            // sessionStorage.setItem('refreshToken', response.refreshToken);
-                            // switch (quyen) {
-                            //     case 'Admin':
-                            //         window.location.href = `../../AdminUI/QLTaiKhoan.php`;
-                            //         break;
-                            //     case 'Manager':
-                            //         window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
-                            //         break;
-                            //     default:
-                            //         window.location.href = `../SignedPage/SignedHomePage.php`;
-                            //         break;
-                            // }
+                           
+                                     window.location.href = `../SignedPage/SignedHomePage.php`;
+                      
+                          
                         }
                     });
                 } else {
@@ -353,6 +360,46 @@
             }
         });
     }
+    sendEmailButton.addEventListener("click", async (event) => {
+    event.preventDefault(); // Ngăn chặn hành động mặc định
+
+    const email = document.getElementById("forgotEmail").value;
+    if (isValidEmail(email)) {
+        // Gửi yêu cầu đến server để reset mật khẩu
+        $.ajax({
+            url: '../../../Controllers/AccountController.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                email: email,
+                action: 'resetPassword'
+            },
+            success: function(response) {
+                Swal.fire({
+                    title: response.message,
+                    icon: response.status === 200 ? 'success' : 'error',
+                    confirmButtonText: 'OK'
+                });
+                $('#forgotPasswordModal').modal('hide');
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Đã xảy ra lỗi khi gửi yêu cầu!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Lỗi!',
+            text: 'Email không hợp lệ!',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+});
 </script>
 
 

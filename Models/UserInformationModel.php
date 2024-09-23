@@ -13,7 +13,7 @@ class UserInformationModel
     // Kiểm tra xem email đã tồn tại hay chưa
     function isEmailExists($email)
     {
-        $query = "SELECT * FROM `user_information` WHERE `email` = :email";
+        $query = "SELECT * FROM `userinformation` WHERE `email` = :email";
 
         try {
             $statement = $this->connection->prepare($query);

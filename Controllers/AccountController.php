@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . "/../Models/AccountModel.php";
 require_once __DIR__ . "/../Models/UserInformationModel.php";
+require_once __DIR__ . '/../Models/TokenModel.php';
+
+require '../vendor/autoload.php'; // Đường dẫn đến autoload.php của Composer
+use PHPMailer\PHPMailer\PHPMailer; // Dùng PHP mailer để gửi mail
+use PHPMailer\PHPMailer\Exception;
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -162,6 +167,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //         'detailMessage' => 'Phương thức không được hỗ trợ'
 //     ]);
 // }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra xem action có phải là loginAdmin không
     if (isset($_POST['action']) && $_POST['action'] === "loginAdmin") {
@@ -203,14 +209,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => 405,
         'message' => 'Phương thức không được hỗ trợ!'
     ]);
+
 }
+// chức năng gửi mail cho mail muốn reset password
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Kiểm tra xem action có phải là resetPassword không
+    if (isset($_POST['action']) && $_POST['action'] === "resetPassword") {
+        $email = $_POST['email'] ?? null;
+
+        if ($email) {
+            $accountController = new AccountController();
+            $response = $accountController->resetPasswordRequest($email);
+
+            // Xử lý phản hồi từ phía controller
+            if ($response->status === 200) {
+                echo json_encode([
+                    'status' => 200,
+                    'message' => "Email khôi phục mật khẩu đã được gửi!"
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => $response->status,
+                    'message' => $response->message
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Vui lòng nhập email!'
+            ]);
+        }
+    }
+} else {
+    echo json_encode([
+        'status' => 405,
+        'message' => 'Phương thức không được hỗ trợ!'
+    ]);
+}
+
+// Xử lý thông tin từ form đổi mật khẩu
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === "setNewPassword") {
+        $email = $_POST['email'] ?? null;
+        $token = $_POST['token'] ?? null;
+        $newPassword = $_POST['new_password'] ?? null;
+        $confirmPassword = $_POST['confirm_password'] ?? null;
+
+        // Kiểm tra dữ liệu
+        if (!$email || !$token || !$newPassword || !$confirmPassword) {
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Vui lòng điền đầy đủ thông tin!'
+            ]);
+            exit;
+        }
+
+        // Kiểm tra xem mật khẩu xác nhận có khớp không
+        if ($newPassword !== $confirmPassword) {
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Mật khẩu xác nhận không khớp.'
+            ]);
+            exit;
+        }
+
+        // Gọi hàm xử lý đặt lại mật khẩu
+        $accountController = new AccountController();
+        $response = $accountController->processNewPassword($email, $token, $newPassword);
+
+        // Trả về phản hồi JSON
+        echo json_encode([
+            'status' => $response->status,
+            'message' => $response->message
+        ]);
+        exit;
+    }
+}
+
+
 class AccountController
 {
     private $accountModel;
+    private $tokenModel;
 
     public function __construct()
     {
         $this->accountModel = new AccountModel();
+        $this->tokenModel = new TokenModel();
     }
 
     // Hàm xử lý đăng nhập Admin
@@ -322,4 +407,137 @@ class AccountController
             "message" => "Tạo tài khoản thất bại !"
         ];
     }
+    public function resetPasswordRequest($email) {
+        if (!$this->isEmailExists($email)) {
+            return (object) [
+                'status' => 404,
+                'message' => 'Email không tồn tại.'
+            ];
+        }
+    
+        // Lấy thông tin tài khoản theo email
+        $accountInfo = $this->accountModel->getAccountByEmail($email);
+        $userId = $accountInfo->data[0]['UserInformationId'];
+    
+        // Xóa tất cả các token cũ liên quan đến email này
+        $this->tokenModel->deleteTokenByEmail($email);
+    
+        // Tạo token mới
+        $token = bin2hex(random_bytes(3)); // Mã 6 ký tự
+        $expiresAt = (new DateTime())->modify('+2 hours')->format('Y-m-d H:i:s');
+    
+        // Lưu token vào database
+        $this->tokenModel->createToken($token, $expiresAt, 'reset_password', $userId);
+    
+        // Gửi email chứa token cho người dùng
+        $this->sendResetEmail($email, $token);
+    
+        return (object) [
+            'status' => 200,
+            'message' => 'Email đã được gửi.'
+        ];
+    }
+    
+    private function sendResetEmail($email, $token) {
+        $mail = new PHPMailer(true);
+        try {
+            // Cấu hình máy chủ
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'automaticemail0204@gmail.com'; // Địa chỉ email
+            $mail->Password = 'lztz vkly edwe sucl'; // Mật khẩu email
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+    
+            // Người gửi và người nhận
+            $mail->setFrom('automaticemail0204@gmail.com', 'Your Name');
+            $mail->addAddress($email);
+    
+            // Nội dung email
+            $mail->isHTML(true);
+            $mail->Subject = 'Khôi phục mật khẩu';
+            
+            // Truyền thêm tham số email vào URL khôi phục mật khẩu
+            $mail->Body = 'Nhấn vào liên kết sau để khôi phục mật khẩu của bạn: <a href="http://localhost/ECommerceProject/Views/MemberUI/Login/ResetPasswordUI.php?token=' . $token . '&email=' . urlencode($email) . '">Khôi phục mật khẩu</a>';
+            
+    
+            // Gửi email
+            $mail->send();
+            return (object) [
+                "status" => 200,
+                "message" => "Email khôi phục mật khẩu đã được gửi!"
+            ];
+        } catch (Exception $e) {
+            return (object) [
+                "status" => 500,
+                "message" => "Không thể gửi email. Lỗi: {$mail->ErrorInfo}"
+            ];
+        }
+    }
+    public function processNewPassword($email, $token, $newPassword)
+    {
+        // Khởi tạo model Account, Token và UserInformation
+        $accountModel = new AccountModel();
+        $tokenModel = new TokenModel();
+        $userInfoModel = new UserInformationModel();
+    
+        // 1. Kiểm tra xem email và token có hợp lệ không
+        $accountResponse = $accountModel->getAccountByEmail($email);
+        $tokenResponse = $tokenModel->getTokenByValue($token);
+    
+        // Kiểm tra xem có tài khoản và token hợp lệ không
+        if ($accountResponse->status === 200 && !empty($accountResponse->data) && 
+            $tokenResponse->status === 200 && !empty($tokenResponse->data)) {
+            
+            $account = $accountResponse->data[0];
+            $tokenData = $tokenResponse->data;
+    
+            // Kiểm tra xem token có hết hạn không
+            $currentDate = new DateTime();
+            $expirationDate = new DateTime($tokenData['Expiration']);
+            if ($currentDate > $expirationDate) {
+                return (object)[
+                    'status' => 400,
+                    'message' => 'Token đã hết hạn.'
+                ];
+            }
+    
+            // 2. Kiểm tra xem email có tồn tại trong bảng user_information không
+            $userInfoResponse = $userInfoModel->isEmailExists($email);
+            if (!$userInfoResponse->isExists) {
+                return (object)[
+                    'status' => 400,
+                    'message' => 'Email không tồn tại trong hệ thống.'
+                ];
+            }
+    
+            // 3. Cập nhật mật khẩu mới trong CSDL
+            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status'], $account['Active']);
+    
+            if ($updateResponse->status === 200) {
+                // 4. Xoá token sau khi đã sử dụng
+                $tokenModel->deleteTokenByEmail($email);
+    
+                // Phản hồi thành công
+                return (object)[
+                    'status' => 200,
+                    'message' => 'Mật khẩu của bạn đã được cập nhật thành công!'
+                ];
+            } else {
+                return (object)[
+                    'status' => 500,
+                    'message' => 'Có lỗi xảy ra khi cập nhật mật khẩu. Vui lòng thử lại sau.'
+                ];
+            }
+        } else {
+            return (object)[
+                'status' => 400,
+                'message' => 'Token không hợp lệ hoặc đã hết hạn.'
+            ];
+        }
+    }
+    
+
+    
 }
