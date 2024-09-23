@@ -287,6 +287,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Kiểm tra nếu action là "getAccountById"
+    if (isset($_GET['action']) && $_GET['action'] === 'getAccountById') {
+        // Lấy ID từ tham số GET
+        $userInformationId = $_GET['userInformationId'] ?? null;
+
+        // Kiểm tra ID có tồn tại không
+        if ($userInformationId) {
+            // Khởi tạo controller
+            $accountController = new AccountController();
+
+            // Gọi hàm getAccountById từ controller
+            $response = $accountController->getAccountById($userInformationId);
+
+            // Trả về phản hồi
+            echo $response;
+        } else {
+            // Trả về lỗi nếu không có ID
+            echo json_encode([
+                'status' => 400,
+                'message' => 'Không tìm thấy tham số ID!'
+            ]);
+        }
+    } else {
+        // Trả về lỗi nếu không có action phù hợp
+        echo json_encode([
+            'status' => 400,
+            'message' => 'Không tìm thấy tham số action!'
+        ]);
+    }
+}
+
+
 class AccountController
 {
     private $accountModel;
@@ -538,6 +571,27 @@ class AccountController
         }
     }
     
+// Hàm lấy tất cả tài khoản
+public function getAccountById($userInformationId, $page, $search, $role, $status)
+    {
+        // Gọi hàm getAccountById từ model
+        $response = $this->accountModel->getAccountById($userInformationId, $page, $search, $role, $status);
 
+        // Kiểm tra kết quả trả về từ model và chuẩn bị phản hồi
+        if ($response->status === 200) {
+            // Nếu thành công, trả về kết quả dưới dạng JSON
+            return json_encode([
+                'status' => 200,
+                'message' => 'Lấy thông tin tài khoản thành công!',
+                'data' => $response->data
+            ]);
+        } else {
+            // Nếu có lỗi, trả về lỗi
+            return json_encode([
+                'status' => 400,
+                'message' => 'Không thể lấy thông tin tài khoản!'
+            ]);
+        }
+    }
     
 }

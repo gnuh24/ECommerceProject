@@ -39,21 +39,68 @@ class AccountModel
         }
     }
 
+
+
     // Lấy thông tin tài khoản theo ID
-    function getAccountById($id)
+    function getAccountById($userInformationId, $page, $search, $role, $status)
     {
-        $query = "SELECT * FROM `account` WHERE `Id` = :id";
+        $query = "SELECT * FROM `account` WHERE `UserInformationId` = :userInformationId";
+
+        //Mảng chứa điều kiện
+        $where_conditions=[];
+
+        //Số phần tử mỗi trang
+        $entityPerPage = 10;
+
+        //Tổng số trang
+        $totalPages = null;
+
+        if (!empty($search)) {
+            $empty = false;
+            $where_conditions[] .= "(`TenDangNhap`  LIKE '%" . $search . "%' OR `Email`         LIKE '%" . $search . "%')";
+        }
+
+        if (!empty($role)) {
+            $where_conditions[] = "`Quyen` = '$quyen' ";
+        }
+
+        if (!empty($status)) {
+            $where_conditions[] = "`TrangThai` = $trangThai";
+        }
+
+        if (!empty($where_conditions)) {
+            $query .= " WHERE " . implode(" AND ", $where_conditions);
+        }
+
+        if ($totalPages === null) {
+            //fetchColumn ( <Cột thứ n> ) : Lấy row đầu tiên của cột thứ n - 1
+            $query_total_row = substr_replace($query, "COUNT(*)", 7, 1);
+
+            // Chạy lệnh Query để lấy ra tổng trang
+            $statement_total_row = $connection->prepare($query_total_row);
+            $statement_total_row->execute();
+    
+            //Làm tròn lên -> Tính ra tổng số trang
+            $totalPages = ceil($statement_total_row->fetchColumn() / $entityPerPage);
+        }
+
+        $current_page = isset($page) ? $page : 1;
+        $start_from = ($current_page - 1) * $entityPerPage;
+    
+        $query .= " LIMIT $entityPerPage OFFSET $start_from";
 
         try {
             $statement = $this->connection->prepare($query);
             if ($statement !== false) {
-                $statement->bindValue(':id', $id, PDO::PARAM_INT);
+                $statement->bindValue(':userInformationId', $userInformationId, PDO::PARAM_INT);
                 $statement->execute();
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $isExists = !empty($result);
                 return (object) [
                     "status" => 200,
-                    "message" => "Thành công",
+                    "message" => "Truy vấn thành công",
                     "data" => $result,
+                    "isExists" => $isExists
                 ];
             } else {
                 throw new PDOException();
@@ -61,7 +108,8 @@ class AccountModel
         } catch (PDOException $e) {
             return (object) [
                 "status" => 400,
-                "message" => "Không thể lấy thông tin tài khoản",
+                "message" => "Truy vấn cơ sở dữ liệu thất bại",
+                "isExists" => false
             ];
         }
     }
