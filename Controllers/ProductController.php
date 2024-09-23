@@ -63,12 +63,6 @@ class ProductController
         $this->sendResponse($response);
     }
 
-    // Xóa sản phẩm theo ID
-    public function deleteProduct($id)
-    {
-        $response = $this->productModel->deleteProduct($id);
-        $this->sendResponse($response);
-    }
 
     // Gửi phản hồi JSON
     private function sendResponse($response)
