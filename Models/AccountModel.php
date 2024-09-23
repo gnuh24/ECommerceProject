@@ -61,11 +61,11 @@ class AccountModel
         }
 
         if (!empty($role)) {
-            $where_conditions[] = "`Quyen` = '$quyen' ";
+            $where_conditions[] = "`role` = '$role' ";
         }
 
         if (!empty($status)) {
-            $where_conditions[] = "`TrangThai` = $trangThai";
+            $where_conditions[] = "`status` = $status";
         }
 
         if (!empty($where_conditions)) {
