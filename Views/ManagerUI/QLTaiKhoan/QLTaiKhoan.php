@@ -98,7 +98,7 @@
     }
 
     // Hàm getAllTaiKhoan
-    function getAllTaiKhoan(page, search) {
+    function getAllTaiKhoan(page, search, status) {
         var token = sessionStorage.getItem('token');
         $.ajax({
             url: '../../../Controllers/AccountController.php',
@@ -110,7 +110,8 @@
       },
             data: {
                 page: page,
-                search: search
+                search: search,
+                status: status
             },
             success: function(response) {
 
