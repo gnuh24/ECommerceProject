@@ -198,7 +198,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-                // Cập nhật trạng thái tài khoản
+            // Cập nhật trạng thái tài khoản
             case 'updateAccount':
                 $Id = $_POST['Id'] ?? null;
                 $Status = $_POST['Status'] ?? null;
@@ -306,12 +306,6 @@ class AccountController
                     ];
                 }
 
-                if ($account['Active'] === 0) {
-                    return (object)[
-                        "status" => 403,
-                        "message" => "Tài khoản chưa được kích hoạt. Kiểm tra email của bạn: " . $account['Email']
-                    ];
-                }
 
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
