@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'id' => $response->data['Id'],
                         'role' => $response->data['Role'],
                         'email' => $response->data['Email'],
-                        'token' => 'dummyToken', 
+                        'token' => 'dummyToken',
                         'refreshToken' => 'dummyRefreshToken'
                     ]
                 ]);
