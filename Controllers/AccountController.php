@@ -511,8 +511,8 @@ class AccountController
             return json_encode([
                 'status' => 400,
                 'message' => 'Không thể lấy thông tin tài khoản!',
-                "tmp" => $response->message,
-                ]);
+                
+            ]);
         }
     }
 

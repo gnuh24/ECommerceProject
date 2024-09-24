@@ -157,9 +157,11 @@ class AccountModel
     
     
     
+    
+    
 
-    
-    
+
+
 
     // Kiểm tra xem email đã tồn tại hay chưa
     function isEmailExists($email)
@@ -243,12 +245,11 @@ class AccountModel
     }
 
     // Cập nhật thông tin tài khoản
-    function updateAccount($id, $password, $status, $active)
+    function updateAccount($id, $password, $status)
     {
         $query = "UPDATE `account` SET 
                     `Password` = :password,
-                    `Status` = :status,
-                    `Active` = :active
+                    `Status` = :status
                   WHERE `Id` = :id";
 
         try {
@@ -257,7 +258,6 @@ class AccountModel
                 $statement->bindValue(':id', $id, PDO::PARAM_INT);
                 $statement->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
                 $statement->bindValue(':status', $status, PDO::PARAM_BOOL);
-                $statement->bindValue(':active', $active, PDO::PARAM_BOOL);
                 $statement->execute();
 
                 if ($statement->rowCount() > 0) {
