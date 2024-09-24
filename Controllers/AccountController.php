@@ -8,316 +8,221 @@ use PHPMailer\PHPMailer\PHPMailer; // Dùng PHP mailer để gửi mail
 use PHPMailer\PHPMailer\Exception;
 
 
+// Xử lý yêu cầu GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Login User
-    if (isset($_GET['action']) && $_GET['action'] === "isThisEmailExists") {
-        // Lấy dữ liệu từ form
-        $email = $_GET['email'] ?? null;
 
-        // Kiểm tra dữ liệu hợp lệ
-        if ($email) {
-            $accountController = new AccountController();
+    // Kiểm tra action
+    if (isset($_GET['action'])) {
+        switch ($_GET['action']) {
 
-            // Gọi hàm login trong AccountController với email và password
-            $response = $accountController->isEmailExists($email);
+                // Kiểm tra email tồn tại
+            case 'isThisEmailExists':
+                $email = $_GET['email'] ?? null;
+                if ($email) {
+                    $accountController = new AccountController();
+                    $response = $accountController->isEmailExists($email);
+                    echo json_encode([
+                        'status' => 200,
+                        'message' => "Kiểm tra thành công!",
+                        'data' => [
+                            'isExists' => $response,
+                        ]
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Email không được cung cấp!'
+                    ]);
+                }
+                break;
 
-            // Trả về kết quả cho client (JavaScript)
-            echo json_encode([
-                'status' => 200,
-                'message' => "Kiểm tra thành công !",
-                'data' => [
-                    'isExists' => $response,
-                ]
-            ]);
+                // Lấy tài khoản theo ID
+            case 'getAccountById':
+                $userInformationId = $_GET['UserInformationId'] ?? null;
+                if ($userInformationId) {
+                    $accountController = new AccountController();
+                    $response = $this->accountController->getAccountById($userInformationId);
+                    echo json_encode($response);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Không tìm thấy tham số ID!'
+                    ]);
+                }
+                break;
+
+            default:
+                echo json_encode([
+                    'status' => 400,
+                    'message' => 'Không tìm thấy tham số action!'
+                ]);
+                break;
         }
     } else {
-        // Trả về lỗi khi không có email hoặc mật khẩu
         echo json_encode([
             'status' => 400,
-            'message' => 'Không tìm thấy tham số `action` !'
+            'message' => 'Không tìm thấy action!'
         ]);
     }
 }
 
-// Kiểm tra yêu cầu POST
+// Xử lý yêu cầu POST
 else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Login User
-    if (isset($_POST['action']) && $_POST['action'] === "loginUser") {
-        // Lấy dữ liệu từ form
-        $email = $_POST['email'] ?? null;
-        $password = $_POST['password'] ?? null;
+    // Kiểm tra action
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
 
-        // Kiểm tra dữ liệu hợp lệ
-        if ($email && $password) {
-            $accountController = new AccountController();
+                // Đăng nhập người dùng
+            case 'loginUser':
+                $email = $_POST['email'] ?? null;
+                $password = $_POST['password'] ?? null;
+                if ($email && $password) {
+                    $accountController = new AccountController();
+                    $response = $accountController->LoginUser($email, $password);
+                    if ($response->status === 200) {
+                        echo json_encode([
+                            'status' => 200,
+                            'message' => $response->message,
+                            'data' => [
+                                'id' => $response->data['Id'],
+                                'role' => $response->data['Role'],
+                                'email' => $response->data['Email'],
+                                'token' => 'dummyToken',
+                                'refreshToken' => 'dummyRefreshToken'
+                            ]
+                        ]);
+                    } else {
+                        echo json_encode([
+                            'status' => $response->status,
+                            'message' => $response->message
+                        ]);
+                    }
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng nhập email và mật khẩu!'
+                    ]);
+                }
+                break;
 
-            // Gọi hàm login trong AccountController với email và password
-            $response = $accountController->LoginUser($email, $password);
+                // Đăng ký tài khoản
+            case 'registration':
+                $email = $_POST['email'] ?? null;
+                $password = $_POST['password'] ?? null;
+                if ($email && $password) {
+                    $accountController = new AccountController();
+                    $response = $accountController->registration($email, $password);
+                    echo json_encode([
+                        'status' => $response->status,
+                        'message' => $response->message
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng nhập email và mật khẩu!'
+                    ]);
+                }
+                break;
 
-            // Trả về kết quả cho client (JavaScript)
-            if ($response->status === 200) {
+                // Đăng nhập admin
+            case 'loginAdmin':
+                $email = $_POST['email'] ?? null;
+                $password = $_POST['password'] ?? null;
+                if ($email && $password) {
+                    $accountController = new AccountController();
+                    $response = $accountController->LoginAdmin($email, $password);
+                    if ($response->status === 200) {
+                        echo json_encode([
+                            'status' => 200,
+                            'message' => "Đăng nhập thành công!",
+                            'data' => [
+                                'id' => $response->data['Id'],
+                                'role' => $response->data['Role'],
+                                'email' => $response->data['Email'],
+                                'token' => 'dummyToken',
+                                'refreshToken' => 'dummyRefreshToken'
+                            ]
+                        ]);
+                    } else {
+                        echo json_encode([
+                            'status' => $response->status,
+                            'message' => $response->message
+                        ]);
+                    }
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng nhập email và mật khẩu!'
+                    ]);
+                }
+                break;
+
+                // Gửi yêu cầu đặt lại mật khẩu
+            case 'resetPassword':
+                $email = $_POST['email'] ?? null;
+                if ($email) {
+                    $accountController = new AccountController();
+                    $response = $accountController->resetPasswordRequest($email);
+                    echo json_encode([
+                        'status' => $response->status,
+                        'message' => $response->message
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng nhập email!'
+                    ]);
+                }
+                break;
+
+                // Đặt lại mật khẩu mới
+            case 'setNewPassword':
+                $email = $_POST['email'] ?? null;
+                $token = $_POST['token'] ?? null;
+                $newPassword = $_POST['new_password'] ?? null;
+                $confirmPassword = $_POST['confirm_password'] ?? null;
+                if ($email && $token && $newPassword && $confirmPassword) {
+                    if ($newPassword === $confirmPassword) {
+                        $accountController = new AccountController();
+                        $response = $accountController->processNewPassword($email, $token, $newPassword);
+                        echo json_encode([
+                            'status' => $response->status,
+                            'message' => $response->message
+                        ]);
+                    } else {
+                        echo json_encode([
+                            'status' => 400,
+                            'message' => 'Mật khẩu xác nhận không khớp.'
+                        ]);
+                    }
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng điền đầy đủ thông tin!'
+                    ]);
+                }
+                break;
+
+            default:
                 echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message,
-                    'data' => [
-                        'id' => $response->data['Id'],
-                        'role' => $response->data['Role'],
-                        'email' => $response->data['Email'],
-                        'token' => 'dummyToken', // You can generate a real token here
-                        'refreshToken' => 'dummyRefreshToken'
-                    ]
+                    'status' => 400,
+                    'message' => 'Không tìm thấy tham số action!'
                 ]);
-            } else {
-                echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message
-                ]);
-            }
-        } else {
-            // Trả về lỗi khi không có email hoặc mật khẩu
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng nhập email và mật khẩu!'
-            ]);
+                break;
         }
-    }
-
-
-    // Login User
-    if (isset($_POST['action']) && $_POST['action'] === "registration") {
-        // Lấy dữ liệu từ form
-        $email = $_POST['email'] ?? null;
-        $password = $_POST['password'] ?? null;
-
-        // Kiểm tra dữ liệu hợp lệ
-        if ($email && $password) {
-            $accountController = new AccountController();
-
-            // Gọi hàm login trong AccountController với email và password
-            $response = $accountController->registration($email, $password);
-
-            // Trả về kết quả cho client (JavaScript)
-            if ($response->status === 201) {
-                echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message
-
-                    // 'data' => [
-                    //     'id' => $response->data['Id'],
-                    //     'role' => $response->data['Role'],
-                    //     'email' => $response->data['Email'],
-                    //     'token' => 'dummyToken', // You can generate a real token here
-                    //     'refreshToken' => 'dummyRefreshToken'
-                    // ]
-                ]);
-            } else {
-                echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message
-                ]);
-            }
-        } else {
-            // Trả về lỗi khi không có email hoặc mật khẩu
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng nhập email và mật khẩu!'
-            ]);
-        }
-    }
-}
-
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//     // Lấy dữ liệu từ form
-//     $email = $_POST['email'] ?? null;
-//     $password = $_POST['password'] ?? null;
-
-//     // Kiểm tra dữ liệu hợp lệ
-//     if ($email && $password) {
-//         $accountController = new AccountController();
-
-//         // Gọi hàm login trong AccountController với email và password
-//         $response = $accountController->LoginAdmin($email, $password);
-
-//         // Trả về kết quả cho client (JavaScript)
-//         if ($response->status === 200) {
-//             echo json_encode([
-//                 'id' => $response->data['Id'],
-//                 'token' => 'dummyToken', // Bạn có thể sinh ra token tại đây
-//                 'refreshToken' => 'dummyRefreshToken'
-//             ]);
-//         } else {
-//             echo json_encode([
-//                 'code' => 8,
-//                 'detailMessage' => $response->message
-//             ]);
-//         }
-//     } else {
-//         // Trả về lỗi khi không có email hoặc mật khẩu
-//         echo json_encode([
-//             'code' => 8,
-//             'detailMessage' => 'Vui lòng nhập email và mật khẩu!'
-//         ]);
-//     }
-// } else {
-//     // Nếu không phải yêu cầu POST, trả về mã lỗi
-//     http_response_code(405);
-//     echo json_encode([
-//         'code' => 405,
-//         'detailMessage' => 'Phương thức không được hỗ trợ'
-//     ]);
-// }
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Kiểm tra xem action có phải là loginAdmin không
-    if (isset($_POST['action']) && $_POST['action'] === "loginAdmin") {
-        $email = $_POST['email'] ?? null;
-        $password = $_POST['password'] ?? null;
-
-        if ($email && $password) {
-            $accountController = new AccountController();
-            $response = $accountController->LoginAdmin($email, $password);
-
-            // Xử lý phản hồi từ phía controller
-            if ($response->status === 200) {
-                echo json_encode([
-                    'status' => 200,
-                    'message' => "Đăng nhập thành công!",
-                    'data' => [
-                        'id' => $response->data['Id'],
-                        'role' => $response->data['Role'],
-                        'email' => $response->data['Email'],
-                        'token' => 'dummyToken',
-                        'refreshToken' => 'dummyRefreshToken'
-                    ]
-                ]);
-            } else {
-                echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message
-                ]);
-            }
-        } else {
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng nhập email và mật khẩu!'
-            ]);
-        }
-    }
-} else {
-    echo json_encode([
-        'status' => 405,
-        'message' => 'Phương thức không được hỗ trợ!'
-    ]);
-}
-
-// chức năng gửi mail cho mail muốn reset password
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Kiểm tra xem action có phải là resetPassword không
-    if (isset($_POST['action']) && $_POST['action'] === "resetPassword") {
-        $email = $_POST['email'] ?? null;
-
-        if ($email) {
-            $accountController = new AccountController();
-            $response = $accountController->resetPasswordRequest($email);
-
-            // Xử lý phản hồi từ phía controller
-            if ($response->status === 200) {
-                echo json_encode([
-                    'status' => 200,
-                    'message' => "Email khôi phục mật khẩu đã được gửi!"
-                ]);
-            } else {
-                echo json_encode([
-                    'status' => $response->status,
-                    'message' => $response->message
-                ]);
-            }
-        } else {
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng nhập email!'
-            ]);
-        }
-    }
-} else {
-    echo json_encode([
-        'status' => 405,
-        'message' => 'Phương thức không được hỗ trợ!'
-    ]);
-}
-
-// Xử lý thông tin từ form đổi mật khẩu
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === "setNewPassword") {
-        $email = $_POST['email'] ?? null;
-        $token = $_POST['token'] ?? null;
-        $newPassword = $_POST['new_password'] ?? null;
-        $confirmPassword = $_POST['confirm_password'] ?? null;
-
-        // Kiểm tra dữ liệu
-        if (!$email || !$token || !$newPassword || !$confirmPassword) {
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng điền đầy đủ thông tin!'
-            ]);
-            exit;
-        }
-
-        // Kiểm tra xem mật khẩu xác nhận có khớp không
-        if ($newPassword !== $confirmPassword) {
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Mật khẩu xác nhận không khớp.'
-            ]);
-            exit;
-        }
-
-        // Gọi hàm xử lý đặt lại mật khẩu
-        $accountController = new AccountController();
-        $response = $accountController->processNewPassword($email, $token, $newPassword);
-
-        // Trả về phản hồi JSON
+    } else {
         echo json_encode([
-            'status' => $response->status,
-            'message' => $response->message
+            'status' => 400,
+            'message' => 'Không tìm thấy action!'
         ]);
-        exit;
     }
+} else {
+    echo json_encode([
+        'status' => 405,
+        'message' => 'Phương thức không được hỗ trợ!'
+    ]);
 }
-
-
-// if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-//     // Kiểm tra nếu action là "getAccountById"
-//     if (isset($_GET['action']) && $_GET['action'] === 'getAccountById') {
-//         // Lấy ID từ tham số GET
-//         $userInformationId = $_GET['userInformationId'] ?? null;
-
-//         // Kiểm tra ID có tồn tại không
-//         if ($userInformationId) {
-//             // Khởi tạo controller
-//             $accountController = new AccountController();
-
-//             // Gọi hàm getAccountById từ controller
-//             $response = $accountController->getAccountById($userInformationId);
-
-//             // Trả về phản hồi
-//             echo $response;
-//         } else {
-//             // Trả về lỗi nếu không có ID
-//             echo json_encode([
-//                 'status' => 400,
-//                 'message' => 'Không tìm thấy tham số ID!'
-//             ]);
-//         }
-//     } else {
-//         // Trả về lỗi nếu không có action phù hợp
-//         echo json_encode([
-//             'status' => 400,
-//             'message' => 'Không tìm thấy tham số action!'
-//         ]);
-//     }
-// }
 
 
 class AccountController
@@ -400,8 +305,8 @@ class AccountController
 
         // Nếu không tìm thấy tài khoản hoặc mật khẩu không khớp
         return (object)[
-            "status" => 404,
-            "message" => "Không tìm thấy tài khoản"
+            "status" => 401,
+            "message" => "Đăng nhập thất bại !!"
         ];
     }
 
@@ -586,7 +491,7 @@ class AccountController
             // Nếu có lỗi, trả về lỗi
             return json_encode([
                 'status' => 400,
-                'message' => 'Không thể lấy thông tin tài khoản!'
+                'message' => 'Không thể lấy thông tin tài khoản!',
             ]);
         }
     }

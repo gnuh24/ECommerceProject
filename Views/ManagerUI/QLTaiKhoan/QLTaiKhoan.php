@@ -98,7 +98,7 @@
     }
 
     // Hàm getAllTaiKhoan
-    function getAllTaiKhoan(page, search, status) {
+    function getAllTaiKhoan(UserInformationId, filter, page, search, status) {
         var token = sessionStorage.getItem('token');
         $.ajax({
             url: '../../../Controllers/AccountController.php',
@@ -109,9 +109,12 @@
         'Authorization': 'Bearer ' + token
       },
             data: {
+                UserInformationId: UserInformationId,
+                filter: filter,
                 page: page,
                 search: search,
-                status: status
+                action: 'getAccountById',
+                status: status,
             },
             success: function(response) {
 
@@ -132,7 +135,7 @@
                         var trContent = `
                         <form id="updateForm" method="post" action="FormUpdateTaiKhoan.php">
                             <tr style="height: 20%"; max-height: 20%;>
-                                <td class="${trClass}" style="width: 130px;">${record.id}</td>
+                                <td class="${trClass}" style="width: 130px;">${record.Id}</td>
                                 <td class="${trClass}">${record.email}</td>
                                 <td class="${trClass}">${record.createTime}</td>
                                 <td class="${trClass}">${record.status === false ? "Khóa" : "Hoạt động"}</td>

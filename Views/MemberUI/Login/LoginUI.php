@@ -192,35 +192,35 @@
         }
 
 
-        // $.ajax({
-        //     url: '../../../Controllers/AccountController.php',
-        //     type: 'POST',
-        //     dataType: 'json',
+        $.ajax({
+            url: '../../../Controllers/AccountController.php',
+            type: 'POST',
+            dataType: 'json',
 
-        //     data: {
-        //         "email": email.value,
-        //         "password": matKhau.value,
-        //         "action": "registration"
-        //     },
-        //     success: function(response) {
-        //         // Kiểm tra xem phản hồi có thành công hay không
-        //         Swal.fire({
-        //             title: response.message,
-        //             text: "Đăng ký thành công !",
-        //             icon: 'success',
-        //             confirmButtonText: 'OK'
-        //         });
-        //     },
-        //     error: function(xhr, status, error) {
+            data: {
+                "email": email.value,
+                "password": matKhau.value,
+                "action": "registration"
+            },
+            success: function(response) {
+                // Kiểm tra xem phản hồi có thành công hay không
+                Swal.fire({
+                    title: response.message,
+                    text: "Đăng ký thành công !",
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            },
+            error: function(xhr, status, error) {
 
-        //         Swal.fire({
-        //             title: 'Lỗi!',
-        //             text: 'Đã xảy ra lỗi khi đăng kí tài khoản!',
-        //             icon: 'error',
-        //             confirmButtonText: 'OK'
-        //         });
-        //     }
-        // });
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Đã xảy ra lỗi khi đăng kí tài khoản!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
 
 
     });
