@@ -83,7 +83,7 @@
         if (logoutButton) {
             logoutButton.addEventListener('click', function() {
                 sessionStorage.removeItem('key');
-                window.location.href = '../../FrontEnd/MemberUI/Login/LoginUI.php';
+                window.location.href = '../../MemberUI/Login/AdminLoginUI.php';
             });
         }
 
@@ -98,19 +98,20 @@
     }
 
     // Hàm getAllTaiKhoan
-    function getAllTaiKhoan(page, search, quyen) {
+    function getAllTaiKhoan(page, search, status) {
+        var token = sessionStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/Account',
+            url: '../../../Controllers/AccountController.php',
             type: 'GET',
             dataType: "json",
             headers: {
-                // Thêm JWT Token vào Authorization header
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
+        // Thêm JWT vào header
+        'Authorization': 'Bearer ' + token
+      },
             data: {
-                pageNumber: page,
+                page: page,
                 search: search,
-                status: quyen
+                status: status
             },
             success: function(response) {
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../Configure/MysqlConfig.php';
+require_once __DIR__ . "/../Configure/MysqlConfig.php";
 
 class TokenModel
 {
@@ -54,7 +54,7 @@ class TokenModel
                 $id = $this->connection->lastInsertId();
                 return (object) [
                     "status" => 201,
-                    "message" => "Tạo token xác thực thành công !",
+                    "message" => "Token created successfully",
                     "data" => $id
                 ];
             } else {
@@ -152,4 +152,47 @@ class TokenModel
             ];
         }
     }
+    // Xóa tất cả token theo email
+function deleteTokenByEmail($email)
+{
+    // Đầu tiên, cần lấy AccountId từ email
+    $accountQuery = "SELECT Id FROM `account` a
+                     JOIN `UserInformation` u ON a.UserInformationId = u.Id
+                     WHERE u.Email = :email";
+    
+    try {
+        $statement = $this->connection->prepare($accountQuery);
+        if ($statement !== false) {
+            $statement->bindValue(':email', $email, PDO::PARAM_STR);
+            $statement->execute();
+            $accountResult = $statement->fetch(PDO::FETCH_ASSOC);
+            
+            if ($accountResult) {
+                $accountId = $accountResult['Id'];
+
+                // Sau khi lấy được AccountId, tiến hành xóa token
+                $deleteQuery = "DELETE FROM `token` WHERE `AccountId` = :accountId";
+                $deleteStatement = $this->connection->prepare($deleteQuery);
+                $deleteStatement->bindValue(':accountId', $accountId, PDO::PARAM_INT);
+                $deleteStatement->execute();
+
+                return (object) [
+                    "status" => 200,
+                    "message" => "Các token đã được xóa thành công"
+                ];
+            } else {
+                return (object) [
+                    "status" => 404,
+                    "message" => "Không tìm thấy tài khoản với email này"
+                ];
+            }
+        }
+    } catch (PDOException $e) {
+        return (object) [
+            "status" => 400,
+            "message" => $e->getMessage()
+        ];
+    }
+}
+
 }
