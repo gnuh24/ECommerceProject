@@ -524,5 +524,41 @@ class AccountController
         }
     }
 
+    // Hàm cập nhật tài khoản
+    public function updateAccount()
+    {
+        // Nhận các tham số từ POST
+        $id = $_POST['Id'] ?? null;
+        $password = $_POST['Password'] ?? null;
+        $status = $_POST['Status'] ?? null;
+
+        // Kiểm tra xem các tham số có đầy đủ không
+        if (!$id || !$status) {
+            return json_encode([
+                'status' => 400,
+                'message' => 'ID hoặc trạng thái không được cung cấp!'
+            ]);
+        }
+
+        // Gọi hàm updateAccount từ model với các tham số đã lấy được
+        $response = $this->accountModel->updateAccount($id, $password, $status);
+
+        // Kiểm tra kết quả trả về từ model
+        if ($response && $response->status === 200) {
+            // Nếu thành công, trả về kết quả dưới dạng JSON
+            return json_encode([
+                'status' => 200,
+                'message' => 'Cập nhật tài khoản thành công!',
+                'data' => $response->data
+            ]);
+        } else {
+            // Nếu có lỗi, trả về lỗi
+            return json_encode([
+                'status' => 400,
+                'message' => 'Không thể cập nhật tài khoản!'
+            ]);
+        }
+    }
+
     
 }
