@@ -39,16 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // Lấy tài khoản theo ID
             case 'getAccountById':
                 $userInformationId = $_GET['UserInformationId'] ?? null;
-                if ($userInformationId) {
                     $accountController = new AccountController();
                     $response = $accountController->getAccountById($userInformationId);
-                    echo json_encode($response);
-                } else {
-                    echo json_encode([
-                        'status' => 400,
-                        'message' => 'Không tìm thấy tham số ID!'
-                    ]);
-                }
+                    echo $response;
+              
                 break;
             
             default:
@@ -200,6 +194,26 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode([
                         'status' => 400,
                         'message' => 'Vui lòng điền đầy đủ thông tin!'
+                    ]);
+                }
+                break;
+
+                // Cập nhật trạng thái tài khoản
+            case 'updateAccount':
+                $Id = $_POST['Id'] ?? null;
+                $Status = $_POST['Status'] ?? null;
+
+                if ($Id && $Status !== null) {
+                    $accountController = new AccountController();
+                    $response = $accountController->updateAccountStatus($Id, $Status);
+                    echo json_encode([
+                        'status' => $response->status,
+                        'message' => $response->message
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Vui lòng cung cấp ID và trạng thái!'
                     ]);
                 }
                 break;

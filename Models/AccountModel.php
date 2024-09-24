@@ -42,16 +42,26 @@ class AccountModel
 
 
     // Lấy thông tin tài khoản theo ID
-    public function getAccountById($userInformationId, $filters = [], $page = 1, $search = '', $role = '', $status = '')
+    public function getAccountById($userInformationId = null, $filters = [], $page = 1, $search = '', $role = '', $status = '')
     {
         // Đảm bảo rằng $page không phải là null và phải là số nguyên dương
         $current_page = isset($page) && $page > 0 ? (int)$page : 1;
         
-        // Khởi tạo câu truy vấn cơ bản
-        $query = "SELECT * FROM `account` WHERE `UserInformationId` = :userInformationId";
+        // Khởi tạo câu truy vấn cơ bản với JOIN bảng UserInformation
+        $query = "SELECT a.*, ui.Email, ui.Address, ui.Birthday, ui.Fullname, ui.Gender, ui.PhoneNumber 
+                  FROM `account` a
+                  JOIN `UserInformation` ui ON a.UserInformationId = ui.Id";
+        
+        // Nếu có $userInformationId, thêm điều kiện WHERE
+        if ($userInformationId !== null) {
+            $query .= " WHERE a.UserInformationId = :userInformationId";
+        }
         
         // Mảng chứa điều kiện
-        $where_conditions = [':userInformationId' => $userInformationId];
+        $where_conditions = [];
+        if ($userInformationId !== null) {
+            $where_conditions[':userInformationId'] = $userInformationId;
+        }
         
         // Số phần tử mỗi trang
         $entityPerPage = 10;
@@ -61,49 +71,56 @@ class AccountModel
         
         // Thêm điều kiện tìm kiếm (username hoặc email)
         if (!empty($search)) {
-            $query .= " AND (`username` LIKE :search OR `email` LIKE :search)";
+            $query .= ($userInformationId !== null ? " AND" : " WHERE") . " (a.`username` LIKE :search OR ui.`Email` LIKE :search)";
             $where_conditions[':search'] = '%' . $search . '%';
         }
         
         // Thêm các điều kiện lọc
         if (!empty($filters)) {
             foreach ($filters as $key => $value) {
-                $query .= " AND `$key` = :$key";
+                $query .= ($userInformationId !== null || !empty($search) ? " AND" : " WHERE") . " a.`$key` = :$key";
                 $where_conditions[":$key"] = $value;
             }
         }
         
         // Thêm điều kiện lọc theo role
         if (!empty($role)) {
-            $query .= " AND `role` = :role";
+            $query .= ($userInformationId !== null || !empty($search) || !empty($filters) ? " AND" : " WHERE") . " a.`role` = :role";
             $where_conditions[':role'] = $role;
         }
         
         // Thêm điều kiện lọc theo status
         if (!empty($status)) {
-            $query .= " AND `status` = :status";
+            $query .= ($userInformationId !== null || !empty($search) || !empty($filters) || !empty($role) ? " AND" : " WHERE") . " a.`status` = :status";
             $where_conditions[':status'] = $status;
         }
         
         // Tính tổng số trang
         if ($totalPages === null) {
             // Câu truy vấn để đếm tổng số hàng
-            $query_total_row = "SELECT COUNT(*) FROM `account` WHERE `UserInformationId` = :userInformationId";
+            $query_total_row = "SELECT COUNT(*) 
+                                FROM `account` a
+                                JOIN `UserInformation` ui ON a.UserInformationId = ui.Id";
+            
+            // Nếu có $userInformationId, thêm điều kiện WHERE
+            if ($userInformationId !== null) {
+                $query_total_row .= " WHERE a.UserInformationId = :userInformationId";
+            }
             
             // Thêm các điều kiện khác vào câu truy vấn đếm
             if (!empty($search)) {
-                $query_total_row .= " AND (`username` LIKE :search OR `email` LIKE :search)";
+                $query_total_row .= ($userInformationId !== null ? " AND" : " WHERE") . " (a.`username` LIKE :search OR ui.`Email` LIKE :search)";
             }
             if (!empty($filters)) {
                 foreach ($filters as $key => $value) {
-                    $query_total_row .= " AND `$key` = :$key";
+                    $query_total_row .= ($userInformationId !== null || !empty($search) ? " AND" : " WHERE") . " a.`$key` = :$key";
                 }
             }
             if (!empty($role)) {
-                $query_total_row .= " AND `role` = :role";
+                $query_total_row .= ($userInformationId !== null || !empty($search) || !empty($filters) ? " AND" : " WHERE") . " a.`role` = :role";
             }
             if (!empty($status)) {
-                $query_total_row .= " AND `status` = :status";
+                $query_total_row .= ($userInformationId !== null || !empty($search) || !empty($filters) || !empty($role) ? " AND" : " WHERE") . " a.`status` = :status";
             }
             
             // Chạy truy vấn đếm
@@ -153,6 +170,7 @@ class AccountModel
             ];
         }
     }
+    
     
     
     

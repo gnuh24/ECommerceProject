@@ -109,7 +109,6 @@
         'Authorization': 'Bearer ' + token
       },
             data: {
-                UserInformationId: UserInformationId,
                 filter: filter,
                 page: page,
                 search: search,
@@ -118,9 +117,9 @@
             },
             success: function(response) {
 
-                console.log(response);
 
-                var data = response.content;
+                var data = response.data;
+                console.log(response);
                 var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
                 var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
                 // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
@@ -130,20 +129,21 @@
                         var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
 
                         // Xác định trạng thái và văn bản của nút dựa trên trạng thái của tài khoản
-                        var buttonText = (record.status === false) ? "Mở khóa" : "Khóa";
-                        var buttonClass = (record.status === false) ? "unlock" : "block";
+                        var buttonText = (record.Status === 0) ? "Mở khóa" : "Khóa";
+                        var buttonClass = (record.Status === 0) ? "unlock" : "block";
+                        var buttonData = (record.Status === 0) ? "unlock" : "block";
                         var trContent = `
                         <form id="updateForm" method="post" action="FormUpdateTaiKhoan.php">
                             <tr style="height: 20%"; max-height: 20%;>
                                 <td class="${trClass}" style="width: 130px;">${record.Id}</td>
-                                <td class="${trClass}">${record.email}</td>
-                                <td class="${trClass}">${record.createTime}</td>
-                                <td class="${trClass}">${record.status === false ? "Khóa" : "Hoạt động"}</td>
-                                <td class="${trClass}">${record.role}</td>`;
+                                <td class="${trClass}">${record.Email}</td>
+                                <td class="${trClass}">${record.CreateTime}</td>
+                                <td class="${trClass}">${record.Status === 0 ? "Khóa" : "Hoạt động"}</td>
+                                <td class="${trClass}">${record.Role}</td>`;
 
-                        if (record.role === "User") {
+                        if (record.Role === "User") {
                             trContent += `<td class="${trClass}">
-                                        <button class="${buttonClass}" onClick="handleLockUnlock(${record.id}, ${record.status})">${buttonText}</button>
+                                        <button class="${buttonClass}" data-action="${buttonData}" onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
                                     </td>`;
                         }
 
@@ -262,10 +262,10 @@
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maTaiKhoan, trangThai) {
-        var newTrangThai = trangThai === false ? true : false;
+        var newTrangThai = trangThai === 0 ? 1 : 0;
 
         Swal.fire({
-            title: `Bạn có muốn ${newTrangThai === false ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
+            title: `Bạn có muốn ${newTrangThai === 0 ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Đồng ý',
@@ -273,24 +273,30 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
-                formData.append('accountId', maTaiKhoan);
-                formData.append('status', newTrangThai ? true : false);
+                formData.append('Id', maTaiKhoan);
+                formData.append('Status', newTrangThai ? 1 : 0);
                 console.log(formData);
                 $.ajax({
-                    url: 'http://localhost:8080/Account/ChangeStatus',
-                    type: 'PATCH',
+                    url: '../../../Controllers/AccountController.php',
+                    type: 'POST',
                     dataType: 'json',
                     headers: {
                         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                     },
-                    data: formData,
+                    data:{
+                        action: 'updateAccount',
+                        formData
+                    },
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        var alertContent = newTrangThai ? "mở khóa" : "khóa";
+                        if (response.status === 200) {
+                        var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";
                         Swal.fire('Thành công!', `Bạn đã ${alertContent} thành công !!`, 'success');
                         fetchDataAndUpdateTable(currentPage, "", null);
-
+                    } else {
+                        Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật trạng thái.', 'error');
+                    }
                     },
                     error: function(xhr, status, error) {
                         console.error('Lỗi khi gọi API: ', error);
