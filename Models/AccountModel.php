@@ -44,81 +44,100 @@ class AccountModel
     // Lấy thông tin tài khoản theo ID
     public function getAccountById($userInformationId, $filters = [], $page = 1, $search = '', $role = '', $status = '')
     {
-
-
+        // Đảm bảo rằng $page không phải là null và phải là số nguyên dương
+        $current_page = isset($page) && $page > 0 ? (int)$page : 1;
+        
+        // Khởi tạo câu truy vấn cơ bản
         $query = "SELECT * FROM `account` WHERE `UserInformationId` = :userInformationId";
-
+        
         // Mảng chứa điều kiện
         $where_conditions = [':userInformationId' => $userInformationId];
-
+        
         // Số phần tử mỗi trang
         $entityPerPage = 10;
-
+        
         // Tổng số trang
         $totalPages = null;
-
-        // Tìm kiếm theo từ khóa (username hoặc email)
+        
+        // Thêm điều kiện tìm kiếm (username hoặc email)
         if (!empty($search)) {
             $query .= " AND (`username` LIKE :search OR `email` LIKE :search)";
             $where_conditions[':search'] = '%' . $search . '%';
         }
-
-        // Lọc theo các filters truyền vào
+        
+        // Thêm các điều kiện lọc
         if (!empty($filters)) {
             foreach ($filters as $key => $value) {
                 $query .= " AND `$key` = :$key";
                 $where_conditions[":$key"] = $value;
             }
         }
-
-        // Lọc theo role
+        
+        // Thêm điều kiện lọc theo role
         if (!empty($role)) {
             $query .= " AND `role` = :role";
             $where_conditions[':role'] = $role;
         }
-
-        // Lọc theo status
+        
+        // Thêm điều kiện lọc theo status
         if (!empty($status)) {
             $query .= " AND `status` = :status";
             $where_conditions[':status'] = $status;
         }
-
-
-        // Tính toán tổng số trang
+        
+        // Tính tổng số trang
         if ($totalPages === null) {
-            //fetchColumn ( <Cột thứ n> ) : Lấy row đầu tiên của cột thứ n - 1
-            $query_total_row = substr_replace($query, "COUNT(*)", 7, 1);
-
-            // Chạy lệnh Query để lấy ra tổng trang
+            // Câu truy vấn để đếm tổng số hàng
+            $query_total_row = "SELECT COUNT(*) FROM `account` WHERE `UserInformationId` = :userInformationId";
+            
+            // Thêm các điều kiện khác vào câu truy vấn đếm
+            if (!empty($search)) {
+                $query_total_row .= " AND (`username` LIKE :search OR `email` LIKE :search)";
+            }
+            if (!empty($filters)) {
+                foreach ($filters as $key => $value) {
+                    $query_total_row .= " AND `$key` = :$key";
+                }
+            }
+            if (!empty($role)) {
+                $query_total_row .= " AND `role` = :role";
+            }
+            if (!empty($status)) {
+                $query_total_row .= " AND `status` = :status";
+            }
+            
+            // Chạy truy vấn đếm
             $statement_total_row = $this->connection->prepare($query_total_row);
-            $statement_total_row->execute();
-
-            //Làm tròn lên -> Tính ra tổng số trang
-            $totalPages = ceil($statement_total_row->fetchColumn() / $entityPerPage);
+            $statement_total_row->execute($where_conditions);
+            
+            // Tính tổng số trang
+            $totalRows = $statement_total_row->fetchColumn();
+            $totalPages = ceil($totalRows / $entityPerPage);
         }
-
-        // Phân trang
-        $current_page = (int)$page; // Ép kiểu $page thành số nguyên
+        
+        // Tính toán phân trang
         $start_from = ($current_page - 1) * $entityPerPage;
-
-        $query .= " LIMIT $entityPerPage OFFSET $start_from";
-
+        
+        // Thêm điều kiện phân trang vào câu truy vấn
+        $query .= " LIMIT :limit OFFSET :offset";
+        
         try {
             // Chuẩn bị câu truy vấn
             $statement = $this->connection->prepare($query);
             foreach ($where_conditions as $key => $value) {
                 $statement->bindValue($key, $value);
             }
+            // Gán giá trị cho LIMIT và OFFSET
             $statement->bindValue(':limit', $entityPerPage, PDO::PARAM_INT);
             $statement->bindValue(':offset', $start_from, PDO::PARAM_INT);
-
-            // Thực thi truy vấn
+            
+            // Thực thi câu truy vấn
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
+            
             // Kiểm tra dữ liệu có tồn tại không
             $isExists = !empty($result);
-
+            
             return (object) [
                 "status" => 200,
                 "message" => "Truy vấn thành công",
@@ -134,6 +153,12 @@ class AccountModel
             ];
         }
     }
+    
+    
+    
+    
+    
+    
 
 
 
@@ -251,4 +276,16 @@ class AccountModel
             ];
         }
     }
+
+
+
+
+
+
+
+
+
+   
+    
+    
 }

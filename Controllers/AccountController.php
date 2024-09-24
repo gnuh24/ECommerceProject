@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $userInformationId = $_GET['UserInformationId'] ?? null;
                 if ($userInformationId) {
                     $accountController = new AccountController();
-                    $response = $this->accountController->getAccountById($userInformationId);
+                    $response = $accountController->getAccountById($userInformationId);
                     echo json_encode($response);
                 } else {
                     echo json_encode([
@@ -292,6 +292,13 @@ class AccountController
                     ];
                 }
 
+                if ($account['Active'] === 0) {
+                    return (object)[
+                        "status" => 403,
+                        "message" => "Tài khoản chưa được kích hoạt. Kiểm tra email của bạn: " . $account['Email']
+                    ];
+                }
+
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
                     return (object)[
@@ -305,8 +312,8 @@ class AccountController
 
         // Nếu không tìm thấy tài khoản hoặc mật khẩu không khớp
         return (object)[
-            "status" => 401,
-            "message" => "Đăng nhập thất bại !!"
+            "status" => 404,
+            "message" => "Không tìm thấy tài khoản"
         ];
     }
 
@@ -457,7 +464,7 @@ class AccountController
             }
 
             // 3. Cập nhật mật khẩu mới trong CSDL
-            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status']);
+            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status'], $account['Active']);
 
             if ($updateResponse->status === 200) {
                 // 4. Xoá token sau khi đã sử dụng
@@ -483,13 +490,29 @@ class AccountController
     }
 
     // Hàm lấy tất cả tài khoản
-    public function getAccountById($userInformationId, $page, $search, $role, $status)
+    public function getAccountById()
     {
-        // Gọi hàm getAccountById từ model
-        $response = $this->accountModel->getAccountById($userInformationId, $page, $search, $role, $status);
+        // Nhận các tham số từ GET, nếu không có thì gán là null
+        $userInformationId = $_GET['UserInformationId'] ?? null;
+        $email = $_GET['Email'] ?? null;
+        $createTime = $_GET['CreateTime'] ?? null;
+        $status = $_GET['Status'] ?? null;
+        $role = $_GET['Role'] ?? null;
+        $filter = $_GET['filter'] ?? null;
+        $page = $_GET['page'] ?? null;
+        $search = $_GET['search'] ?? null;
 
-        // Kiểm tra kết quả trả về từ model và chuẩn bị phản hồi
-        if ($response->status === 200) {
+        // Gọi hàm getAccountById từ model với các tham số đã lấy được
+        $response = $this->accountModel->getAccountById(
+            $userInformationId,
+            $filter,
+            $page,
+            $search,
+            $role,
+            $status
+        );
+        // Kiểm tra kết quả trả về từ model
+        if ($response && $response->status === 200) {
             // Nếu thành công, trả về kết quả dưới dạng JSON
             return json_encode([
                 'status' => 200,
@@ -501,6 +524,7 @@ class AccountController
             return json_encode([
                 'status' => 400,
                 'message' => 'Không thể lấy thông tin tài khoản!',
+
             ]);
         }
     }
