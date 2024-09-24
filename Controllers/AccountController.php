@@ -372,6 +372,15 @@ class AccountController
 
     private function sendResetEmail($email, $token)
     {
+
+        /***
+         * PHPMaile đầu vào 1 tham số
+         * 
+         * 
+         * 
+         * 
+         * */
+
         $mail = new PHPMailer(true);
         try {
             // Cấu hình máy chủ
