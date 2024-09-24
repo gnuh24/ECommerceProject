@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `Account`(
     `Password`          NVARCHAR(800)                               NOT NULL,
     `CreateTime`        DATETIME                                    NOT NULL            DEFAULT NOW(),
     `Status`            BOOLEAN                                     NOT NULL            DEFAULT TRUE,
-    `Active`			BOOLEAN 		                            NOT NULL            DEFAULT FALSE,
     `Role`              ENUM("User", "Admin")                       NOT NULL            DEFAULT "User",
     `Type`              ENUM("Standard", "Google")                  NOT NULL            DEFAULT "Standard",
     `UserInformationId` INT UNSIGNED                                NOT NULL,

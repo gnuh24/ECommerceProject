@@ -209,8 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => 405,
         'message' => 'Phương thức không được hỗ trợ!'
     ]);
-
 }
+
 // chức năng gửi mail cho mail muốn reset password
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra xem action có phải là resetPassword không
@@ -287,37 +287,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Kiểm tra nếu action là "getAccountById"
-    if (isset($_GET['action']) && $_GET['action'] === 'getAccountById') {
-        // Lấy ID từ tham số GET
-        $userInformationId = $_GET['userInformationId'] ?? null;
+// if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+//     // Kiểm tra nếu action là "getAccountById"
+//     if (isset($_GET['action']) && $_GET['action'] === 'getAccountById') {
+//         // Lấy ID từ tham số GET
+//         $userInformationId = $_GET['userInformationId'] ?? null;
 
-        // Kiểm tra ID có tồn tại không
-        if ($userInformationId) {
-            // Khởi tạo controller
-            $accountController = new AccountController();
+//         // Kiểm tra ID có tồn tại không
+//         if ($userInformationId) {
+//             // Khởi tạo controller
+//             $accountController = new AccountController();
 
-            // Gọi hàm getAccountById từ controller
-            $response = $accountController->getAccountById($userInformationId);
+//             // Gọi hàm getAccountById từ controller
+//             $response = $accountController->getAccountById($userInformationId);
 
-            // Trả về phản hồi
-            echo $response;
-        } else {
-            // Trả về lỗi nếu không có ID
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Không tìm thấy tham số ID!'
-            ]);
-        }
-    } else {
-        // Trả về lỗi nếu không có action phù hợp
-        echo json_encode([
-            'status' => 400,
-            'message' => 'Không tìm thấy tham số action!'
-        ]);
-    }
-}
+//             // Trả về phản hồi
+//             echo $response;
+//         } else {
+//             // Trả về lỗi nếu không có ID
+//             echo json_encode([
+//                 'status' => 400,
+//                 'message' => 'Không tìm thấy tham số ID!'
+//             ]);
+//         }
+//     } else {
+//         // Trả về lỗi nếu không có action phù hợp
+//         echo json_encode([
+//             'status' => 400,
+//             'message' => 'Không tìm thấy tham số action!'
+//         ]);
+//     }
+// }
 
 
 class AccountController
@@ -387,13 +387,6 @@ class AccountController
                     ];
                 }
 
-                if ($account['Active'] === 0) {
-                    return (object)[
-                        "status" => 403,
-                        "message" => "Tài khoản chưa được kích hoạt. Kiểm tra email của bạn: " . $account['Email']
-                    ];
-                }
-
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
                     return (object)[
@@ -440,38 +433,40 @@ class AccountController
             "message" => "Tạo tài khoản thất bại !"
         ];
     }
-    public function resetPasswordRequest($email) {
+    public function resetPasswordRequest($email)
+    {
         if (!$this->isEmailExists($email)) {
             return (object) [
                 'status' => 404,
                 'message' => 'Email không tồn tại.'
             ];
         }
-    
+
         // Lấy thông tin tài khoản theo email
         $accountInfo = $this->accountModel->getAccountByEmail($email);
         $userId = $accountInfo->data[0]['UserInformationId'];
-    
+
         // Xóa tất cả các token cũ liên quan đến email này
         $this->tokenModel->deleteTokenByEmail($email);
-    
+
         // Tạo token mới
         $token = bin2hex(random_bytes(3)); // Mã 6 ký tự
         $expiresAt = (new DateTime())->modify('+2 hours')->format('Y-m-d H:i:s');
-    
+
         // Lưu token vào database
         $this->tokenModel->createToken($token, $expiresAt, 'reset_password', $userId);
-    
+
         // Gửi email chứa token cho người dùng
         $this->sendResetEmail($email, $token);
-    
+
         return (object) [
             'status' => 200,
             'message' => 'Email đã được gửi.'
         ];
     }
-    
-    private function sendResetEmail($email, $token) {
+
+    private function sendResetEmail($email, $token)
+    {
         $mail = new PHPMailer(true);
         try {
             // Cấu hình máy chủ
@@ -482,19 +477,19 @@ class AccountController
             $mail->Password = 'lztz vkly edwe sucl'; // Mật khẩu email
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
-    
+
             // Người gửi và người nhận
             $mail->setFrom('automaticemail0204@gmail.com', 'Your Name');
             $mail->addAddress($email);
-    
+
             // Nội dung email
             $mail->isHTML(true);
             $mail->Subject = 'Khôi phục mật khẩu';
-            
+
             // Truyền thêm tham số email vào URL khôi phục mật khẩu
             $mail->Body = 'Nhấn vào liên kết sau để khôi phục mật khẩu của bạn: <a href="http://localhost/ECommerceProject/Views/MemberUI/Login/ResetPasswordUI.php?token=' . $token . '&email=' . urlencode($email) . '">Khôi phục mật khẩu</a>';
-            
-    
+
+
             // Gửi email
             $mail->send();
             return (object) [
@@ -514,18 +509,20 @@ class AccountController
         $accountModel = new AccountModel();
         $tokenModel = new TokenModel();
         $userInfoModel = new UserInformationModel();
-    
+
         // 1. Kiểm tra xem email và token có hợp lệ không
         $accountResponse = $accountModel->getAccountByEmail($email);
         $tokenResponse = $tokenModel->getTokenByValue($token);
-    
+
         // Kiểm tra xem có tài khoản và token hợp lệ không
-        if ($accountResponse->status === 200 && !empty($accountResponse->data) && 
-            $tokenResponse->status === 200 && !empty($tokenResponse->data)) {
-            
+        if (
+            $accountResponse->status === 200 && !empty($accountResponse->data) &&
+            $tokenResponse->status === 200 && !empty($tokenResponse->data)
+        ) {
+
             $account = $accountResponse->data[0];
             $tokenData = $tokenResponse->data;
-    
+
             // Kiểm tra xem token có hết hạn không
             $currentDate = new DateTime();
             $expirationDate = new DateTime($tokenData['Expiration']);
@@ -535,7 +532,7 @@ class AccountController
                     'message' => 'Token đã hết hạn.'
                 ];
             }
-    
+
             // 2. Kiểm tra xem email có tồn tại trong bảng user_information không
             $userInfoResponse = $userInfoModel->isEmailExists($email);
             if (!$userInfoResponse->isExists) {
@@ -544,14 +541,14 @@ class AccountController
                     'message' => 'Email không tồn tại trong hệ thống.'
                 ];
             }
-    
+
             // 3. Cập nhật mật khẩu mới trong CSDL
-            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status'], $account['Active']);
-    
+            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status']);
+
             if ($updateResponse->status === 200) {
                 // 4. Xoá token sau khi đã sử dụng
                 $tokenModel->deleteTokenByEmail($email);
-    
+
                 // Phản hồi thành công
                 return (object)[
                     'status' => 200,
@@ -570,9 +567,9 @@ class AccountController
             ];
         }
     }
-    
-// Hàm lấy tất cả tài khoản
-public function getAccountById($userInformationId, $page, $search, $role, $status)
+
+    // Hàm lấy tất cả tài khoản
+    public function getAccountById($userInformationId, $page, $search, $role, $status)
     {
         // Gọi hàm getAccountById từ model
         $response = $this->accountModel->getAccountById($userInformationId, $page, $search, $role, $status);
@@ -593,5 +590,4 @@ public function getAccountById($userInformationId, $page, $search, $role, $statu
             ]);
         }
     }
-    
 }

@@ -91,11 +91,11 @@
         container.classList.remove("active");
     });
     forgotPasswordBtn.addEventListener("click", (event) => {
-    event.preventDefault(); // Ngăn chặn sự chuyển đổi
-    $('#forgotPasswordModal').modal('show');
-});
+        event.preventDefault(); // Ngăn chặn sự chuyển đổi
+        $('#forgotPasswordModal').modal('show');
+    });
 
-   
+
     const signUpButton = document.getElementById("signUpButton");
 
     signUpButton.addEventListener('click', async function check(event) {
@@ -170,6 +170,7 @@
 
         try {
             const emailExists = await checkEmail(email.value); // đợi kết quả
+            console.log(emailExists);
 
             if (emailExists.data.isExists === true) {
                 Swal.fire({
@@ -191,53 +192,35 @@
         }
 
 
-        $.ajax({
-            url: '../../../Controllers/AccountController.php',
-            type: 'POST',
-            dataType: 'json',
+        // $.ajax({
+        //     url: '../../../Controllers/AccountController.php',
+        //     type: 'POST',
+        //     dataType: 'json',
 
-            data: {
-                "email": email.value,
-                "password": matKhau.value,
-                "action": "registration"
-            },
-            beforeSend: function() {
-                // Hiện thông báo "Đang xử lý"
-                Swal.fire({
-                    title: 'Đang xử lý...',
-                    text: 'Vui lòng chờ trong giây lát.',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    allowOutsideClick: false
-                });
-            },
-            success: function(response) {
-                // Đóng thông báo "Đang xử lý"
-                Swal.close();
+        //     data: {
+        //         "email": email.value,
+        //         "password": matKhau.value,
+        //         "action": "registration"
+        //     },
+        //     success: function(response) {
+        //         // Kiểm tra xem phản hồi có thành công hay không
+        //         Swal.fire({
+        //             title: response.message,
+        //             text: "Đăng ký thành công !",
+        //             icon: 'success',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     },
+        //     error: function(xhr, status, error) {
 
-                console.log(response);
-
-                // Kiểm tra xem phản hồi có thành công hay không
-                Swal.fire({
-                    title: response.message,
-                    text: "Vui lòng xác thực email",
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            },
-            error: function(xhr, status, error) {
-                // Đóng thông báo "Đang xử lý"
-                Swal.close();
-
-                console.error('Lỗi:', error);
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: 'Đã xảy ra lỗi khi đăng kí tài khoản!',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
+        //         Swal.fire({
+        //             title: 'Lỗi!',
+        //             text: 'Đã xảy ra lỗi khi đăng kí tài khoản!',
+        //             icon: 'error',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     }
+        // });
 
 
     });
@@ -257,12 +240,14 @@
                 data: {
                     email: email,
                     action: "isThisEmailExists"
-
                 },
                 success: function(response) {
+                    console.log("Thành công : " + response)
                     resolve(response); // Resolve the promise with the response
                 },
                 error: function(error) {
+                    console.log("Thất bại : " + error)
+
                     reject(error); // Reject the promise if there's an error
                 }
             });
@@ -330,12 +315,12 @@
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result) {
-                     
 
-                           
-                                     window.location.href = `../SignedPage/SignedHomePage.php`;
-                      
-                          
+
+
+                            window.location.href = `../SignedPage/SignedHomePage.php`;
+
+
                         }
                     });
                 } else {
@@ -361,45 +346,45 @@
         });
     }
     sendEmailButton.addEventListener("click", async (event) => {
-    event.preventDefault(); // Ngăn chặn hành động mặc định
+        event.preventDefault(); // Ngăn chặn hành động mặc định
 
-    const email = document.getElementById("forgotEmail").value;
-    if (isValidEmail(email)) {
-        // Gửi yêu cầu đến server để reset mật khẩu
-        $.ajax({
-            url: '../../../Controllers/AccountController.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                email: email,
-                action: 'resetPassword'
-            },
-            success: function(response) {
-                Swal.fire({
-                    title: response.message,
-                    icon: response.status === 200 ? 'success' : 'error',
-                    confirmButtonText: 'OK'
-                });
-                $('#forgotPasswordModal').modal('hide');
-            },
-            error: function() {
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: 'Đã xảy ra lỗi khi gửi yêu cầu!',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    } else {
-        Swal.fire({
-            title: 'Lỗi!',
-            text: 'Email không hợp lệ!',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-});
+        const email = document.getElementById("forgotEmail").value;
+        if (isValidEmail(email)) {
+            // Gửi yêu cầu đến server để reset mật khẩu
+            $.ajax({
+                url: '../../../Controllers/AccountController.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    email: email,
+                    action: 'resetPassword'
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: response.message,
+                        icon: response.status === 200 ? 'success' : 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    $('#forgotPasswordModal').modal('hide');
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi gửi yêu cầu!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Email không hợp lệ!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
 </script>
 
 

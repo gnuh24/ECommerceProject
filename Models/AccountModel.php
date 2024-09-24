@@ -47,7 +47,7 @@ class AccountModel
         $query = "SELECT * FROM `account` WHERE `UserInformationId` = :userInformationId";
 
         //Mảng chứa điều kiện
-        $where_conditions=[];
+        $where_conditions = [];
 
         //Số phần tử mỗi trang
         $entityPerPage = 10;
@@ -77,16 +77,16 @@ class AccountModel
             $query_total_row = substr_replace($query, "COUNT(*)", 7, 1);
 
             // Chạy lệnh Query để lấy ra tổng trang
-            $statement_total_row = $connection->prepare($query_total_row);
+            $statement_total_row = $this->connection->prepare($query_total_row);
             $statement_total_row->execute();
-    
+
             //Làm tròn lên -> Tính ra tổng số trang
             $totalPages = ceil($statement_total_row->fetchColumn() / $entityPerPage);
         }
 
         $current_page = isset($page) ? $page : 1;
         $start_from = ($current_page - 1) * $entityPerPage;
-    
+
         $query .= " LIMIT $entityPerPage OFFSET $start_from";
 
         try {
@@ -196,12 +196,11 @@ class AccountModel
     }
 
     // Cập nhật thông tin tài khoản
-    function updateAccount($id, $password, $status, $active)
+    function updateAccount($id, $password, $status)
     {
         $query = "UPDATE `account` SET 
                     `Password` = :password,
-                    `Status` = :status,
-                    `Active` = :active
+                    `Status` = :status
                   WHERE `Id` = :id";
 
         try {
@@ -210,7 +209,6 @@ class AccountModel
                 $statement->bindValue(':id', $id, PDO::PARAM_INT);
                 $statement->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
                 $statement->bindValue(':status', $status, PDO::PARAM_BOOL);
-                $statement->bindValue(':active', $active, PDO::PARAM_BOOL);
                 $statement->execute();
 
                 if ($statement->rowCount() > 0) {
