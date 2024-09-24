@@ -292,12 +292,6 @@ class AccountController
                     ];
                 }
 
-                if ($account['Active'] === 0) {
-                    return (object)[
-                        "status" => 403,
-                        "message" => "Tài khoản chưa được kích hoạt. Kiểm tra email của bạn: " . $account['Email']
-                    ];
-                }
 
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
@@ -312,8 +306,8 @@ class AccountController
 
         // Nếu không tìm thấy tài khoản hoặc mật khẩu không khớp
         return (object)[
-            "status" => 404,
-            "message" => "Không tìm thấy tài khoản"
+            "status" => 401,
+            "message" => "Đăng nhập thất bại !"
         ];
     }
 
