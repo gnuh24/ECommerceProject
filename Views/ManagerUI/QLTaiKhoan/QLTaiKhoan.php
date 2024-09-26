@@ -262,49 +262,50 @@
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maTaiKhoan, trangThai) {
-        var newTrangThai = trangThai === 0 ? 1 : 0;
+    // Xác định trạng thái mới dựa trên trạng thái hiện tại
+    var newTrangThai = trangThai === 0 ? 1 : 0;
 
-        Swal.fire({
-            title: `Bạn có muốn ${newTrangThai === 0 ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Đồng ý',
-            cancelButtonText: 'Hủy'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var formData = new FormData();
-                formData.append('Id', maTaiKhoan);
-                formData.append('Status', newTrangThai ? 1 : 0);
-                console.log(formData);
-                $.ajax({
-                    url: '../../../Controllers/AccountController.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                    },
-                    data:{
-                        action: 'updateAccount',
-                        formData
-                    },
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.status === 200) {
+    Swal.fire({
+        title: `Bạn có muốn ${newTrangThai === 0 ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var formData = new FormData();
+            formData.append('Id', maTaiKhoan);
+            formData.append('Status', newTrangThai); // Gửi đúng giá trị trạng thái mới (0 hoặc 1)
+            formData.append('action', 'updateAccount'); // Gửi thêm action cho server biết
+
+            $.ajax({
+                url: '../../../Controllers/AccountController.php',
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 200) {
                         var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";
                         Swal.fire('Thành công!', `Bạn đã ${alertContent} thành công !!`, 'success');
                         fetchDataAndUpdateTable(currentPage, "", null);
                     } else {
                         Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật trạng thái.', 'error');
                     }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Lỗi khi gọi API: ', error);
-                    }
-                });
-            }
-        });
-    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi gọi API: ', error);
+                }
+            });
+        }
+    });
+}
+
+
 </script>
 
 </html>

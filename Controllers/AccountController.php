@@ -202,14 +202,23 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'updateAccount':
                 $Id = $_POST['Id'] ?? null;
                 $Status = $_POST['Status'] ?? null;
-
+            
                 if ($Id && $Status !== null) {
                     $accountController = new AccountController();
-                    $response = $accountController->updateAccountStatus($Id, $Status);
-                    echo json_encode([
-                        'status' => $response->status,
-                        'message' => $response->message
-                    ]);
+                    $response = json_decode($accountController->updateAccount());  // Giải mã JSON trả về
+            
+                    // Kiểm tra xem $response có phải là đối tượng hay không trước khi truy cập thuộc tính
+                    if (is_object($response) && isset($response->status)) {
+                        echo json_encode([
+                            'status' => $response->status,
+                            'message' => $response->message
+                        ]);
+                    } else {
+                        echo json_encode([
+                            'status' => 400,
+                            'message' => 'Phản hồi không hợp lệ từ phương thức updateAccount!'
+                        ]);
+                    }
                 } else {
                     echo json_encode([
                         'status' => 400,
@@ -217,6 +226,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                 }
                 break;
+            
 
             default:
                 echo json_encode([
@@ -526,39 +536,41 @@ class AccountController
 
     // Hàm cập nhật tài khoản
     public function updateAccount()
-    {
-        // Nhận các tham số từ POST
-        $id = $_POST['Id'] ?? null;
-        $password = $_POST['Password'] ?? null;
-        $status = $_POST['Status'] ?? null;
+{
+    // Nhận các tham số từ POST
+    $id = $_POST['Id'] ?? null;
+    $password = $_POST['Password'] ?? null;
+    $status = $_POST['Status'] ?? null;
 
-        // Kiểm tra xem các tham số có đầy đủ không
-        if (!$id || !$status) {
-            return json_encode([
-                'status' => 400,
-                'message' => 'ID hoặc trạng thái không được cung cấp!'
-            ]);
-        }
-
-        // Gọi hàm updateAccount từ model với các tham số đã lấy được
-        $response = $this->accountModel->updateAccount($id, $password, $status);
-
-        // Kiểm tra kết quả trả về từ model
-        if ($response && $response->status === 200) {
-            // Nếu thành công, trả về kết quả dưới dạng JSON
-            return json_encode([
-                'status' => 200,
-                'message' => 'Cập nhật tài khoản thành công!',
-                'data' => $response->data
-            ]);
-        } else {
-            // Nếu có lỗi, trả về lỗi
-            return json_encode([
-                'status' => 400,
-                'message' => 'Không thể cập nhật tài khoản!'
-            ]);
-        }
+    // Kiểm tra xem các tham số có đầy đủ không
+    if (!$id || $status === null) {
+        return json_encode([
+            'status' => 400,
+            'message' => 'ID hoặc trạng thái không được cung cấp!'
+        ]);
     }
+
+    // Gọi hàm updateAccount từ model với các tham số đã lấy được
+    $response = $this->accountModel->updateAccount($id, $password, $status);
+
+    // Kiểm tra kết quả trả về từ model
+    if ($response && $response->status === 200) {
+        // Nếu thành công, trả về kết quả dưới dạng JSON
+        return json_encode([
+            'status' => 200,
+            'message' => 'Cập nhật tài khoản thành công!',
+            'data' => $response->data ?? null
+        ]);
+    } else {
+        // Nếu có lỗi, trả về lỗi
+        return json_encode([
+            'status' => 400,
+            'message' => 'Không thể cập nhật tài khoản!'
+        ]);
+    }
+}
+
+
 
     
 }
