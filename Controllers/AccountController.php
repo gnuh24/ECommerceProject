@@ -501,11 +501,16 @@ class AccountController
         $userInformationId = $_GET['UserInformationId'] ?? null;
         $email = $_GET['Email'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
-        $status = $_GET['Status'] ?? null;
+        $status = $_GET['status'] ;
         $role = $_GET['Role'] ?? null;
-        $filter = $_GET['filter'] ?? null;
-        $page = $_GET['page'] ?? null;
-        $search = $_GET['search'] ?? null;
+        // Kiểm tra filter có phải mảng hay không, nếu không thì gán thành mảng rỗng
+        $filter = isset($_GET['filter']) && is_array($_GET['filter']) ? $_GET['filter'] : [];
+        
+        // Kiểm tra page có phải số không, nếu không thì gán mặc định là 1
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        
+        // Kiểm tra search có phải chuỗi không, nếu không thì gán mặc định là rỗng
+        $search = isset($_GET['search']) && is_string($_GET['search']) ? trim($_GET['search']) : '';
 
         // Gọi hàm getAccountById từ model với các tham số đã lấy được
         $response = $this->accountModel->getAccountById(
@@ -522,7 +527,9 @@ class AccountController
             return json_encode([
                 'status' => 200,
                 'message' => 'Lấy thông tin tài khoản thành công!',
-                'data' => $response->data
+                'data' => $response->data,
+                'totalPages' => $response->totalPages, // Trả về tổng số trang
+                'isExists' => $response->isExists // Kiểm tra dữ liệu có tồn tại hay không
             ]);
         } else {
             // Nếu có lỗi, trả về lỗi

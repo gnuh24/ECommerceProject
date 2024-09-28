@@ -37,8 +37,8 @@
                                             </div>
                                             <select id="selectQuyen" style="height: 3rem; padding: 0.3rem;">
                                                 <option value="">Trạng thái: tất cả</option>
-                                                <option value="true">Hoạt động</option>
-                                                <option value="false">Khóa</option>
+                                                <option value="1">Hoạt động</option>
+                                                <option value="0">Khóa</option>
                                             </select>
                                             <button id="searchButton" style="">Tìm kiếm</button>
                                         </div>
@@ -91,14 +91,13 @@
         fetchDataAndUpdateTable(currentPage, '', '');
     });
 
-    // Hàm để xóa hết các dòng trong bảng
     function clearTable() {
         var tableBody = document.querySelector('.Table_table__BWPy tbody');
         tableBody.innerHTML = ''; // Xóa nội dung trong tbody
     }
 
-    // Hàm getAllTaiKhoan
-    function getAllTaiKhoan(UserInformationId, filter, page, search, status) {
+
+    function getAllTaiKhoan( page, search, status) {
         var token = sessionStorage.getItem('token');
         $.ajax({
             url: '../../../Controllers/AccountController.php',
@@ -109,20 +108,15 @@
         'Authorization': 'Bearer ' + token
       },
             data: {
-                filter: filter,
                 page: page,
                 search: search,
                 action: 'getAccountById',
                 status: status,
             },
             success: function(response) {
-
-
                 var data = response.data;
-                console.log(response);
                 var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
                 var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
-                // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
 
                 if (data.length > 0) {
                     data.forEach(function(record, index) {
@@ -195,13 +189,11 @@
     }
 
 
-    // Hàm để gọi getAllTaiKhoan và cập nhật dữ liệu và phân trang
-    function fetchDataAndUpdateTable(page, search, quyen) {
+    function fetchDataAndUpdateTable( page, search, status) {
         //Clear dữ liệu cũ
         clearTable();
 
-        // Gọi hàm getAllTaiKhoan và truyền các giá trị tương ứng
-        getAllTaiKhoan(page, search, quyen);
+        getAllTaiKhoan( page, search, status);
     }
 
     // Hàm tạo nút phân trang
@@ -211,7 +203,7 @@
         var quyenValue = document.querySelector('#selectQuyen').value;
         // Xóa nút phân trang cũ (nếu có)
         paginationContainer.innerHTML = '';
-        if (totalPages > 1) {
+        if (totalPages > 1) {            
             // Tạo nút cho từng trang và thêm vào chuỗi HTML
             var paginationHTML = '';
             for (var i = 1; i <= totalPages; i++) {
@@ -222,29 +214,33 @@
             // Thêm sự kiện click cho từng nút phân trang
             paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
                 button.addEventListener('click', function() {
-                    // Gọi hàm fetchDataAndUpdateTable khi người dùng click vào nút phân trang
+                    
                     fetchDataAndUpdateTable(index + 1, searchValue, quyenValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
                 });
             });
 
+            // Đảm bảo rằng currentPage nằm trong phạm vi hợp lệ
+        if (currentPage >= 1 && currentPage <= totalPages) {
             // Đánh dấu trang hiện tại
-            paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active'); // Sửa lại để chỉ chọn trang hiện tại
+            paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active');
+        } else {
+            console.error('currentPage is out of bounds');
+        }
         }
     }
+
 
     // Hàm xử lý sự kiện khi select Quyen thay đổi
     document.querySelector('#selectQuyen').addEventListener('change', function() {
         var searchValue = document.querySelector('.Admin_input__LtEE-').value;
         var quyenValue = this.value;
-        // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
         fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
     });
     // Hàm xử lý sự kiện khi nút tìm kiếm được click
     document.getElementById('searchButton').addEventListener('click', function() {
         var searchValue = document.querySelector('.Admin_input__LtEE-').value;
         var quyenValue = document.querySelector('#selectQuyen').value;
-        // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
-        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, '');
+        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
     });
     // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
     document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
@@ -255,7 +251,6 @@
             // Lấy giá trị của ô tìm kiếm và của select quyền
             var searchValue = this.value;
             var quyenValue = document.querySelector('#selectQuyen').value;
-            // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
             fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
         }
     });
