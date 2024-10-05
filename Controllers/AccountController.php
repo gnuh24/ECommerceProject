@@ -10,12 +10,12 @@ use PHPMailer\PHPMailer\Exception;
 
 // Xử lý yêu cầu GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    
+
     // Kiểm tra action
     if (isset($_GET['action'])) {
         switch ($_GET['action']) {
-            
-            // Kiểm tra email tồn tại
+
+                // Kiểm tra email tồn tại
             case 'isThisEmailExists':
                 $email = $_GET['email'] ?? null;
                 if ($email) {
@@ -35,16 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     ]);
                 }
                 break;
-            
-            // Lấy tài khoản theo ID
+
+                // Lấy tài khoản theo ID
             case 'getAccountById':
                 $userInformationId = $_GET['UserInformationId'] ?? null;
-                    $accountController = new AccountController();
-                    $response = $accountController->getAccountById($userInformationId);
-                    echo $response;
-              
+                $accountController = new AccountController();
+                $response = $accountController->getAccountById($userInformationId);
+                echo $response;
+
                 break;
-            
+
             default:
                 echo json_encode([
                     'status' => 400,
@@ -66,8 +66,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra action
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
-            
-            // Đăng nhập người dùng
+
+                // Đăng nhập người dùng
             case 'loginUser':
                 $email = $_POST['email'] ?? null;
                 $password = $_POST['password'] ?? null;
@@ -100,7 +100,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Đăng ký tài khoản
+                // Đăng ký tài khoản
             case 'registration':
                 $email = $_POST['email'] ?? null;
                 $password = $_POST['password'] ?? null;
@@ -119,7 +119,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Đăng nhập admin
+                // Đăng nhập admin
             case 'loginAdmin':
                 $email = $_POST['email'] ?? null;
                 $password = $_POST['password'] ?? null;
@@ -152,7 +152,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Gửi yêu cầu đặt lại mật khẩu
+                // Gửi yêu cầu đặt lại mật khẩu
             case 'resetPassword':
                 $email = $_POST['email'] ?? null;
                 if ($email) {
@@ -170,7 +170,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Đặt lại mật khẩu mới
+                // Đặt lại mật khẩu mới
             case 'setNewPassword':
                 $email = $_POST['email'] ?? null;
                 $token = $_POST['token'] ?? null;
@@ -198,15 +198,15 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Cập nhật trạng thái tài khoản
+                // Cập nhật trạng thái tài khoản
             case 'updateAccount':
                 $Id = $_POST['Id'] ?? null;
                 $Status = $_POST['Status'] ?? null;
-            
+
                 if ($Id && $Status !== null) {
                     $accountController = new AccountController();
                     $response = json_decode($accountController->updateAccount());  // Giải mã JSON trả về
-            
+
                     // Kiểm tra xem $response có phải là đối tượng hay không trước khi truy cập thuộc tính
                     if (is_object($response) && isset($response->status)) {
                         echo json_encode([
@@ -226,7 +226,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                 }
                 break;
-            
+
 
             default:
                 echo json_encode([
@@ -363,38 +363,41 @@ class AccountController
             "message" => "Tạo tài khoản thất bại !"
         ];
     }
-    public function resetPasswordRequest($email) {
+
+    public function resetPasswordRequest($email)
+    {
         if (!$this->isEmailExists($email)) {
             return (object) [
                 'status' => 404,
                 'message' => 'Email không tồn tại.'
             ];
         }
-    
+
         // Lấy thông tin tài khoản theo email
         $accountInfo = $this->accountModel->getAccountByEmail($email);
         $userId = $accountInfo->data[0]['UserInformationId'];
-    
+
         // Xóa tất cả các token cũ liên quan đến email này
         $this->tokenModel->deleteTokenByEmail($email);
-    
+
         // Tạo token mới
         $token = bin2hex(random_bytes(3)); // Mã 6 ký tự
         $expiresAt = (new DateTime())->modify('+2 hours')->format('Y-m-d H:i:s');
-    
+
         // Lưu token vào database
         $this->tokenModel->createToken($token, $expiresAt, 'reset_password', $userId);
-    
+
         // Gửi email chứa token cho người dùng
         $this->sendResetEmail($email, $token);
-    
+
         return (object) [
             'status' => 200,
             'message' => 'Email đã được gửi.'
         ];
     }
-    
-    private function sendResetEmail($email, $token) {
+
+    private function sendResetEmail($email, $token)
+    {
         $mail = new PHPMailer(true);
         try {
             // Cấu hình máy chủ
@@ -405,19 +408,19 @@ class AccountController
             $mail->Password = 'lztz vkly edwe sucl'; // Mật khẩu email
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
-    
+
             // Người gửi và người nhận
             $mail->setFrom('automaticemail0204@gmail.com', 'Your Name');
             $mail->addAddress($email);
-    
+
             // Nội dung email
             $mail->isHTML(true);
             $mail->Subject = 'Khôi phục mật khẩu';
-            
+
             // Truyền thêm tham số email vào URL khôi phục mật khẩu
             $mail->Body = 'Nhấn vào liên kết sau để khôi phục mật khẩu của bạn: <a href="http://localhost/ECommerceProject/Views/MemberUI/Login/ResetPasswordUI.php?token=' . $token . '&email=' . urlencode($email) . '">Khôi phục mật khẩu</a>';
-            
-    
+
+
             // Gửi email
             $mail->send();
             return (object) [
@@ -431,24 +434,28 @@ class AccountController
             ];
         }
     }
+
+
     public function processNewPassword($email, $token, $newPassword)
     {
         // Khởi tạo model Account, Token và UserInformation
         $accountModel = new AccountModel();
         $tokenModel = new TokenModel();
         $userInfoModel = new UserInformationModel();
-    
+
         // 1. Kiểm tra xem email và token có hợp lệ không
         $accountResponse = $accountModel->getAccountByEmail($email);
         $tokenResponse = $tokenModel->getTokenByValue($token);
-    
+
         // Kiểm tra xem có tài khoản và token hợp lệ không
-        if ($accountResponse->status === 200 && !empty($accountResponse->data) && 
-            $tokenResponse->status === 200 && !empty($tokenResponse->data)) {
-            
+        if (
+            $accountResponse->status === 200 && !empty($accountResponse->data) &&
+            $tokenResponse->status === 200 && !empty($tokenResponse->data)
+        ) {
+
             $account = $accountResponse->data[0];
             $tokenData = $tokenResponse->data;
-    
+
             // Kiểm tra xem token có hết hạn không
             $currentDate = new DateTime();
             $expirationDate = new DateTime($tokenData['Expiration']);
@@ -458,7 +465,7 @@ class AccountController
                     'message' => 'Token đã hết hạn.'
                 ];
             }
-    
+
             // 2. Kiểm tra xem email có tồn tại trong bảng user_information không
             $userInfoResponse = $userInfoModel->isEmailExists($email);
             if (!$userInfoResponse->isExists) {
@@ -467,14 +474,14 @@ class AccountController
                     'message' => 'Email không tồn tại trong hệ thống.'
                 ];
             }
-    
+
             // 3. Cập nhật mật khẩu mới trong CSDL
             $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status'], $account['Active']);
-    
+
             if ($updateResponse->status === 200) {
                 // 4. Xoá token sau khi đã sử dụng
                 $tokenModel->deleteTokenByEmail($email);
-    
+
                 // Phản hồi thành công
                 return (object)[
                     'status' => 200,
@@ -493,7 +500,7 @@ class AccountController
             ];
         }
     }
-    
+
     // Hàm lấy tất cả tài khoản
     public function getAccountById()
     {
@@ -501,14 +508,14 @@ class AccountController
         $userInformationId = $_GET['UserInformationId'] ?? null;
         $email = $_GET['Email'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
-        $status = $_GET['status'] ;
+        $status = $_GET['status'];
         $role = $_GET['Role'] ?? null;
         // Kiểm tra filter có phải mảng hay không, nếu không thì gán thành mảng rỗng
         $filter = isset($_GET['filter']) && is_array($_GET['filter']) ? $_GET['filter'] : [];
-        
+
         // Kiểm tra page có phải số không, nếu không thì gán mặc định là 1
         $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-        
+
         // Kiểm tra search có phải chuỗi không, nếu không thì gán mặc định là rỗng
         $search = isset($_GET['search']) && is_string($_GET['search']) ? trim($_GET['search']) : '';
 
@@ -536,48 +543,44 @@ class AccountController
             return json_encode([
                 'status' => 400,
                 'message' => 'Không thể lấy thông tin tài khoản!',
-                
+
             ]);
         }
     }
 
     // Hàm cập nhật tài khoản
     public function updateAccount()
-{
-    // Nhận các tham số từ POST
-    $id = $_POST['Id'] ?? null;
-    $password = $_POST['Password'] ?? null;
-    $status = $_POST['Status'] ?? null;
+    {
+        // Nhận các tham số từ POST
+        $id = $_POST['Id'] ?? null;
+        $password = $_POST['Password'] ?? null;
+        $status = $_POST['Status'] ?? null;
 
-    // Kiểm tra xem các tham số có đầy đủ không
-    if (!$id || $status === null) {
-        return json_encode([
-            'status' => 400,
-            'message' => 'ID hoặc trạng thái không được cung cấp!'
-        ]);
+        // Kiểm tra xem các tham số có đầy đủ không
+        if (!$id || $status === null) {
+            return json_encode([
+                'status' => 400,
+                'message' => 'ID hoặc trạng thái không được cung cấp!'
+            ]);
+        }
+
+        // Gọi hàm updateAccount từ model với các tham số đã lấy được
+        $response = $this->accountModel->updateAccount($id, $password, $status);
+
+        // Kiểm tra kết quả trả về từ model
+        if ($response && $response->status === 200) {
+            // Nếu thành công, trả về kết quả dưới dạng JSON
+            return json_encode([
+                'status' => 200,
+                'message' => 'Cập nhật tài khoản thành công!',
+                'data' => $response->data ?? null
+            ]);
+        } else {
+            // Nếu có lỗi, trả về lỗi
+            return json_encode([
+                'status' => 400,
+                'message' => 'Không thể cập nhật tài khoản!'
+            ]);
+        }
     }
-
-    // Gọi hàm updateAccount từ model với các tham số đã lấy được
-    $response = $this->accountModel->updateAccount($id, $password, $status);
-
-    // Kiểm tra kết quả trả về từ model
-    if ($response && $response->status === 200) {
-        // Nếu thành công, trả về kết quả dưới dạng JSON
-        return json_encode([
-            'status' => 200,
-            'message' => 'Cập nhật tài khoản thành công!',
-            'data' => $response->data ?? null
-        ]);
-    } else {
-        // Nếu có lỗi, trả về lỗi
-        return json_encode([
-            'status' => 400,
-            'message' => 'Không thể cập nhật tài khoản!'
-        ]);
-    }
-}
-
-
-
-    
 }
