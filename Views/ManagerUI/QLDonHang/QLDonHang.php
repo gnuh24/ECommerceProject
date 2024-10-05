@@ -156,7 +156,7 @@
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:8080/OrderStatus/Admin",
+                    url: "../../../Controllers/OrderStatusController.php",
                     headers: {
                         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                     },
@@ -253,7 +253,7 @@
 
         $.ajax({
             type: "GET",
-            url: "http://localhost:8080/Order/Admin",
+            url: "../../../Controllers/OrderController.php",
             headers: {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
             },

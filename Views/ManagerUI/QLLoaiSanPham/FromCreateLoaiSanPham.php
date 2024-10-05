@@ -150,7 +150,7 @@
     function isTenLoaiSanPhamExists(value) {
         let exists = false;
         $.ajax({
-            url: 'http://localhost:8080/Category',
+            url: '../../../Controllers/CategoryController.php',
             type: 'GET',
             dataType: "json",
             async: false, // Đảm bảo AJAX request được thực hiện đồng bộ
@@ -174,7 +174,7 @@
     function createLoaiSanPham(categoryName) {
         var token = sessionStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/Category',
+            url: '../../../Controllers/CategoryController.php',
             type: 'POST',
             dataType: "json",
             headers: {

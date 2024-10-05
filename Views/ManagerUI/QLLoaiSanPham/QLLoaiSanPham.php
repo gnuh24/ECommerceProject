@@ -102,7 +102,7 @@
   function getAllLoaiSanPham(page, search) {
     var token = sessionStorage.getItem('token');
     $.ajax({
-      url: "http://localhost:8080/Category",
+      url: "../../../Controllers/CategoryController.php",
       type: "GET",
       dataType: "json",
       headers: {
@@ -251,7 +251,7 @@
         // Gọi Ajax để xóa loại sản phẩm
         var token = sessionStorage.getItem('token');
         $.ajax({
-          url: 'http://localhost:8080/Category/' +
+          url: '../../../Controllers/CategoryController.php' +
             id,
           type: 'DELETE',
           headers: {

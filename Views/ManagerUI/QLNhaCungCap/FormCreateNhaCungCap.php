@@ -147,7 +147,7 @@
         let exists = false;
         var token = sessionStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/Brand',
+            url: '../../../Controllers/BrandController.php',
             type: 'GET',
             dataType: "json",
             headers: {

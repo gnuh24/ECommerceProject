@@ -119,7 +119,7 @@
         dataform.append("brandName", brandName);
 
         $.ajax({
-            url: 'http://localhost:8080/Brand',
+            url: '../../../Controllers/BrandController.php',
             type: 'PATCH',
             dataType: "json",
             headers: {

@@ -133,7 +133,7 @@
 
         // Gọi API để lấy dữ liệu sản phẩm
         $.ajax({
-            url: "http://localhost:8080/Product/Admin",
+            url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
             headers: {
@@ -202,7 +202,7 @@
                 formData.append('id', maSanPham);
                 // Gọi hàm updateTaiKhoan bằng Ajax
                 $.ajax({
-                    url: 'http://localhost:8080/Product',
+                    url: '../../../Controllers/ProductController.php',
                     type: 'PATCH',
                     processData: false, // Không xử lý dữ liệu (vì chúng ta đang gửi FormData)
                     contentType: false, // Không đặt tiêu đề Content-Type vì FormData tự xử lý
@@ -381,7 +381,8 @@
 
     function getCategories() {
         $.ajax({
-            url: "http://localhost:8080/Category/noPaging",
+            // no paging
+            url: "../../../Controllers/CategoryController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {
@@ -407,7 +408,8 @@
 
     function getBrand() {
         $.ajax({
-            url: "http://localhost:8080/Brand/noPaging",
+            //no pag
+            url: "../../../Controllers/BrandController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {

@@ -164,7 +164,7 @@
       }
 
       $.ajax({
-        url: 'http://localhost:8080/InventoryReport',
+        url: '../../../Controllers/InventoryReportController.php',
         type: 'GET',
         dataType: "json",
         data: data, // Truyền object data đã được kiểm tra

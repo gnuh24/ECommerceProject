@@ -403,7 +403,7 @@
         }
         $.ajax({
             type: 'POST',
-            url: 'http://localhost:8080/InventoryReport',
+            url: '../../../Controllers/InventoryReportController.php',
             data: formData,
             contentType: false, // Không gửi tiêu đề Content-Type
             processData: false, // Không xử lý dữ liệu
@@ -605,7 +605,7 @@
         }
 
         $.ajax({
-            url: 'http://localhost:8080/Product/Admin',
+            url: '../../../Controllers/ProductController.php',
             type: 'GET',
             dataType: "json",
             data: ajaxData, // Truyền object ajaxData
@@ -684,7 +684,7 @@
         const token = sessionStorage.getItem("token");
 
         $.ajax({
-            url: 'http://localhost:8080/InventoryReport/' + maPhieu,
+            url: '../../../Controllers/InventoryReportController.php/' + maPhieu,
             type: 'GET',
             dataType: "json",
             headers: {
@@ -838,7 +838,7 @@
         formData.append('id', maPNK.value)
         $.ajax({
             type: 'PATCH',
-            url: 'http://localhost:8080/InventoryReport',
+            url: '../../../Controllers/InventoryReportController.php',
             data: formData,
             contentType: false, // Không gửi tiêu đề Content-Type
             processData: false, // Không xử lý dữ liệu

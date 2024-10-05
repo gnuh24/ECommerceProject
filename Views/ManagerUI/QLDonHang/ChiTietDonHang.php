@@ -98,7 +98,7 @@
 
     function getOrderDetailsAndStatus(orderId) {
         $.ajax({
-            url: `http://localhost:8080/Order/Admin/${orderId}`,
+            url: `../../../Controllers/OrderController.php`,
             type: 'GET',
             dataType: "json",
             headers: {

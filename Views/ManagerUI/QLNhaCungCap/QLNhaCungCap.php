@@ -108,7 +108,7 @@
   function getAllNhaCungCap(page, search) {
     var token = sessionStorage.getItem('token');
     $.ajax({
-      url: 'http://localhost:8080/Brand',
+      url: '../../../Controllers/BrandController.php',
       type: 'GET',
       dataType: "json",
       headers: {
@@ -260,7 +260,7 @@
         // Thực hiện gọi Ajax để xóa nhà cung cấp
         var token = sessionStorage.getItem('token');
         $.ajax({
-          url: 'http://localhost:8080/Brand/' + brandId,
+          url: '../../../Controllers/BrandController.php' + brandId,
           type: 'DELETE',
           headers: {
             'Authorization': 'Bearer ' + token
