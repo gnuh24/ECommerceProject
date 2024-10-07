@@ -10,19 +10,22 @@ class OrderStatusModel
         $this->connection = MysqlConfig::getConnection();
     }
 
-    // Lấy trạng thái đơn hàng theo OrderId
-    public function getStatusByOrderId($orderId)
+    // Lấy trạng thái mới nhất của đơn hàng theo OrderId
+    public function getNewestOrderStatus($orderId)
     {
-        $query = "SELECT * FROM `OrderStatus` WHERE `OrderId` = :orderId";
+        $query = "SELECT * FROM `OrderStatus` 
+                  WHERE `OrderId` = :orderId 
+                  ORDER BY `UpdateTime` DESC 
+                  LIMIT 1";
 
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
             $statement->execute();
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
             return (object) [
                 "status" => 200,
-                "message" => "Status fetched successfully",
+                "message" => "Newest order status fetched successfully",
                 "data" => $result
             ];
         } catch (PDOException $e) {
@@ -33,17 +36,17 @@ class OrderStatusModel
         }
     }
 
-    // Tạo trạng thái mới cho đơn hàng
-    public function createOrderStatus($orderId, $status, $updateTime)
+    // Tạo trạng thái mới cho đơn hàng lần đầu
+    public function createOrderStatusFirstTime($form)
     {
         $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
                   VALUES (:orderId, :status, :updateTime)";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':status', $status, PDO::PARAM_STR);
-            $statement->bindValue(':updateTime', $updateTime, PDO::PARAM_STR);
+            $statement->bindValue(':orderId', $form->orderId, PDO::PARAM_STR);
+            $statement->bindValue(':status', $form->status, PDO::PARAM_STR);
+            $statement->bindValue(':updateTime', $form->updateTime, PDO::PARAM_STR);
             $statement->execute();
             return (object) [
                 "status" => 201,
@@ -55,6 +58,26 @@ class OrderStatusModel
                 "message" => $e->getMessage()
             ];
         }
+    }
+
+    // Tạo trạng thái đơn hàng (có kiểm tra tồn kho)
+    public function createOrderStatus($token, $form)
+    {
+        // Kiểm tra tồn kho ở đây
+        // Nếu không đủ hàng tồn kho, ném exception NotEnoughInventory
+        // ...
+
+        return $this->createOrderStatusFirstTime($form);
+    }
+
+    // Tạo trạng thái đơn hàng (có xác thực quyền truy cập)
+    public function createOrderStatusWithAccess($token, $form)
+    {
+        // Kiểm tra quyền truy cập ở đây
+        // Nếu không có quyền, ném exception AccessDeniedException
+        // ...
+
+        return $this->createOrderStatus($token, $form);
     }
 
     // Cập nhật trạng thái của đơn hàng
