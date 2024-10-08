@@ -103,8 +103,7 @@
     tableBody.innerHTML = ''; // Xóa nội dung trong tbody
   }
 
-  // Hàm getAllNhaCungCap
-  // Hàm getAllNhaCungCap
+
   function getAllNhaCungCap(page, search) {
     var token = sessionStorage.getItem('token');
     $.ajax({
@@ -116,36 +115,33 @@
         'Authorization': 'Bearer ' + token
       },
       data: {
-        pageNumber: page,
+        page: page,
         search: search
       },
       success: function(response) {
-        var data = response.data;
+        var data = response.data; // Lấy mảng dữ liệu từ API
         var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
         var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
         // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
-        var htmlContent = '';
-        $.each(response.content, function(index, record) {
+        $.each(data, function(index, record) {
           var htmlContent = `
                     <tr>
-                        <td style="text-align:center">${record.brandId}</td>
-                        <td style="text-align:center">${record.brandName}</td>
+                        <td style="text-align:center">${record.Id}</td>
+                        <td style="text-align:center">${record.BrandName}</td>
                         
                         <td style="text-align:center">`;
 
-          // Kiểm tra nếu record.MaNCC == 1 thì hiển thị nút "Mặc định" thay vì "Sửa" và "Xoá"
-          if (record.brandId == 1) {
-            htmlContent += `
-                    <p>Mặc định</p>`;
+          // Kiểm tra nếu record.Id == 1 thì hiển thị nút "Mặc định" thay vì "Sửa" và "Xoá"
+          if (record.Id == 1) {
+            htmlContent += `<p>Mặc định</p>`;
           } else {
             htmlContent += `
-                    <button style="cursor:pointer" class="edit" onclick="updateNhaCungCap(${record.brandId}, '${record.brandName}')">Sửa</button>
-                    <button style="cursor:pointer" class="delete" onclick="deleteNhaCungCap(${record.brandId}, '${record.brandName}')">Xoá</button>`;
+                        <button style="cursor:pointer" class="edit" onclick="updateNhaCungCap(${record.Id}, '${record.BrandName}')">Sửa</button>
+                        <button style="cursor:pointer" class="delete" onclick="deleteNhaCungCap(${record.Id}, '${record.BrandName}')">Xoá</button>`;
           }
 
-          htmlContent += `</td>
-                    </tr>`;
+          htmlContent += `</td></tr>`;
 
           tableContent += htmlContent; // Thêm nội dung của hàng vào chuỗi tableContent
         });
@@ -153,7 +149,7 @@
         // Thiết lập lại nội dung của tbody bằng chuỗi tableContent
         tableBody.innerHTML = tableContent;
 
-        //Tạo phân trang
+        // Tạo phân trang (giả sử `createPagination` là hàm bạn đã định nghĩa để tạo phân trang)
         createPagination(page, response.totalPages);
       },
 
@@ -168,6 +164,7 @@
       }
     });
   }
+
 
 
 

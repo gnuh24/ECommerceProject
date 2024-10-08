@@ -114,38 +114,63 @@
             return;
         }
 
-        var dataform = new FormData();
-        dataform.append("brandId", brandId);
-        dataform.append("brandName", brandName);
+        // Dữ liệu gửi đi được định dạng dưới dạng JSON
+        var data = JSON.stringify({
+            brandId: brandId,
+            brandName: brandName
+        });
 
         $.ajax({
             url: '../../../Controllers/BrandController.php',
             type: 'PATCH',
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
-            data: dataform,
-            contentType: false,
-            processData: false,
+            data: data,
             success: function(data) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
-                    text: 'Thay đổi thương hiệu mới thành công !!',
+                    text: 'Thay đổi thương hiệu mới thành công!',
                 }).then(() => {
-                    window.location.href = 'QLNhaCungCap.php';
+                    window.location.href = 'QLNhaCungCap.php'; // Chuyển hướng đến trang quản lý nhà cung cấp
                 });
             },
-            error: function(xhr, status, error) {
-                console.error('Error: ' + xhr.status + ' - ' + error);
+            error: function(xhr) {
+                console.error('Error: ' + xhr.status + ' - ' + xhr.responseText);
 
-                // Hiển thị thông báo lỗi
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi!',
-                    text: 'Đã xảy ra lỗi khi cập nhật thương hiệu. Mã lỗi: ' + xhr.status,
-                });
+                // Xử lý các mã lỗi cụ thể
+                switch (xhr.status) {
+                    case 409:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Tên thương hiệu đã tồn tại.',
+                        });
+                        break;
+                    case 404:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Không tìm thấy thương hiệu để cập nhật.',
+                        });
+                        break;
+                    case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi cập nhật thương hiệu: ' + xhr.responseJSON.message,
+                        });
+                        break;
+                    default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi không xác định.',
+                        });
+                }
             }
         });
     }

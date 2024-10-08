@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . "../../Configure/MysqlConfig.php";
 
 class BrandModel
 {
@@ -33,23 +33,39 @@ class BrandModel
     }
 
     // Lấy tất cả Brand có phân trang và tìm kiếm
-    public function getAllBrand($pageable, $search = null)
+    public function getAllBrand($page, $search, $pageSize)
     {
-        $query = "SELECT * FROM `brand` WHERE `BrandName` LIKE :search LIMIT :offset, :limit";
+        // Tính toán offset
+        $offset = ($page - 1) * $pageSize;
+
+        // Chuẩn bị truy vấn để lấy tất cả các thương hiệu với phân trang và tìm kiếm
+        $query = "SELECT * FROM `brand` WHERE `BrandName` LIKE :search LIMIT :offset, :pageSize";
 
         try {
+            // Chuẩn bị và thực hiện truy vấn để lấy thương hiệu
             $statement = $this->connection->prepare($query);
             $searchTerm = '%' . $search . '%';
             $statement->bindValue(':search', $searchTerm, PDO::PARAM_STR);
-            $statement->bindValue(':offset', $pageable->getOffset(), PDO::PARAM_INT);
-            $statement->bindValue(':limit', $pageable->getPageSize(), PDO::PARAM_INT);
+            $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $statement->bindValue(':pageSize', $pageSize, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+            // Truy vấn để lấy tổng số thương hiệu
+            $totalQuery = "SELECT COUNT(*) as total FROM `brand` WHERE `BrandName` LIKE :search";
+            $totalStmt = $this->connection->prepare($totalQuery);
+            $totalStmt->bindValue(':search', $searchTerm, PDO::PARAM_STR);
+            $totalStmt->execute();
+            $totalResult = $totalStmt->fetch(PDO::FETCH_ASSOC);
+
+            // Tính toán tổng số trang
+            $totalPages = $totalResult['total'] > 0 ? ceil($totalResult['total'] / $pageSize) : 1;
+
             return (object) [
                 "status" => 200,
-                "message" => "Brands fetched successfully with pagination",
-                "data" => $result
+                "message" => "Brands fetched successfully",
+                "data" => $result,
+                "totalPages" => $totalPages
             ];
         } catch (PDOException $e) {
             return (object) [
@@ -58,6 +74,8 @@ class BrandModel
             ];
         }
     }
+
+
 
     // Lấy Brand theo ID
     public function getBrandById($id)
@@ -121,35 +139,37 @@ class BrandModel
             ];
         }
     }
-
-
     // Cập nhật Brand
-    public function updateBrand($form)
+    public function updateBrand($id, $brandName)
     {
-        // Kiểm tra xem brand với tên đã tồn tại chưa (trừ brand hiện tại đang cập nhật)
-        $checkQuery = "SELECT COUNT(*) FROM `brand` WHERE `BrandName` = :brandName AND `Id` != :id";
-        $query = "UPDATE `brand` SET `BrandName` = :brandName, `Description` = :description WHERE `Id` = :id";
+        // Kiểm tra xem tên thương hiệu đã tồn tại trong danh sách khác chưa
+        $checkQuery = "SELECT `Id` FROM `brand` WHERE `BrandName` = :brandName AND `Id` != :id";
 
         try {
-            // Kiểm tra tên brand
+            // Kiểm tra tên thương hiệu
             $checkStatement = $this->connection->prepare($checkQuery);
-            $checkStatement->bindValue(':brandName', $form->brandName, PDO::PARAM_STR);
-            $checkStatement->bindValue(':id', $form->id, PDO::PARAM_INT);
+            $checkStatement->bindValue(':brandName', $brandName, PDO::PARAM_STR);
+            $checkStatement->bindValue(':id', $id, PDO::PARAM_INT);
             $checkStatement->execute();
-            $count = $checkStatement->fetchColumn();
 
-            if ($count > 0) {
+            // Nếu tìm thấy thương hiệu khác với cùng tên, trả về lỗi 409 (Conflict)
+            if ($checkStatement->rowCount() > 0) {
                 return (object) [
-                    "status" => 400,
-                    "message" => "Brand name already exists in the system"
+                    "status" => 409,
+                    "message" => "Brand name already exists"
                 ];
             }
 
-            // Nếu tên brand chưa tồn tại, tiếp tục cập nhật
+            // Nếu không có xung đột tên, tiếp tục thực hiện cập nhật
+            $query = "
+        UPDATE `brand`
+        SET `BrandName` = :brandName
+        WHERE `Id` = :id
+        ";
+
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':id', $form->id, PDO::PARAM_INT);
-            $statement->bindValue(':brandName', $form->brandName, PDO::PARAM_STR);
-            $statement->bindValue(':description', $form->description, PDO::PARAM_STR);
+            $statement->bindValue(':id', $id, PDO::PARAM_INT);
+            $statement->bindValue(':brandName', $brandName, PDO::PARAM_STR);
             $statement->execute();
 
             if ($statement->rowCount() > 0) {
@@ -158,15 +178,34 @@ class BrandModel
                     "message" => "Brand updated successfully"
                 ];
             } else {
-                throw new PDOException("No record was updated");
+                // Kiểm tra xem thương hiệu có tồn tại không
+                $checkExistQuery = "SELECT `Id` FROM `brand` WHERE `Id` = :id";
+                $checkExistStatement = $this->connection->prepare($checkExistQuery);
+                $checkExistStatement->bindValue(':id', $id, PDO::PARAM_INT);
+                $checkExistStatement->execute();
+
+                if ($checkExistStatement->rowCount() == 0) {
+                    // Nếu thương hiệu không tồn tại
+                    return (object) [
+                        "status" => 404,
+                        "message" => "Brand not found"
+                    ];
+                } else {
+                    // Nếu thương hiệu tồn tại nhưng không cần cập nhật
+                    return (object) [
+                        "status" => 200,
+                        "message" => "Brand updated successfully"
+                    ];
+                }
             }
         } catch (PDOException $e) {
             return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
+                "status" => 500,
+                "message" => "An error occurred while updating the brand: " . $e->getMessage()
             ];
         }
     }
+
 
 
     // Xóa Brand theo ID sau khi chuyển sản phẩm sang BrandId 1 (trừ khi BrandId = 1)

@@ -169,8 +169,7 @@ class CategoryModel
         SET `CategoryName` = :categoryName
         WHERE `Id` = :id
         AND `CategoryName` != :categoryName
-    ";
-
+        ";
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
