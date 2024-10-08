@@ -14,14 +14,14 @@ class OrderController
     public function getAllOrders()
     {
         $response = $this->orderModel->getAllOrders();
-        $this->response($response->status, $response->message, $response->data ?? null);
+        $this->response($response);
     }
 
     // Lấy đơn hàng theo Id
     public function getOrderById($orderId)
     {
         $response = $this->orderModel->getOrderById($orderId);
-        $this->response($response->status, $response->message, $response->data ?? null);
+        $this->response($response);
     }
 
     // Tạo đơn hàng mới
@@ -32,7 +32,10 @@ class OrderController
 
         // Kiểm tra dữ liệu hợp lệ
         if (!isset($data['orderId'], $data['orderTime'], $data['totalPrice'], $data['note'], $data['accountId'])) {
-            return $this->response(400, "Invalid input data");
+            return $this->response((object)[
+                "status" => 400,
+                "message" => "Invalid input data"
+            ]);
         }
 
         $response = $this->orderModel->createOrder(
@@ -43,7 +46,7 @@ class OrderController
             $data['accountId']
         );
 
-        $this->response($response->status, $response->message);
+        $this->response($response);
     }
 
     // Cập nhật thông tin đơn hàng
@@ -52,44 +55,45 @@ class OrderController
         // Giả sử bạn đã lấy dữ liệu từ request (PUT)
         $data = json_decode(file_get_contents("php://input"), true);
 
+        if (!isset($data['totalPrice'], $data['note'])) {
+            return $this->response((object)[
+                "status" => 400,
+                "message" => "Invalid input data"
+            ]);
+        }
+
         $response = $this->orderModel->updateOrder($orderId, $data['totalPrice'], $data['note']);
-        $this->response($response->status, $response->message);
+        $this->response($response);
     }
 
     // Xóa đơn hàng theo Id
     public function deleteOrder($orderId)
     {
         $response = $this->orderModel->deleteOrder($orderId);
-        $this->response($response->status, $response->message);
+        $this->response($response);
     }
 
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId
     public function getOrdersByAccountId($accountId)
     {
         $response = $this->orderModel->getOrdersByAccountId($accountId);
-        $this->response($response->status, $response->message, $response->data ?? null);
+        $this->response($response);
     }
 
-    // Hàm response
-    private function response($status, $message, $data = null)
+    // Phương thức xử lý phản hồi
+    private function response($result)
     {
-        // Thiết lập mã trạng thái HTTP
-        http_response_code($status);
-
-        // Thiết lập tiêu đề nội dung là JSON
-        header('Content-Type: application/json');
-
-        // Tạo mảng phản hồi
+        http_response_code($result->status);
         $response = [
-            'status' => $status,
-            'message' => $message,
-            'data' => $data
+            "message" => $result->message,
+            "data" => $result->data ?? null
         ];
 
-        // Gửi phản hồi JSON
-        echo json_encode($response);
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
 
-        // Dừng thực thi script
-        exit;
+        echo json_encode($response);
     }
 }

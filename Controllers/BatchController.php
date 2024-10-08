@@ -111,9 +111,16 @@ class BatchController
     private function respond($result)
     {
         http_response_code($result->status);
-        echo json_encode([
+        $response = [
             "message" => $result->message,
             "data" => $result->data ?? null
-        ]);
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
+
+        echo json_encode($response);
     }
 }

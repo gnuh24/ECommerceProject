@@ -165,4 +165,19 @@ class ProductController
             echo json_encode(["status" => 400, "message" => "Invalid input data"]);
         }
     }
+    private function response($result)
+    {
+        http_response_code($result->status);
+        $response = [
+            "message" => $result->message,
+            "data" => $result->data ?? null
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
+
+        echo json_encode($response);
+    }
 }

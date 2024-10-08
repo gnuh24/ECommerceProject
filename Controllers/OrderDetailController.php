@@ -10,13 +10,7 @@ class OrderDetailController
         $this->orderDetailModel = new OrderDetailModel();
     }
 
-    // Hàm phản hồi chuẩn hóa
-    private function response($data)
-    {
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit();
-    }
+
 
     // Lấy chi tiết đơn hàng theo OrderId
     public function getAllOrderDetailByOrderId($orderId)
@@ -78,5 +72,20 @@ class OrderDetailController
     {
         $response = $this->orderDetailModel->deleteOrderDetail($orderId, $productId);
         $this->response($response);
+    }
+    private function response($result)
+    {
+        http_response_code($result->status);
+        $response = [
+            "message" => $result->message,
+            "data" => $result->data ?? null
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
+
+        echo json_encode($response);
     }
 }

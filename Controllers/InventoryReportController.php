@@ -55,15 +55,19 @@ class InventoryReportController
         }
     }
 
-    // Hàm response để chuẩn hóa phản hồi
-    private function response($status, $message, $data = null)
+    private function response($result)
     {
-        header("Content-Type: application/json");
-        http_response_code($status);
-        $response = ["status" => $status, "message" => $message];
-        if ($data) {
-            $response["data"] = $data;
+        http_response_code($result->status);
+        $response = [
+            "message" => $result->message,
+            "data" => $result->data ?? null
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
         }
+
         echo json_encode($response);
     }
 }
