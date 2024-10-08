@@ -103,21 +103,10 @@
 
     function updateNhaCungCap(brandId, brandName) {
         var token = sessionStorage.getItem('token');
-
-        // Kiểm tra nếu token không tồn tại
-        if (!token) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: 'Không tìm thấy token xác thực. Vui lòng đăng nhập lại!',
-            });
-            return;
-        }
-
         // Dữ liệu gửi đi được định dạng dưới dạng JSON
         var data = JSON.stringify({
-            brandId: brandId,
-            brandName: brandName
+            Id: brandId,
+            BrandName: brandName
         });
 
         $.ajax({

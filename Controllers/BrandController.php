@@ -27,7 +27,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
         // Kiểm tra nếu có ID và tên thương hiệu trong request
         if (isset($data['Id']) && isset($data['BrandName'])) {
-            $response = $controller->updateBrand($data);
+            $response = $controller->updateBrand($data['Id'], $data['BrandName']);
             echo $response;
         } else {
             // Phản hồi lỗi nếu không có ID hoặc BrandName
@@ -40,7 +40,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'POST':
-        // Lấy dữ liệu JSON từ yêu cầu POST
         $data = file_get_contents('php://input');
         $decodedData = json_decode($data, true);
 
@@ -54,7 +53,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }
 
         // Gọi hàm xử lý tạo thương hiệu mới và trả về phản hồi
-        $response = $controller->createBrand($decodedData);
+        $response = $controller->createBrand($decodedData['BrandName']);
 
         // Trả về dưới dạng JSON
         echo $response;
@@ -122,16 +121,16 @@ class BrandController
     }
 
     // Tạo Brand mới
-    public function createBrand($form)
+    public function createBrand($name)
     {
-        $result = $this->BrandModel->createBrand($form);
+        $result = $this->BrandModel->createBrand($name);
         return $this->respond($result);
     }
 
     // Cập nhật Brand
-    public function updateBrand($form)
+    public function updateBrand($id, $name)
     {
-        $result = $this->BrandModel->updateBrand($form);
+        $result = $this->BrandModel->updateBrand($id, $name);
         return $this->respond($result);
     }
 

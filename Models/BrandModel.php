@@ -101,32 +101,31 @@ class BrandModel
     }
 
     // Tạo Brand mới
-    public function createBrand($form)
+    public function createBrand($brandName)
     {
         // Kiểm tra xem brand với tên đã tồn tại chưa
-        $checkQuery = "SELECT COUNT(*) FROM `brand` WHERE `BrandName` = :brandName";
-        $query = "INSERT INTO `brand` (`BrandName`, `Description`) VALUES (:brandName, :description)";
+        $checkQuery = "SELECT COUNT(*) FROM `brand` WHERE `BrandName` = :brandName"; // Sửa tên bảng thành 'brand'
+        $query = "INSERT INTO `brand` (`BrandName`) VALUES (:brandName)"; // Xóa dấu phẩy thừa
 
         try {
             // Kiểm tra tên brand
             $checkStatement = $this->connection->prepare($checkQuery);
-            $checkStatement->bindValue(':brandName', $form->brandName, PDO::PARAM_STR);
+            $checkStatement->bindValue(':brandName', $brandName, PDO::PARAM_STR);
             $checkStatement->execute();
             $count = $checkStatement->fetchColumn();
 
             if ($count > 0) {
                 return (object) [
-                    "status" => 400,
+                    "status" => 409,
                     "message" => "Brand name already exists in the system"
                 ];
             }
 
             // Nếu tên brand chưa tồn tại, tiếp tục tạo mới
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':brandName', $form->brandName, PDO::PARAM_STR);
-            $statement->bindValue(':description', $form->description, PDO::PARAM_STR);
+            $statement->bindValue(':brandName', $brandName, PDO::PARAM_STR);
             $statement->execute();
-            $id = $this->connection->lastInsertId();
+            $id = $this->connection->lastInsertId(); // Lấy ID của thương hiệu vừa tạo
             return (object) [
                 "status" => 201,
                 "message" => "Brand created successfully",
@@ -139,6 +138,7 @@ class BrandModel
             ];
         }
     }
+
     // Cập nhật Brand
     public function updateBrand($id, $brandName)
     {
@@ -162,11 +162,10 @@ class BrandModel
 
             // Nếu không có xung đột tên, tiếp tục thực hiện cập nhật
             $query = "
-        UPDATE `brand`
-        SET `BrandName` = :brandName
-        WHERE `Id` = :id
-        ";
-
+                    UPDATE `brand`
+                    SET `BrandName` = :brandName
+                    WHERE `Id` = :id
+                    ";
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
             $statement->bindValue(':brandName', $brandName, PDO::PARAM_STR);

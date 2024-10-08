@@ -114,32 +114,11 @@
             return;
         }
 
-
-        //Kiểm tra tên thương hiệu
-        if (isTenNhaCungCapExists(brandName.value.trim())) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: 'Tên thương hiệu đã tồn tại',
-            });
-            brandName.focus();
-            event.preventDefault();
-            return;
-        }
         let isCreateNhaCungCapComplete = createNhaCungCap(
             brandName.value,
             // Email.value,
             // SoDienThoai.value
         );
-
-        //Sau khi tạo xong chuyển về trang QLNhaCungCap
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: 'Thêm thương hiệu mới thành công !!',
-        }).then(() => {
-            window.location.href = 'QLNhaCungCap.php';
-        });
 
     });
 
@@ -157,21 +136,14 @@
                 BrandName: brandName // Gửi thông tin thương hiệu
             }),
             success: function(data) {
-                if (data.status === 200) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Thành công!',
-                        text: 'Tạo nhà cung cấp thành công!',
-                    }).then(function() {
-                        window.location.href = 'QLNhaCungCap.php'; // Chuyển hướng đến trang quản lý nhà cung cấp
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Cảnh báo!',
-                        text: data.message, // Thông điệp từ máy chủ
-                    });
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Tạo nhà cung cấp thành công!',
+                }).then(function() {
+                    window.location.href = 'QLNhaCungCap.php'; // Chuyển hướng đến trang quản lý nhà cung cấp
+                });
+
             },
             error: function(xhr) {
                 // Xử lý tất cả các status code khác

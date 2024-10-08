@@ -257,7 +257,7 @@
         // Thực hiện gọi Ajax để xóa nhà cung cấp
         var token = sessionStorage.getItem('token');
         $.ajax({
-          url: '../../../Controllers/BrandController.php' + brandId,
+          url: '../../../Controllers/BrandController.php?id=' + brandId,
           type: 'DELETE',
           headers: {
             'Authorization': 'Bearer ' + token
