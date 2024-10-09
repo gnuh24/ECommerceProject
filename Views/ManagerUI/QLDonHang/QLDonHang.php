@@ -177,20 +177,21 @@
     }
 
     function renderTableBody(data) {
+        console.log(data);
         var tableBody = document.getElementById("tableBody");
         var html = '';
-        $.each(data.content, function(index, record) {
-            let totalPriceFormat = number_format_vnd(record.totalPrice);
+        $.each(data, function(index, record) {
+            let totalPriceFormat = number_format_vnd(record.TotalPrice);
             html += '<tr>';
-            html += '<td>' + record.id + '</td>';
-            html += '<td>' + record.orderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
+            html += '<td>' + record.Id + '</td>';
+            html += '<td>' + record.OrderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
             html += '<td>' + totalPriceFormat + '</td>';
-            html += '<td>' + record.fullname + '</td>';
-            html += '<td>' + record.phoneNumber + '</td>';
-            html += '<td>' + formatStatus(record.status) + '</td>';
+            html += '<td>' + record.Fullname + '</td>';
+            html += '<td>' + record.PhoneNumber + '</td>';
+            html += '<td>' + formatStatus(record.Status) + '</td>';
 
             html += '<td style="display: flex; gap: 5px;">';
-            html += '<a href="./ChiTietDonHang.php?id=' + record.id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
+            html += '<a href="./ChiTietDonHang.php?id=' + record.Id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
 
             // Nút Cập nhật trạng thái (màu xanh lá) với nội dung tùy thuộc vào trạng thái
             if (record.status !== 'GiaoThanhCong' && record.status !== 'Huy') {
@@ -201,19 +202,20 @@
                     <button 
                         type="button" 
                         class="update-status" 
-                        onclick="updateStatus('${record.id}', '${nextStatus}')"
+                        onclick="updateStatus('${record.Id}', '${nextStatus}')"
                     >
                         ${updateStatusText}
                     </button>`;
             }
 
             // Kiểm tra trạng thái trước khi hiển thị nút Hủy
-            if (record.status !== 'DaDuyet' && record.status !== 'GiaoThanhCong' && record.status !== 'Huy' && record.status !== 'DangGiao') {
+            if (record.Status === "ChoDuyet") {
+
                 html += `
                       <button 
                           type="button" 
                           class="cancel" 
-                          onclick="updateStatus('${record.id}', 'Huy')"
+                          onclick="updateStatus('${record.Id}', 'Huy')"
                       >
                           Hủy
                       </button>`;
@@ -254,18 +256,18 @@
         $.ajax({
             type: "GET",
             url: "../../../Controllers/OrderController.php",
+            dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             data: {
-                pageNumber: page,
-                sort: "orderTime,desc",
+                page: page,
                 from: minNgayTao,
                 to: maxNgayTao,
                 status: trangThai,
             },
             success: function(response) {
-                renderTableBody(response);
+                renderTableBody(response.data);
                 renderPagination(response.totalPages, page);
             },
             error: function(error) {

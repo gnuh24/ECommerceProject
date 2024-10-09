@@ -1,6 +1,59 @@
 <?php
-require_once __DIR__ . "/../../Models/OrderModel.php";
+require_once __DIR__ . "/../Models/OrderModel.php";
+require '../vendor/autoload.php';
 
+$controller = new OrderController();
+
+switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+        if (isset($_GET['orderId'])) {
+            $response = $controller->getOrderById($_GET['orderId']);
+            echo $response;
+        } elseif (isset($_GET['accountId'])) {
+            $response = $controller->getOrdersByAccountId($_GET['accountId']);
+            echo $response;
+        } else {
+            $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $size = isset($_GET['size']) ? (int)$_GET['size'] : 10;
+            $minNgayTao = $_GET['minNgayTao'] ?? null;
+            $maxNgayTao = $_GET['maxNgayTao'] ?? null;
+            $status = $_GET['status'] ?? null;
+
+            $response = $controller->getAllOrders($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);
+            echo $response;
+        }
+        break;
+
+    case 'POST':
+        $response = $controller->createOrder();
+        echo $response;
+        break;
+
+    case 'PUT':
+        if (isset($_GET['orderId'])) {
+            $response = $controller->updateOrder($_GET['orderId']);
+            echo $response;
+        } else {
+            http_response_code(400);
+            echo json_encode(["status" => 400, "message" => "Order ID is required for update."]);
+        }
+        break;
+
+    case 'DELETE':
+        if (isset($_GET['orderId'])) {
+            $response = $controller->deleteOrder($_GET['orderId']);
+            echo $response;
+        } else {
+            http_response_code(400);
+            echo json_encode(["status" => 400, "message" => "Order ID is required for deletion."]);
+        }
+        break;
+
+    default:
+        http_response_code(405);
+        echo json_encode(["status" => 405, "message" => "Method not allowed."]);
+        break;
+}
 class OrderController
 {
     private $orderModel;
@@ -9,62 +62,43 @@ class OrderController
     {
         $this->orderModel = new OrderModel();
     }
-
-    // Lấy tất cả các đơn hàng
-    public function getAllOrders()
+    public function getAllOrders($pageNumber = 1, $size = 10, $minNgayTao = null, $maxNgayTao = null, $status = null)
     {
-        $response = $this->orderModel->getAllOrders();
+        $response = $this->orderModel->getAllOrder($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);
         $this->response($response);
     }
-
-    // Lấy đơn hàng theo Id
     public function getOrderById($orderId)
     {
         $response = $this->orderModel->getOrderById($orderId);
         $this->response($response);
     }
 
-    // Tạo đơn hàng mới
-    public function createOrder()
+    public function createOrder($data)
     {
-        // Giả sử bạn đã lấy dữ liệu từ request (POST)
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        // Kiểm tra dữ liệu hợp lệ
-        if (!isset($data['orderId'], $data['orderTime'], $data['totalPrice'], $data['note'], $data['accountId'])) {
+        if (!isset($data['totalPrice'], $data['note'], $data['accountId'])) {
             return $this->response((object)[
                 "status" => 400,
                 "message" => "Invalid input data"
             ]);
         }
 
-        $response = $this->orderModel->createOrder(
-            $data['orderId'],
-            $data['orderTime'],
-            $data['totalPrice'],
-            $data['note'],
-            $data['accountId']
-        );
-
+        $response = $this->orderModel->createOrder((object)$data);
         $this->response($response);
     }
 
     // Cập nhật thông tin đơn hàng
-    public function updateOrder($orderId)
-    {
-        // Giả sử bạn đã lấy dữ liệu từ request (PUT)
-        $data = json_decode(file_get_contents("php://input"), true);
+    // public function updateOrder($orderId, $data)
+    // {
+    //     if (!isset($data['totalPrice'], $data['note'])) {
+    //         return $this->response((object)[
+    //             "status" => 400,
+    //             "message" => "Invalid input data"
+    //         ]);
+    //     }
 
-        if (!isset($data['totalPrice'], $data['note'])) {
-            return $this->response((object)[
-                "status" => 400,
-                "message" => "Invalid input data"
-            ]);
-        }
-
-        $response = $this->orderModel->updateOrder($orderId, $data['totalPrice'], $data['note']);
-        $this->response($response);
-    }
+    //     $response = $this->orderModel->updateOrder($orderId, $data['totalPrice'], $data['note']);
+    //     $this->response($response);
+    // }
 
     // Xóa đơn hàng theo Id
     public function deleteOrder($orderId)
@@ -89,7 +123,6 @@ class OrderController
             "data" => $result->data ?? null
         ];
 
-        // Kiểm tra và thêm totalPages nếu có trong kết quả
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
         }

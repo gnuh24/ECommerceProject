@@ -37,16 +37,16 @@ class OrderStatusModel
     }
 
     // Tạo trạng thái mới cho đơn hàng lần đầu
-    public function createOrderStatusFirstTime($form)
+    public function createOrderStatusFirstTime($orderId, $status, $updateTime)
     {
         $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
                   VALUES (:orderId, :status, :updateTime)";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $form->orderId, PDO::PARAM_STR);
-            $statement->bindValue(':status', $form->status, PDO::PARAM_STR);
-            $statement->bindValue(':updateTime', $form->updateTime, PDO::PARAM_STR);
+            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
+            $statement->bindValue(':status', $status, PDO::PARAM_STR);
+            $statement->bindValue(':updateTime', $updateTime, PDO::PARAM_STR);
             $statement->execute();
             return (object) [
                 "status" => 201,
@@ -60,25 +60,7 @@ class OrderStatusModel
         }
     }
 
-    // Tạo trạng thái đơn hàng (có kiểm tra tồn kho)
-    public function createOrderStatus($token, $form)
-    {
-        // Kiểm tra tồn kho ở đây
-        // Nếu không đủ hàng tồn kho, ném exception NotEnoughInventory
-        // ...
 
-        return $this->createOrderStatusFirstTime($form);
-    }
-
-    // Tạo trạng thái đơn hàng (có xác thực quyền truy cập)
-    public function createOrderStatusWithAccess($token, $form)
-    {
-        // Kiểm tra quyền truy cập ở đây
-        // Nếu không có quyền, ném exception AccessDeniedException
-        // ...
-
-        return $this->createOrderStatus($token, $form);
-    }
 
     // Cập nhật trạng thái của đơn hàng
     public function updateOrderStatus($orderId, $status, $updateTime)

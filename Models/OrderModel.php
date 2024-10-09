@@ -11,14 +11,102 @@ class OrderModel
     }
 
     // Lấy tất cả các đơn hàng với phân trang và tìm kiếm
-    public function getAllOrder($page, $size, $search)
+    public function getAllOrder($pageNumber, $size, $minNgayTao, $maxNgayTao, $status)
     {
-        $query = "SELECT * FROM `order` WHERE `Note` LIKE :search LIMIT :offset, :size";
-        $offset = ($page - 1) * $size;
+        // Xác định phần sụt giảm và điều kiện cho truy vấn
+        $offset = ($pageNumber - 1) * $size;
+        $query = "
+        SELECT o.*, os.Status, u.Fullname, u.Email, u.PhoneNumber, u.Address, u.Birthday, u.Gender
+        FROM `Order` o
+        LEFT JOIN `OrderStatus` os ON o.Id = os.OrderId
+        LEFT JOIN `UserInformation` u ON o.AccountId = u.Id
+        WHERE 1=1
+    ";
 
+        // Kiểm tra điều kiện ngày bắt đầu và ngày kết thúc
+        if (!empty($minNgayTao) && !empty($maxNgayTao)) {
+            // Cả 2 ngày đều tồn tại
+            $query .= " AND o.OrderTime BETWEEN :from AND :to";
+        } elseif (!empty($minNgayTao)) {
+            // Chỉ ngày bắt đầu tồn tại
+            $query .= " AND o.OrderTime >= :from";
+        } elseif (!empty($maxNgayTao)) {
+            // Chỉ ngày kết thúc tồn tại
+            $query .= " AND o.OrderTime <= :to";
+        }
+
+        // Điều kiện trạng thái đơn hàng nếu có
+        if (!empty($status)) {
+            $query .= " AND os.Status = :status";
+        }
+
+        $query .= "
+        AND os.UpdateTime = (
+            SELECT MAX(os2.UpdateTime)
+            FROM `OrderStatus` os2
+            WHERE os2.OrderId = o.Id
+        )
+    ";
+
+        // Tính toán tổng số đơn hàng
+        $countQuery = "
+        SELECT COUNT(*) AS total
+        FROM `Order` o
+        LEFT JOIN `OrderStatus` os ON o.Id = os.OrderId
+        LEFT JOIN `UserInformation` u ON o.AccountId = u.Id
+        WHERE 1=1
+    ";
+
+        // Điều kiện ngày bắt đầu và ngày kết thúc cho truy vấn đếm
+        if (!empty($minNgayTao) && !empty($maxNgayTao)) {
+            $countQuery .= " AND o.OrderTime BETWEEN :from AND :to";
+        } elseif (!empty($minNgayTao)) {
+            $countQuery .= " AND o.OrderTime >= :from";
+        } elseif (!empty($maxNgayTao)) {
+            $countQuery .= " AND o.OrderTime <= :to";
+        }
+
+        // Điều kiện trạng thái đơn hàng nếu có
+        if (!empty($status)) {
+            $countQuery .= " AND os.Status = :status";
+        }
+
+        $countQuery .= "
+        AND os.UpdateTime = (
+            SELECT MAX(os2.UpdateTime)
+            FROM `OrderStatus` os2
+            WHERE os2.OrderId = o.Id
+        )
+    ";
+
+        // Thực hiện truy vấn đếm
         try {
+            $countStatement = $this->connection->prepare($countQuery);
+            if (!empty($minNgayTao)) {
+                $countStatement->bindValue(':from', $minNgayTao, PDO::PARAM_STR);
+            }
+            if (!empty($maxNgayTao)) {
+                $countStatement->bindValue(':to', $maxNgayTao, PDO::PARAM_STR);
+            }
+            if (!empty($status)) {
+                $countStatement->bindValue(':status', $status, PDO::PARAM_STR);
+            }
+            $countStatement->execute();
+            $totalCount = $countStatement->fetchColumn();
+            $totalPages = ceil($totalCount / $size); // Tính tổng số trang
+
+            // Truy vấn lấy dữ liệu đơn hàng
+            $query .= " ORDER BY o.OrderTime DESC LIMIT :offset, :size";
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            if (!empty($minNgayTao)) {
+                $statement->bindValue(':from', $minNgayTao, PDO::PARAM_STR);
+            }
+            if (!empty($maxNgayTao)) {
+                $statement->bindValue(':to', $maxNgayTao, PDO::PARAM_STR);
+            }
+            if (!empty($status)) {
+                $statement->bindValue(':status', $status, PDO::PARAM_STR);
+            }
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
             $statement->bindValue(':size', $size, PDO::PARAM_INT);
             $statement->execute();
@@ -27,6 +115,7 @@ class OrderModel
             return (object) [
                 "status" => 200,
                 "message" => "Orders fetched successfully",
+                "totalPages" => $totalPages,
                 "data" => $result
             ];
         } catch (PDOException $e) {
@@ -36,6 +125,9 @@ class OrderModel
             ];
         }
     }
+
+
+
 
     // Kiểm tra xem đơn hàng có thuộc về ID người dùng không
     public function isOrderBelongToThisId($userInformationId, $orderId)
@@ -69,22 +161,6 @@ class OrderModel
         return $this->getOrder($orderId);
     }
 
-    // Lấy đơn hàng theo Id với xác thực token
-    public function getOrderByIdWithToken($token, $orderId)
-    {
-        // Giả định rằng bạn đã xác thực token và lấy được AccountId từ nó
-        $accountId = $this->getAccountIdFromToken($token);
-
-        if ($this->isOrderBelongToThisId($accountId, $orderId)) {
-            return $this->getOrder($orderId);
-        } else {
-            return (object) [
-                "status" => 403,
-                "message" => "Access denied"
-            ];
-        }
-    }
-
     // Tạo đơn hàng mới
     public function createOrder($form)
     {
@@ -96,15 +172,6 @@ class OrderModel
 
         return $this->createNewOrder($orderId, $orderTime, $totalPrice, $note, $accountId);
     }
-
-    // Hàm lấy AccountId từ token (giả định)
-    private function getAccountIdFromToken($token)
-    {
-        // Giả định bạn có một hàm để lấy AccountId từ token
-        // Ví dụ: giải mã JWT hoặc xác thực token
-        return 1; // Thay đổi tùy theo logic thực tế của bạn
-    }
-
     // Phương thức riêng để lấy đơn hàng theo Id
     private function getOrder($orderId)
     {

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Models/OrderDetailModel.php";
+require_once __DIR__ . "/../Models/OrderDetailModel.php";
 
 class OrderDetailController
 {

@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `Order` (
     `OrderTime`         DATETIME           NOT NULL,
     `TotalPrice`        INT UNSIGNED       NOT NULL,
     `Note`              TEXT,		
-    `AccountId`         INT UNSIGNED,
+    `AccountId`         INT UNSIGNED, 
     FOREIGN KEY (`AccountId`) REFERENCES `Account` (`Id`)
 );
 
