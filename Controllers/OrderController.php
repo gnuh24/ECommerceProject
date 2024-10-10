@@ -6,8 +6,8 @@ $controller = new OrderController();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        if (isset($_GET['orderId'])) {
-            $response = $controller->getOrderById($_GET['orderId']);
+        if (isset($_GET['id'])) {
+            $response = $controller->getOrderById($_GET['id']);
             echo $response;
         } elseif (isset($_GET['accountId'])) {
             $response = $controller->getOrdersByAccountId($_GET['accountId']);
@@ -15,8 +15,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $size = isset($_GET['size']) ? (int)$_GET['size'] : 10;
-            $minNgayTao = $_GET['minNgayTao'] ?? null;
-            $maxNgayTao = $_GET['maxNgayTao'] ?? null;
+            $minNgayTao = isset($_GET['from']) ? urldecode($_GET['from']) : null;
+            $maxNgayTao = isset($_GET['to']) ? urldecode($_GET['to']) : null;
+
             $status = $_GET['status'] ?? null;
 
             $response = $controller->getAllOrders($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);

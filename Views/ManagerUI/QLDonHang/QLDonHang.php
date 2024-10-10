@@ -92,14 +92,17 @@
         loadDataToTable(udPage, null, null, null);
 
         $("#dateStart").on("change", function() {
-            udminNgayTao = $(this).val();
+            let value = $(this).val();
+            udminNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
             loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
         });
 
         $("#dateEnd").on("change", function() {
-            udmaxNgayTao = $(this).val();
+            let value = $(this).val();
+            udmaxNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
             loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
         });
+
 
         $("#TrangThai").on("change", function() {
             udtrangThai = $(this).val();
@@ -155,26 +158,28 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    type: "POST",
-                    url: "../../../Controllers/OrderStatusController.php",
+                    type: "PATCH",
+                    url: "../../../Controllers/OrderStatusController.php?orderId=" + orderId, // Thêm orderId vào URL
                     headers: {
                         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                     },
-                    data: {
-                        orderId: orderId,
-                        idStatus: currentStatus
-                    },
+                    contentType: "application/json", // Định dạng dữ liệu là JSON
+                    data: JSON.stringify({
+                        status: currentStatus,
+                        updateTime: new Date().toISOString() // Thêm thời gian hiện tại vào dữ liệu
+                    }),
                     success: function(response) {
                         Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
-                        loadDataToTable(udPage, udminNgayTao, udmaxNgayTao, udtrangThai);
+                        loadDataToTable(udPage, udminNgayTao, udmaxNgayTao, udtrangThai); // Cập nhật lại bảng
                     },
                     error: function(error) {
-                        Swal.fire('Thất bại!', error.responseJSON.detailMessage, 'error');
+                        Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
                     }
                 });
             }
         });
     }
+
 
     function renderTableBody(data) {
         console.log(data);
@@ -194,9 +199,9 @@
             html += '<a href="./ChiTietDonHang.php?id=' + record.Id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
 
             // Nút Cập nhật trạng thái (màu xanh lá) với nội dung tùy thuộc vào trạng thái
-            if (record.status !== 'GiaoThanhCong' && record.status !== 'Huy') {
-                const updateStatusText = getUpdateStatusText(record.status);
-                const nextStatus = getUpdateStatus(record.status);
+            if (record.Status !== 'GiaoThanhCong' && record.Status !== 'Huy') {
+                const updateStatusText = getUpdateStatusText(record.Status);
+                const nextStatus = getUpdateStatus(record.Status);
 
                 html += `
                     <button 
@@ -225,6 +230,24 @@
         });
         tableBody.innerHTML = html;
     }
+
+    function convertDateFormat(dateString) {
+        // Kiểm tra định dạng đầu vào
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) {
+            throw new Error("Định dạng ngày không hợp lệ. Vui lòng sử dụng 'yyyy-MM-dd'.");
+        }
+
+        // Tách các phần của ngày
+        const parts = dateString.split('-');
+        const year = parts[0];
+        const month = parts[1];
+        const day = parts[2];
+
+        // Trả về định dạng mới
+        return `${year}/${month}/${day}`; // Đổi thành yyyy/mm/dd
+    }
+
 
     function formatStatus(status) {
         switch (status) {

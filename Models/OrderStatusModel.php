@@ -36,17 +36,17 @@ class OrderStatusModel
         }
     }
 
-    // Tạo trạng thái mới cho đơn hàng lần đầu
-    public function createOrderStatusFirstTime($orderId, $status, $updateTime)
+    // Tạo trạng thái đơn hàng lần đầu tiên
+    public function createOrderStatusFirstTime($form)
     {
         $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
                   VALUES (:orderId, :status, :updateTime)";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':status', $status, PDO::PARAM_STR);
-            $statement->bindValue(':updateTime', $updateTime, PDO::PARAM_STR);
+            $statement->bindValue(':orderId', $form->orderId, PDO::PARAM_STR);
+            $statement->bindValue(':status', $form->status, PDO::PARAM_STR);
+            $statement->bindValue(':updateTime', $form->updateTime, PDO::PARAM_STR);
             $statement->execute();
             return (object) [
                 "status" => 201,
@@ -60,14 +60,11 @@ class OrderStatusModel
         }
     }
 
-
-
-    // Cập nhật trạng thái của đơn hàng
-    public function updateOrderStatus($orderId, $status, $updateTime)
+    // Tạo trạng thái mới cho đơn hàng (không phải lần đầu)
+    public function createOrderStatus($orderId, $status, $updateTime)
     {
-        $query = "UPDATE `OrderStatus` 
-                  SET `UpdateTime` = :updateTime 
-                  WHERE `OrderId` = :orderId AND `Status` = :status";
+        $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
+                  VALUES (:orderId, :status, :updateTime)";
 
         try {
             $statement = $this->connection->prepare($query);
@@ -75,33 +72,9 @@ class OrderStatusModel
             $statement->bindValue(':status', $status, PDO::PARAM_STR);
             $statement->bindValue(':updateTime', $updateTime, PDO::PARAM_STR);
             $statement->execute();
-
             return (object) [
-                "status" => 200,
-                "message" => "Order status updated successfully"
-            ];
-        } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
-
-    // Xóa trạng thái của đơn hàng
-    public function deleteOrderStatus($orderId, $status)
-    {
-        $query = "DELETE FROM `OrderStatus` WHERE `OrderId` = :orderId AND `Status` = :status";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':status', $status, PDO::PARAM_STR);
-            $statement->execute();
-
-            return (object) [
-                "status" => 200,
-                "message" => "Order status deleted successfully"
+                "status" => 201,
+                "message" => "Order status created successfully"
             ];
         } catch (PDOException $e) {
             return (object) [

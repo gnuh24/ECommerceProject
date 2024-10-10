@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../Controllers/OrderStatusController.php";
+require_once __DIR__ . "/../Models/OrderStatusModel.php";
 
 $controller = new OrderStatusController();
 
@@ -19,35 +19,30 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['orderId']) && isset($data['status']) && isset($data['updateTime'])) {
             // Tạo trạng thái đơn hàng lần đầu
-            $controller->createOrderStatusFirstTime($data['orderId'], $data['status'], $data['updateTime']);
+            $controller->createOrderStatusFirstTime($data);
         } else {
             http_response_code(400);
             echo json_encode(["status" => 400, "message" => "Order ID, status, and update time are required."]);
         }
         break;
 
-    case 'PUT':
-        // Nhận dữ liệu từ PUT request
+    case 'PATCH':
+        // Nhận dữ liệu từ PATCH request
         $data = json_decode(file_get_contents('php://input'), true);
+
+        // Kiểm tra xem đã truyền đầy đủ các tham số orderId, status và updateTime hay chưa
         if (isset($_GET['orderId']) && isset($data['status']) && isset($data['updateTime'])) {
-            // Cập nhật trạng thái đơn hàng
-            $controller->updateOrderStatus($_GET['orderId'], $data['status'], $data['updateTime']);
+            // Truyền tất cả tham số vào controller để cập nhật trạng thái đơn hàng
+            $controller->createOrderStatus(
+                $_GET['orderId'], // Lấy orderId từ URL
+                $data['status'],   // Lấy status từ request body
+                $data['updateTime'] // Lấy updateTime từ request body
+            );
         } else {
             http_response_code(400);
-            echo json_encode(["status" => 400, "message" => "Order ID, status, and update time are required for update."]);
+            echo json_encode(["status" => 400, "message" => "Order ID, status, and update time are required."]);
         }
         break;
-
-    case 'DELETE':
-        if (isset($_GET['orderId']) && isset($_GET['status'])) {
-            // Xóa trạng thái đơn hàng
-            $controller->deleteOrderStatus($_GET['orderId'], $_GET['status']);
-        } else {
-            http_response_code(400);
-            echo json_encode(["status" => 400, "message" => "Order ID and status are required for deletion."]);
-        }
-        break;
-
     default:
         http_response_code(405);
         echo json_encode(["status" => 405, "message" => "Method not allowed."]);
@@ -70,24 +65,17 @@ class OrderStatusController
         $this->response($response);
     }
 
-    // Tạo trạng thái đơn hàng lần đầu
-    public function createOrderStatusFirstTime($orderId, $status, $updateTime)
+    // Tạo trạng thái đơn hàng lần đầu tiên
+    public function createOrderStatusFirstTime($data)
     {
-        $response = $this->orderStatusModel->createOrderStatusFirstTime($orderId, $status, $updateTime);
+        $response = $this->orderStatusModel->createOrderStatusFirstTime((object) $data);
         $this->response($response);
     }
 
-    // Cập nhật trạng thái đơn hàng
-    public function updateOrderStatus($orderId, $status, $updateTime)
+    // Tạo trạng thái mới cho đơn hàng (không phải lần đầu)
+    public function createOrderStatus($orderId, $status, $updateTime)
     {
-        $response = $this->orderStatusModel->updateOrderStatus($orderId, $status, $updateTime);
-        $this->response($response);
-    }
-
-    // Xóa trạng thái đơn hàng
-    public function deleteOrderStatus($orderId, $status)
-    {
-        $response = $this->orderStatusModel->deleteOrderStatus($orderId, $status);
+        $response = $this->orderStatusModel->createOrderStatus($orderId, $status, $updateTime);
         $this->response($response);
     }
 
@@ -101,11 +89,6 @@ class OrderStatusController
             "message" => $result->message,
             "data" => $result->data ?? null
         ];
-
-        // Nếu có số trang (trong trường hợp lấy danh sách)
-        if (isset($result->totalPages)) {
-            $response['totalPages'] = $result->totalPages;
-        }
 
         echo json_encode($response);
     }
