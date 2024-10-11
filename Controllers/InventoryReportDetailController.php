@@ -1,82 +1,31 @@
 <?php
-require_once __DIR__ . "/../Models/InventoryReportModel.php";
+require_once __DIR__ . "/../Models/InventoryReportDetailModel.php";
 require '../vendor/autoload.php';
 
-class InventoryReportController
+class InventoryReportDetailController
 {
-    private $inventoryReportModel;
+    private $inventoryReportDetailModel;
 
     public function __construct()
     {
-        $this->inventoryReportModel = new InventoryReportModel();
+        $this->inventoryReportDetailModel = new InventoryReportDetailModel(); // Chỉnh sửa tên lớp thành InventoryReportDetailModel
     }
-
-    // Lấy tất cả báo cáo tồn kho
-    public function getAllReports()
+    // Lấy chi tiết báo cáo tồn kho theo ID
+    public function getInventoryReportDetailById($id)
     {
-        $response = $this->inventoryReportModel->getAllReports();
+        $response = $this->inventoryReportDetailModel->getInventoryReportDetailById($id); // Gọi đến phương thức trong model
         echo json_encode($response);
     }
 
-    // Lấy báo cáo tồn kho theo ID
-    public function getReportById($id)
+    // Tạo chi tiết báo cáo tồn kho
+    public function createInventoryReportDetail($inventoryReportId, $inventoryDetails)
     {
-        $response = $this->inventoryReportModel->getReportById($id);
-        echo json_encode($response);
-    }
-
-    // Tạo báo cáo tồn kho mới
-    public function createReport()
-    {
-        // Giả định dữ liệu được gửi qua POST
-        $data = json_decode(file_get_contents("php://input"), true);
-        $supplier = $data['supplier'] ?? null;
-        $supplierPhone = $data['supplierPhone'] ?? null;
-        $totalPrice = $data['totalPrice'] ?? null;
-
-        if ($supplier && $supplierPhone && $totalPrice) {
-            $response = $this->inventoryReportModel->createReport($supplier, $supplierPhone, $totalPrice);
-            echo json_encode($response);
+        if (!empty($inventoryDetails)) {
+            // Gọi phương thức để thêm chi tiết vào model
+            $response = $this->inventoryReportDetailModel->addInventoryReportDetails($inventoryReportId, $inventoryDetails);
+            return $response;
         } else {
-            echo json_encode([
-                "status" => 400,
-                "message" => "Invalid input data"
-            ]);
+            return (object) ["status" => 400, "message" => "No inventory details provided."];
         }
-    }
-
-    // Cập nhật báo cáo tồn kho
-    public function updateReport($id)
-    {
-        // Giả định dữ liệu được gửi qua POST
-        $data = json_decode(file_get_contents("php://input"), true);
-        $supplier = $data['supplier'] ?? null;
-        $supplierPhone = $data['supplierPhone'] ?? null;
-        $totalPrice = $data['totalPrice'] ?? null;
-
-        if ($supplier && $supplierPhone && $totalPrice) {
-            $response = $this->inventoryReportModel->updateReport($id, $supplier, $supplierPhone, $totalPrice);
-            echo json_encode($response);
-        } else {
-            echo json_encode([
-                "status" => 400,
-                "message" => "Invalid input data"
-            ]);
-        }
-    }
-    private function response($result)
-    {
-        http_response_code($result->status);
-        $response = [
-            "message" => $result->message,
-            "data" => $result->data ?? null
-        ];
-
-        // Kiểm tra và thêm totalPages nếu có trong kết quả
-        if (isset($result->totalPages)) {
-            $response['totalPages'] = $result->totalPages;
-        }
-
-        echo json_encode($response);
     }
 }

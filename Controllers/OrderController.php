@@ -115,7 +115,6 @@ class OrderController
         $this->response($response);
     }
 
-    // Phương thức xử lý phản hồi
     private function response($result)
     {
         http_response_code($result->status);

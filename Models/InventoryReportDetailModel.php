@@ -33,29 +33,33 @@ class InventoryReportDetailModel
         }
     }
 
-    // Tạo chi tiết báo cáo tồn kho mới
-    public function createInventoryReportDetail($form)
+    public function addInventoryReportDetails($inventoryReportId, $inventoryDetails)
     {
         $query = "INSERT INTO `InventoryReportDetail` 
-                  (`InventoryReportId`, `ProductId`, `Quantity`, `UnitPrice`, `Total`, `Profit`) 
-                  VALUES (:inventoryReportId, :productId, :quantity, :unitPrice, :total, :profit)";
+              (`InventoryReportId`, `ProductId`, `Quantity`, `UnitPrice`, `Total`, `Profit`) 
+              VALUES (:inventoryReportId, :productId, :quantity, :unitPrice, :total, :profit)";
 
         try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':inventoryReportId', $form['InventoryReportId'], PDO::PARAM_INT);
-            $statement->bindValue(':productId', $form['ProductId'], PDO::PARAM_INT);
-            $statement->bindValue(':quantity', $form['Quantity'], PDO::PARAM_INT);
-            $statement->bindValue(':unitPrice', $form['UnitPrice'], PDO::PARAM_INT);
-            $statement->bindValue(':total', $form['Total'], PDO::PARAM_INT);
-            $statement->bindValue(':profit', $form['Profit'], PDO::PARAM_INT);
-            $statement->execute();
-            $id = $this->connection->lastInsertId();
+            $this->connection->beginTransaction();
+
+            foreach ($inventoryDetails as $detail) {
+                $statement = $this->connection->prepare($query);
+                $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
+                $statement->bindValue(':productId', $detail['ProductId'], PDO::PARAM_INT);
+                $statement->bindValue(':quantity', $detail['Quantity'], PDO::PARAM_INT);
+                $statement->bindValue(':unitPrice', $detail['UnitPrice'], PDO::PARAM_INT);
+                $statement->bindValue(':total', $detail['Total'], PDO::PARAM_INT);
+                $statement->bindValue(':profit', $detail['Profit'], PDO::PARAM_INT);
+                $statement->execute();
+            }
+
+            $this->connection->commit();
             return (object) [
                 "status" => 201,
-                "message" => "Inventory report detail created successfully",
-                "data" => $id
+                "message" => "Inventory report details created successfully"
             ];
         } catch (PDOException $e) {
+            $this->connection->rollBack();
             return (object) [
                 "status" => 400,
                 "message" => $e->getMessage()

@@ -51,17 +51,17 @@ class ProductModel
 
         // Truy vấn lấy sản phẩm
         $query = "
-        SELECT p.*, 
-            (SELECT b.UnitPrice 
-                FROM `batch` b 
-                WHERE b.ProductId = p.Id 
-                AND b.Quantity > 0 
-                ORDER BY b.ReceivingTime DESC 
-                LIMIT 1) AS UnitPrice
-        FROM `product` p
-        $whereClause
-        LIMIT :limit OFFSET :offset
-    ";
+                    SELECT p.*, 
+                        (SELECT b.UnitPrice 
+                            FROM `batch` b 
+                            WHERE b.ProductId = p.Id 
+                            AND b.Quantity > 0 
+                            ORDER BY b.ReceivingTime DESC 
+                            LIMIT 1) AS UnitPrice
+                    FROM `product` p
+                    $whereClause
+                    LIMIT :limit OFFSET :offset
+                ";
 
         try {
             $statement = $this->connection->prepare($query);
@@ -103,45 +103,42 @@ class ProductModel
 
 
     // Lấy tất cả sản phẩm của Admin
-    public function getAllProductsAdmin($brandId = null, $categoryId = null, $search = null, $minPrice = null, $maxPrice = null, $limit = 20, $offset = 0)
+    public function getAllProductsAdmin($brandId = null, $categoryId = null, $search = null, $minPrice = null, $maxPrice = null, $limit = 20, $page = 1)
     {
-        // Lưu trữ điều kiện WHERE
         $conditions = [];
         $params = [];
 
+        // Các điều kiện lọc
         if ($brandId !== null) {
             $conditions[] = "p.BrandId = :brandId";
             $params[':brandId'] = $brandId;
         }
-
         if ($categoryId !== null) {
             $conditions[] = "p.CategoryId = :categoryId";
             $params[':categoryId'] = $categoryId;
         }
-
         if ($search !== null) {
             $conditions[] = "(p.ProductName LIKE :search OR p.Id = :searchId)";
             $params[':search'] = '%' . $search . '%';
-            $params[':searchId'] = $search;  // Thêm tham số cho tìm kiếm theo ID
+            $params[':searchId'] = $search;
         }
-
         if ($minPrice !== null) {
             $conditions[] = "(SELECT MIN(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) >= :minPrice";
             $params[':minPrice'] = $minPrice;
         }
-
         if ($maxPrice !== null) {
             $conditions[] = "(SELECT MAX(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) <= :maxPrice";
             $params[':maxPrice'] = $maxPrice;
         }
 
-        // Xây dựng điều kiện WHERE nếu có
         $whereClause = '';
         if (!empty($conditions)) {
             $whereClause = 'WHERE ' . implode(' AND ', $conditions);
         }
 
-        // Truy vấn lấy sản phẩm
+        // Tính toán offset
+        $offset = ($page - 1) * $limit;
+
         $query = "
         SELECT p.*, 
             (SELECT b.UnitPrice 
@@ -169,20 +166,13 @@ class ProductModel
 
         try {
             $statement = $this->connection->prepare($query);
-
-            // Gán giá trị cho tham số LIMIT và OFFSET
             $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
-
-            // Gán các tham số khác nếu có
             foreach ($params as $key => $value) {
                 $statement->bindValue($key, $value);
             }
-
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-            // Lấy tổng số sản phẩm để hỗ trợ phân trang
             $countQuery = "SELECT COUNT(*) AS total FROM `product` p $whereClause";
             $countStatement = $this->connection->prepare($countQuery);
             foreach ($params as $key => $value) {
@@ -190,11 +180,7 @@ class ProductModel
             }
             $countStatement->execute();
             $totalCount = $countStatement->fetchColumn();
-
-            // Tính tổng số trang
             $totalPages = ceil($totalCount / $limit);
-
-            // Định dạng lại dữ liệu
             $content = array_map(function ($item) {
                 return [
                     "id" => $item['Id'],
@@ -230,6 +216,7 @@ class ProductModel
             ];
         }
     }
+
 
     // Lấy sản phẩm theo ID của Admin
     public function getProductByIdAdmin($id)

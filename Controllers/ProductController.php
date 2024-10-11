@@ -71,7 +71,7 @@ class ProductController
         $minPrice = $_GET['minPrice'] ?? null;
         $maxPrice = $_GET['maxPrice'] ?? null;
         $limit = $_GET['limit'] ?? 20;
-        $offset = $_GET['offset'] ?? 0;
+        $offset = $_GET['page'] ?? 0;
 
         $result = $this->productModel->getAllProductsAdmin($brandId, $categoryId, $search, $minPrice, $maxPrice, $limit, $offset);
         http_response_code(200);

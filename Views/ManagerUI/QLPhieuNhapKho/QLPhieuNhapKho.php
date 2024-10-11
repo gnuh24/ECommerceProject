@@ -81,7 +81,7 @@
                               <th class="Table_th__hCkcg">Mã Phiếu</th>
                               <th class="Table_th__hCkcg">Ngày Nhập Kho</th>
                               <th class="Table_th__hCkcg">Tên Nhà Cung Cấp</th>
-                              <th class="Table_th__hCkcg">Tên Người Quản Lý</th>
+                              <th class="Table_th__hCkcg">Số điện thoại nhà cung cấp</th>
                               <th class="Table_th__hCkcg"> Tổng Giá Trị</th>
                               <th class="Table_th__hCkcg">Thao Tác</th>
                             </tr>
@@ -139,8 +139,9 @@
       const day = parts[2];
 
       // Trả về định dạng mới
-      return `${day}/${month}/${year}`;
+      return `${year}/${month}/${day}`; // Đổi thành yyyy/mm/dd
     }
+
 
     // Hàm getAllphieunhapkho
     function getAllphieunhapkho(page, dateFrom, dateTo, searchTerm) {
@@ -148,15 +149,15 @@
 
       // Tạo object `data` và chỉ thêm các trường nếu chúng có giá trị
       let data = {
-        pageNumber: page
+        page: page
       };
 
       if (dateFrom) {
-        data.to = convertDateFormat(dateFrom); // Chỉ thêm vào nếu có dateFrom
+        data.dateTo = convertDateFormat(dateFrom); // Chỉ thêm vào nếu có dateFrom
       }
 
       if (dateTo) {
-        data.from = convertDateFormat(dateTo); // Chỉ thêm vào nếu có dateTo
+        data.dateFrom = convertDateFormat(dateTo); // Chỉ thêm vào nếu có dateTo
       }
 
       if (searchTerm) {
@@ -172,25 +173,26 @@
           'Authorization': 'Bearer ' + token
         },
         success: function(response) {
-          var data = response.content;
+          console.log(response)
+          var data = response.data;
           var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
           var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
           // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
           data.forEach(function(record) {
 
-            var formattedTongGiaTri = formatCurrency(record['totalPrice']);
+            var formattedTongGiaTri = formatCurrency(record['TotalPrice']);
 
             var trContent = `
-          <form id="updateForm_${record['id']}" method="post" action="taoPhieuNhapKho.php?MaPhieu=${record['id']}">
+          <form id="updateForm_${record['Id']}" method="post" action="taoPhieuNhapKho.php?MaPhieu=${record['Id']}">
             <tr>
-              <td class="Table_data" style="width: 130px;">${record['id']}</td>
-              <td class="Table_data">${record['createTime']}</td>
-              <td class="Table_data">${record['supplier']}</td>
-              <td class="Table_data">${record['supplierPhone']}</td>
+              <td class="Table_data" style="width: 130px;">${record['Id']}</td>
+              <td class="Table_data">${record['CreateTime']}</td>
+              <td class="Table_data">${record['Supplier']}</td>
+              <td class="Table_data">${record['SupplierPhone']}</td>
               <td class="Table_data">${formattedTongGiaTri}</td>
               <td class="Table_data">
-                <button class="edit" onclick="update(${record['id']})">Xem chi tiết</button>
+                <button class="edit" onclick="update(${record['Id']})">Xem chi tiết</button>
               </td>
             </tr>
           </form>
@@ -252,9 +254,19 @@
           paginationHTML += '<button class="pageButton" data-page="1"><<</button>';
         }
 
+        // Thêm nút "Trang trước"
+        if (currentPage > 1) {
+          paginationHTML += '<button class="pageButton" data-page="' + (currentPage - 1) + '"><</button>';
+        }
+
         // Tạo các nút trang
         for (var i = startPage; i <= endPage; i++) {
           paginationHTML += '<button class="pageButton" data-page="' + i + '">' + i + '</button>';
+        }
+
+        // Thêm nút "Trang tiếp theo"
+        if (currentPage < totalPages) {
+          paginationHTML += '<button class="pageButton" data-page="' + (currentPage + 1) + '">></button>';
         }
 
         // Thêm nút "Trang cuối"
@@ -274,10 +286,12 @@
         });
 
         // Đánh dấu trang hiện tại
-        paginationContainer.querySelector('.pageButton[data-page="' + currentPage + '"]').classList.add('active');
+        var activeButton = paginationContainer.querySelector('.pageButton[data-page="' + currentPage + '"]');
+        if (activeButton) {
+          activeButton.classList.add('active');
+        }
       }
     }
-
 
     // Sự kiện DOMContentLoaded
     document.addEventListener('DOMContentLoaded', function() {
