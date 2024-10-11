@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../QLTaiKhoan/UserUpdate.css" />
     <link rel="stylesheet" href="../QLTaiKhoan/oneForAll.css" />
     <style>
-        .batch-item{
+        .batch-item {
             background-color: white;
             border: 2px solid black;
             margin-top: 25px;
@@ -80,32 +80,32 @@
                                                         <input id="nongDoCon" type="text" class="input" name="nongDoCon" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
-                                                       
+
                                                         <p class="text">Trạng thái</p>
                                                         <input disabled id="status" class="input" name="status" style="width: 40rem" readonly />
 
                                                         <p class="text">Thời gian tạo</p>
                                                         <input disabled id="createTime" class="input" name="createTime" style="width: 40rem" readonly />
 
-                                                       
+
                                                         <p class="text">Mô tả sản phẩm</p>
                                                         <textarea id="moTa" class="input" name="moTa" style="width: 40rem; height: 8rem;"></textarea>
                                                     </div>
 
 
-                                                    
+
 
 
                                                     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                         <p class="text">Ảnh minh họa</p>
                                                         <img id="xuatAnh" style="width: 350px; height: 400px;" alt="">
                                                         <input id="anhMinhHoa" type="file" name="anhMinhHoa" accept="image/*">
-                                                    
+
                                                         <div id="batch" style="padding-left: 1rem; margin-left: 25px;">
 
 
                                                         </div>
-                                                    
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -152,7 +152,7 @@
         let theTich = document.getElementById("theTich");
         let nongDoCon = document.getElementById("nongDoCon");
         let anhMinhHoa = document.getElementById("anhMinhHoa");
-        
+
         let moTa = document.getElementById("moTa");
 
 
@@ -188,38 +188,40 @@
 
     function fetchProductDetails(productId) {
         $.ajax({
-            url: `http://localhost:8080/Product/Admin/${productId}`,
+            url: "../../../Controllers/ProductController.php",
             type: 'GET',
             dataType: 'json',
+            data: {
+                Id: productId,
+                action: 'getProductByIdAdmin'
+            },
             headers: {
                 "Authorization": "Bearer " + sessionStorage.getItem('token') // Gửi token trong header
             },
             success: function(data) {
                 // Điền dữ liệu vào form
-                $('#tenSanPham').val(data.productName);
-                $('#xuatXu').val(data.origin);
-                $('#thuongHieu').val(data.brand.id); // Sử dụng ID của thương hiệu
-                $('#loaiSanPham').val(data.category.id); // Sử dụng ID của loại sản phẩm
-                $('#theTich').val(data.capacity);
-                $('#nongDoCon').val(data.abv);
-                $('#status').val(data.status ? 'Đang bán' : 'Ngừng bán'); // Trạng thái
-                $('#createTime').val(data.createTime); // Thời gian tạo
-                $('#quantity').val(data.quantity); // Số lượng
-                $('#moTa').val(data.description); // Mô tả
-
-                console.log(data);
+                $('#tenSanPham').val(data.data.productName);
+                $('#xuatXu').val(data.data.origin);
+                $('#thuongHieu').val(data.data.brand.id); // Sử dụng ID của thương hiệu
+                $('#loaiSanPham').val(data.data.category.id); // Sử dụng ID của loại sản phẩm
+                $('#theTich').val(data.data.capacity);
+                $('#nongDoCon').val(data.data.abv);
+                $('#status').val(data.data.status ? 'Đang bán' : 'Ngừng bán'); // Trạng thái
+                $('#createTime').val(data.data.createTime); // Thời gian tạo
+                $('#quantity').val(data.data.quantity); // Số lượng
+                $('#moTa').val(data.data.description); // Mô tả
 
                 // Cập nhật hình ảnh
-                $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.image);
+                $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.data.image);
 
                 // Xử lý phần batches
                 const batchesContainer = $('#batch');
                 batchesContainer.empty(); // Clear the current content in the #batch div
 
-                if (data.batches && data.batches.length > 0) {
+                if (data.data.batches && data.data.batches.length > 0) {
                     // Loop through each batch and add it to the #batch div
-                        data.batches.forEach((batch, index) => {
-                            const batchHTML = `
+                    data.data.batches.forEach((batch, index) => {
+                        const batchHTML = `
                                 <div class="batch-item">
                                     <h4>Lô số ${index + 1}</h4>
                                     <p>Đơn giá: ${batch.price} VND</p>
@@ -227,16 +229,16 @@
                                     <p>Ngày nhập: ${batch.receivingTime}</p>
                                 </div>
                             `;
-                            batchesContainer.append(batchHTML); // Append each batch to the #batch div
-                        });
-                    } else {
-                        // If no batches are available, show a message
-                        batchesContainer.append('<p>No batches available</p>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
+                        batchesContainer.append(batchHTML); // Append each batch to the #batch div
+                    });
+                } else {
+                    // If no batches are available, show a message
+                    batchesContainer.append('<p>No batches available</p>');
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
         });
     }
 
@@ -245,14 +247,14 @@
 
     function getCategories() {
         $.ajax({
-            url: 'http://localhost:8080/Category/noPaging', // API lấy danh sách loại sản phẩm
+            url: "../../../Controllers/CategoryController.php",
             type: 'GET',
             dataType: 'json',
             success: function(data) {
                 let categorySelect = $('#loaiSanPham');
                 categorySelect.empty(); // Xóa các options cũ
-                data.forEach(function(category) {
-                    categorySelect.append(new Option(category.categoryName, category.id));
+                data.data.forEach(function(category) {
+                    categorySelect.append(new Option(category.CategoryName, category.Id));
                 });
             },
             error: function(xhr, status, error) {
@@ -263,14 +265,14 @@
 
     function getBrand() {
         $.ajax({
-            url: 'http://localhost:8080/Brand/noPaging', // API lấy danh sách thương hiệu
+            url: "../../../Controllers/BrandController.php",
             type: 'GET',
             dataType: 'json',
             success: function(data) {
                 let brandSelect = $('#thuongHieu');
                 brandSelect.empty(); // Xóa các options cũ
-                data.forEach(function(brand) {
-                    brandSelect.append(new Option(brand.brandName, brand.brandId));
+                data.data.forEach(function(brand) {
+                    brandSelect.append(new Option(brand.BrandName, brand.Id));
                 });
             },
             error: function(xhr, status, error) {
@@ -303,35 +305,41 @@
         });
     }
 
-
-
-
-    function updateSanPham(id,  anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa) {
-        var formData = new FormData();
-        formData.append("id", id); // ID là bắt buộc cho việc cập nhật
-        formData.append("categoryId", Number(maLoaiSanPham)); // Ép kiểu số nguyên cho categoryId
-        formData.append("origin", xuatXu);
-        formData.append("brandId", Number(thuongHieu)); // Ép kiểu số nguyên cho brandId
-        formData.append("capacity", theTich);
-        formData.append("abv", nongDoCon);
-        formData.append("description", moTa);
+    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa) {
+        // Tạo đối tượng dữ liệu
+        var dataToSend = {
+            id: id,
+            categoryId: Number(maLoaiSanPham),
+            origin: xuatXu,
+            brandId: Number(thuongHieu),
+            capacity: theTich,
+            abv: nongDoCon,
+            description: moTa
+        };
 
         // Thêm file ảnh nếu có
         if (anhMinhHoa) {
-            formData.append("image", anhMinhHoa); // Gửi file ảnh kèm theo formData
+            // Chuyển đổi file ảnh thành base64 nếu cần
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                dataToSend.image = reader.result; // Lưu trữ ảnh dưới dạng base64
+                sendUpdateRequest(dataToSend);
+            }
+            reader.readAsDataURL(anhMinhHoa); // Đọc file ảnh
+        } else {
+            sendUpdateRequest(dataToSend);
         }
+    }
 
+    function sendUpdateRequest(data) {
         $.ajax({
-            url: 'http://localhost:8080/Product', // Thay URL bằng đúng API của bạn
-            type: 'PATCH', // Sử dụng PATCH cho việc cập nhật
-            data: formData,
-            processData: false, // Không xử lý dữ liệu vì chúng ta đang gửi formData
-            contentType: false, // Không đặt kiểu content-type, để jQuery tự động xử lý
-            headers: {
-                "Authorization": "Bearer " + sessionStorage.getItem('token') // Gửi token trong header
-            },
+            url: "../../../Controllers/ProductController.php",
+            type: 'PATCH',
+            contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
+            data: JSON.stringify(data), // Chuyển đổi đối tượng thành chuỗi JSON
+
             success: function(data) {
-                console.log("Sản phẩm được cập nhật thành công!");
+                console.log("Sản phẩm được cập nhật thành công!", data);
             },
             error: function(xhr, status, error) {
                 console.error('Error: ' + xhr.status + ' - ' + error);

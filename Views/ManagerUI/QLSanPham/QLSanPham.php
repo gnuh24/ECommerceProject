@@ -56,7 +56,7 @@
 
                                         <label for="state-filter">Trạng thái:</label>
                                         <select id="state-filter">
-                                            <option value="">Tất cả</option>
+                                            <option value="all">Tất cả</option>
                                             <option value="true">Kinh doanh</option>
                                             <option value="false">Ngừng kinh doanh</option>
 
@@ -116,11 +116,13 @@
 
     function getAllSanPham(page, search, trangThai, maLoaiSanPham, brandId) {
         let data = {
-            pageNumber: page,
+            page: page,
             search: search,
-            status: trangThai
+            action: 'getAllProductsAdmin'
         };
-
+        if (trangThai !== 'all') {
+            data.status = trangThai;
+        }
         // Only include categoryId if maLoaiSanPham is not 0
         if (maLoaiSanPham !== 0) {
             data.categoryId = maLoaiSanPham;
@@ -242,7 +244,6 @@
 
         currentPage = 1;
 
-        // Gọi lại hàm getAllSanPham với các giá trị mặc định
         getAllSanPham(currentPage, "", "", 0, 0);
 
     });
@@ -390,8 +391,8 @@
                 var htmlContent = '';
 
                 // Duyệt qua danh sách loại sản phẩm và tạo option cho select
-                $.each(response, function(index, category) {
-                    htmlContent += `<option value="${category.id}">${category.categoryName}</option>`;
+                $.each(response.data, function(index, category) {
+                    htmlContent += `<option value="${category.Id}">${category.CategoryName}</option>`;
                 });
 
                 // Thêm tùy chọn "Tất cả"
@@ -417,8 +418,8 @@
                 var htmlContent = '';
 
                 // Duyệt qua danh sách thương hiệu và tạo option cho select
-                $.each(response, function(index, brand) {
-                    htmlContent += `<option value="${brand.brandId}">${brand.brandName}</option>`; // Sử dụng 'brandName'
+                $.each(response.data, function(index, brand) {
+                    htmlContent += `<option value="${brand.Id}">${brand.BrandName}</option>`; // Sử dụng 'brandName'
                 });
 
                 // Thêm tùy chọn "Tất cả"
