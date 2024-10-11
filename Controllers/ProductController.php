@@ -163,40 +163,35 @@ class ProductController
 
     public function updateProduct($id, $parsedData)
     {
-        // Kiểm tra nếu các trường bắt buộc được gửi qua form
-        if (
-            isset($parsedData['origin'], $parsedData['capacity'], $parsedData['abv'], $parsedData['description'], $parsedData['brandId'], $parsedData['categoryId'])
-        ) {
-            // Khởi tạo biến cho hình ảnh
-            $image = null;
 
-            // Kiểm tra xem có file ảnh được upload hay không
-            if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
-                // Xử lý file upload (image)
-                $image = $parsedData['image']['name'];
-                // Di chuyển file đến thư mục mong muốn
-                move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
-            }
+        // Khởi tạo biến cho hình ảnh
+        $image = null;
 
-            // Gọi hàm cập nhật sản phẩm trong mô hình
-            $result = $this->productModel->updateProduct(
-                $id,
-                $image,  // Có thể là null nếu không có file ảnh
-                $parsedData['origin'],
-                $parsedData['capacity'],
-                $parsedData['abv'],
-                $parsedData['description'],
-                intval($parsedData['brandId']),
-                intval($parsedData['categoryId'])
-            );
-
-            // Trả về phản hồi thành công
-            return $this->response($result); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
-        } else {
-            // Trả về phản hồi lỗi nếu thiếu dữ liệu bắt buộc
-            http_response_code(400);
-            return ["status" => 400, "message" => "Invalid input data"];
+        // Kiểm tra xem có file ảnh được upload hay không
+        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
+            // Xử lý file upload (image)
+            $image = $parsedData['image']['name'];
+            // Di chuyển file đến thư mục mong muốn
+            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
         }
+
+        // Gọi hàm cập nhật sản phẩm trong mô hình
+        $result = $this->productModel->updateProduct(
+            $id,
+            $image, // Trường hợp ảnh có thể là một chuỗi rỗng hoặc null
+            isset($parsedData['origin']) && !empty($parsedData['origin']) ? $parsedData['origin'] : null,
+            isset($parsedData['capacity']) && !empty($parsedData['capacity']) ? $parsedData['capacity'] : null,
+            isset($parsedData['abv']) && !empty($parsedData['abv']) ? $parsedData['abv'] : null,
+            isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
+            isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
+            isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
+            isset($parsedData['status']) ? $parsedData['status'] : null
+        );
+
+
+        // Trả về phản hồi thành công
+        return $this->response($result); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
+
     }
 
     private function response($result)

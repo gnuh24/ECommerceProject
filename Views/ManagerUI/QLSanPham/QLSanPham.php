@@ -189,7 +189,7 @@
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maSanPham, trangThai) {
-        var newTrangThai = trangThai === false ? true : false; // Đảo ngược trạng thái
+        var newTrangThai = trangThai === 0 ? true : false; // Đảo ngược trạng thái
         // Hiển thị hộp thoại xác nhận bằng SweetAlert2
         Swal.fire({
             title: `Bạn có muốn ${newTrangThai ===  false ? 'khóa' : 'mở khóa'} sản phẩm ${maSanPham} không?`,
@@ -199,19 +199,16 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
-                var formData = new FormData();
-                formData.append('status', newTrangThai);
-                formData.append('id', maSanPham);
+                var dataToSend = {
+                    id: maSanPham,
+                    status: newTrangThai
+                };
                 // Gọi hàm updateTaiKhoan bằng Ajax
                 $.ajax({
-                    url: '../../../Controllers/ProductController.php',
+                    url: "../../../Controllers/ProductController.php",
                     type: 'PATCH',
-                    processData: false, // Không xử lý dữ liệu (vì chúng ta đang gửi FormData)
-                    contentType: false, // Không đặt tiêu đề Content-Type vì FormData tự xử lý
-                    data: formData, // Dữ liệu cần gửi đi
-                    headers: {
-                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                    },
+                    contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
+                    data: JSON.stringify(dataToSend),
                     success: function(response) {
                         // Nếu cập nhật thành công, reload bảng
                         var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";

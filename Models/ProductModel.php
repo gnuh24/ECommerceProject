@@ -427,7 +427,7 @@ class ProductModel
         }
     }
 
-    public function updateProduct($id, $image, $origin, $capacity, $abv, $description, $brandId, $categoryId)
+    public function updateProduct($id, $image, $origin, $capacity, $abv, $description, $brandId, $categoryId, $status)
     {
         $fieldsToUpdate = [];
         $params = [];
@@ -466,6 +466,12 @@ class ProductModel
         if ($categoryId !== null) {
             $fieldsToUpdate[] = "`CategoryId` = :categoryId";
             $params[':categoryId'] = $categoryId;
+        }
+
+        // Thêm logic cập nhật cho status
+        if ($status !== null) {
+            $fieldsToUpdate[] = "`Status` = :status";
+            $params[':status'] = $status;
         }
 
         // Kiểm tra nếu không có trường nào hợp lệ để cập nhật
