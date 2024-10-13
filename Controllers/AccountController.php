@@ -231,14 +231,14 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default:
                 echo json_encode([
                     'status' => 400,
-                    'message' => 'Không tìm thấy tham số action!'
+                    'message' => 'Không tìm thấy action cần thực hiện!'
                 ]);
                 break;
         }
     } else {
         echo json_encode([
             'status' => 400,
-            'message' => 'Không tìm thấy action!'
+            'message' => 'Không tìm thấy tham số action!'
         ]);
     }
 } else {

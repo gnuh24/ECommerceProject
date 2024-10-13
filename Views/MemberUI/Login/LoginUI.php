@@ -31,8 +31,14 @@
                 <input type="password" placeholder="Password" id="passwordLogin" />
                 <button type="button" class="btn btn-danger" id="signInButton">Đăng nhập</button>
                 <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
+
+                <!-- Google Login Button with correct icon -->
+                <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
+                    <i class="fab fa-google"></i> Đăng nhập bằng Google
+                </button>
             </form>
         </div>
+
         <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
@@ -67,7 +73,12 @@
             </div>
         </div>
     </div>
+
+    <!-- Font Awesome (for Google icon) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
+
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
