@@ -92,14 +92,17 @@
         loadDataToTable(udPage, null, null, null);
 
         $("#dateStart").on("change", function() {
-            udminNgayTao = $(this).val();
+            let value = $(this).val();
+            udminNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
             loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
         });
 
         $("#dateEnd").on("change", function() {
-            udmaxNgayTao = $(this).val();
+            let value = $(this).val();
+            udmaxNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
             loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
         });
+
 
         $("#TrangThai").on("change", function() {
             udtrangThai = $(this).val();
@@ -155,65 +158,69 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    type: "POST",
-                    url: "../../../Controllers/OrderStatusController.php",
+                    type: "PATCH",
+                    url: "../../../Controllers/OrderStatusController.php?orderId=" + orderId, // Thêm orderId vào URL
                     headers: {
                         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                     },
-                    data: {
-                        orderId: orderId,
-                        idStatus: currentStatus
-                    },
+                    contentType: "application/json", // Định dạng dữ liệu là JSON
+                    data: JSON.stringify({
+                        status: currentStatus,
+                        updateTime: new Date().toISOString() // Thêm thời gian hiện tại vào dữ liệu
+                    }),
                     success: function(response) {
                         Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
-                        loadDataToTable(udPage, udminNgayTao, udmaxNgayTao, udtrangThai);
+                        loadDataToTable(udPage, udminNgayTao, udmaxNgayTao, udtrangThai); // Cập nhật lại bảng
                     },
                     error: function(error) {
-                        Swal.fire('Thất bại!', error.responseJSON.detailMessage, 'error');
+                        Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
                     }
                 });
             }
         });
     }
 
+
     function renderTableBody(data) {
+        console.log(data);
         var tableBody = document.getElementById("tableBody");
         var html = '';
-        $.each(data.content, function(index, record) {
-            let totalPriceFormat = number_format_vnd(record.totalPrice);
+        $.each(data, function(index, record) {
+            let totalPriceFormat = number_format_vnd(record.TotalPrice);
             html += '<tr>';
-            html += '<td>' + record.id + '</td>';
-            html += '<td>' + record.orderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
+            html += '<td>' + record.Id + '</td>';
+            html += '<td>' + record.OrderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
             html += '<td>' + totalPriceFormat + '</td>';
-            html += '<td>' + record.fullname + '</td>';
-            html += '<td>' + record.phoneNumber + '</td>';
-            html += '<td>' + formatStatus(record.status) + '</td>';
+            html += '<td>' + record.Fullname + '</td>';
+            html += '<td>' + record.PhoneNumber + '</td>';
+            html += '<td>' + formatStatus(record.Status) + '</td>';
 
             html += '<td style="display: flex; gap: 5px;">';
-            html += '<a href="./ChiTietDonHang.php?id=' + record.id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
+            html += '<a href="./ChiTietDonHang.php?id=' + record.Id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
 
             // Nút Cập nhật trạng thái (màu xanh lá) với nội dung tùy thuộc vào trạng thái
-            if (record.status !== 'GiaoThanhCong' && record.status !== 'Huy') {
-                const updateStatusText = getUpdateStatusText(record.status);
-                const nextStatus = getUpdateStatus(record.status);
+            if (record.Status !== 'GiaoThanhCong' && record.Status !== 'Huy') {
+                const updateStatusText = getUpdateStatusText(record.Status);
+                const nextStatus = getUpdateStatus(record.Status);
 
                 html += `
                     <button 
                         type="button" 
                         class="update-status" 
-                        onclick="updateStatus('${record.id}', '${nextStatus}')"
+                        onclick="updateStatus('${record.Id}', '${nextStatus}')"
                     >
                         ${updateStatusText}
                     </button>`;
             }
 
             // Kiểm tra trạng thái trước khi hiển thị nút Hủy
-            if (record.status !== 'DaDuyet' && record.status !== 'GiaoThanhCong' && record.status !== 'Huy' && record.status !== 'DangGiao') {
+            if (record.Status === "ChoDuyet") {
+
                 html += `
                       <button 
                           type="button" 
                           class="cancel" 
-                          onclick="updateStatus('${record.id}', 'Huy')"
+                          onclick="updateStatus('${record.Id}', 'Huy')"
                       >
                           Hủy
                       </button>`;
@@ -223,6 +230,24 @@
         });
         tableBody.innerHTML = html;
     }
+
+    function convertDateFormat(dateString) {
+        // Kiểm tra định dạng đầu vào
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) {
+            throw new Error("Định dạng ngày không hợp lệ. Vui lòng sử dụng 'yyyy-MM-dd'.");
+        }
+
+        // Tách các phần của ngày
+        const parts = dateString.split('-');
+        const year = parts[0];
+        const month = parts[1];
+        const day = parts[2];
+
+        // Trả về định dạng mới
+        return `${year}/${month}/${day}`; // Đổi thành yyyy/mm/dd
+    }
+
 
     function formatStatus(status) {
         switch (status) {
@@ -254,18 +279,18 @@
         $.ajax({
             type: "GET",
             url: "../../../Controllers/OrderController.php",
+            dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             data: {
-                pageNumber: page,
-                sort: "orderTime,desc",
+                page: page,
                 from: minNgayTao,
                 to: maxNgayTao,
                 status: trangThai,
             },
             success: function(response) {
-                renderTableBody(response);
+                renderTableBody(response.data);
                 renderPagination(response.totalPages, page);
             },
             error: function(error) {

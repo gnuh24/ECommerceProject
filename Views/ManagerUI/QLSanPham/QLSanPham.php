@@ -56,7 +56,7 @@
 
                                         <label for="state-filter">Trạng thái:</label>
                                         <select id="state-filter">
-                                            <option value="">Tất cả</option>
+                                            <option value="all">Tất cả</option>
                                             <option value="true">Kinh doanh</option>
                                             <option value="false">Ngừng kinh doanh</option>
 
@@ -116,11 +116,13 @@
 
     function getAllSanPham(page, search, trangThai, maLoaiSanPham, brandId) {
         let data = {
-            pageNumber: page,
+            page: page,
             search: search,
-            status: trangThai
+            action: 'getAllProductsAdmin'
         };
-
+        if (trangThai !== 'all') {
+            data.status = trangThai;
+        }
         // Only include categoryId if maLoaiSanPham is not 0
         if (maLoaiSanPham !== 0) {
             data.categoryId = maLoaiSanPham;
@@ -187,7 +189,7 @@
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maSanPham, trangThai) {
-        var newTrangThai = trangThai === false ? true : false; // Đảo ngược trạng thái
+        var newTrangThai = trangThai === 0 ? true : false; // Đảo ngược trạng thái
         // Hiển thị hộp thoại xác nhận bằng SweetAlert2
         Swal.fire({
             title: `Bạn có muốn ${newTrangThai ===  false ? 'khóa' : 'mở khóa'} sản phẩm ${maSanPham} không?`,
@@ -197,19 +199,16 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
-                var formData = new FormData();
-                formData.append('status', newTrangThai);
-                formData.append('id', maSanPham);
+                var dataToSend = {
+                    id: maSanPham,
+                    status: newTrangThai
+                };
                 // Gọi hàm updateTaiKhoan bằng Ajax
                 $.ajax({
-                    url: '../../../Controllers/ProductController.php',
+                    url: "../../../Controllers/ProductController.php",
                     type: 'PATCH',
-                    processData: false, // Không xử lý dữ liệu (vì chúng ta đang gửi FormData)
-                    contentType: false, // Không đặt tiêu đề Content-Type vì FormData tự xử lý
-                    data: formData, // Dữ liệu cần gửi đi
-                    headers: {
-                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                    },
+                    contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
+                    data: JSON.stringify(dataToSend),
                     success: function(response) {
                         // Nếu cập nhật thành công, reload bảng
                         var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";
@@ -242,7 +241,6 @@
 
         currentPage = 1;
 
-        // Gọi lại hàm getAllSanPham với các giá trị mặc định
         getAllSanPham(currentPage, "", "", 0, 0);
 
     });
@@ -390,8 +388,8 @@
                 var htmlContent = '';
 
                 // Duyệt qua danh sách loại sản phẩm và tạo option cho select
-                $.each(response, function(index, category) {
-                    htmlContent += `<option value="${category.id}">${category.categoryName}</option>`;
+                $.each(response.data, function(index, category) {
+                    htmlContent += `<option value="${category.Id}">${category.CategoryName}</option>`;
                 });
 
                 // Thêm tùy chọn "Tất cả"
@@ -417,8 +415,8 @@
                 var htmlContent = '';
 
                 // Duyệt qua danh sách thương hiệu và tạo option cho select
-                $.each(response, function(index, brand) {
-                    htmlContent += `<option value="${brand.brandId}">${brand.brandName}</option>`; // Sử dụng 'brandName'
+                $.each(response.data, function(index, brand) {
+                    htmlContent += `<option value="${brand.Id}">${brand.BrandName}</option>`; // Sử dụng 'brandName'
                 });
 
                 // Thêm tùy chọn "Tất cả"

@@ -10,10 +10,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } elseif (isset($_GET['action']) && $_GET['action'] === 'getAllProductsAdmin') {
         $productController = new ProductController();
         $productController->getAllProductsAdmin();
-    } elseif (isset($_GET['id'])) {
-        $id = intval($_GET['id']);
-        $productController = new ProductController();
-        $productController->getProductByIdCommonUser($id); // Hoặc getProductByIdAdmin() tùy theo vai trò
+    } elseif (isset($_GET['Id'])) {
+        if (isset($_GET['action']) && $_GET['action'] === 'getProductByIdAdmin') {
+            $productController = new ProductController();
+            $productController->getProductByIdAdmin($_GET['Id']);
+        } else {
+            $productController = new ProductController();
+            $productController->getProductByIdCommonUser($id);
+        }
     } else {
         echo json_encode(["status" => 400, "message" => "Invalid action"]);
     }
@@ -25,12 +29,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(["status" => 400, "message" => "Invalid action"]);
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-    if (isset($_GET['id'])) {
-        $id = intval($_GET['id']);
+    // Lấy raw data từ input stream
+    $rawData = file_get_contents("php://input");
+
+    // Ghi nhận thông tin từ raw data
+    error_log("Raw Data: " . $rawData); // Ghi nhận dữ liệu thô
+
+    // Giải mã JSON thành mảng
+    $parsedData = json_decode($rawData, true);
+
+    // Kiểm tra nếu không thể giải mã
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(400);
+        echo json_encode(["status" => 400, "message" => "Invalid JSON data"]);
+        exit;
+    }
+
+    // Ghi nhận thông tin từ mảng đã phân tích
+    error_log("Parsed PATCH Data: " . print_r($parsedData, true)); // Ghi nhận dữ liệu đã phân tích
+
+    // Kiểm tra ID
+    if (isset($parsedData['id']) && !empty($parsedData['id'])) {
+        $id = intval($parsedData['id']);
         $productController = new ProductController();
-        $productController->updateProduct($id);
+
+        // Gọi hàm updateProduct và truyền dữ liệu cần thiết
+        $result = $productController->updateProduct($id, $parsedData);
     } else {
-        echo json_encode(["status" => 400, "message" => "Product ID is required"]);
+        http_response_code(400);
+        echo json_encode(["status" => 400, "message" => "Product ID is required", "data" => $parsedData]);
     }
 } else {
     echo json_encode(["status" => 405, "message" => "Method not allowed"]);
@@ -71,9 +98,21 @@ class ProductController
         $minPrice = $_GET['minPrice'] ?? null;
         $maxPrice = $_GET['maxPrice'] ?? null;
         $limit = $_GET['limit'] ?? 20;
-        $offset = $_GET['offset'] ?? 0;
+        $offset = $_GET['page'] ?? 0;
+        // Ở phần đầu phương thức, chuyển đổi status sang boolean nếu có:
+        $status = null;
+        if (isset($_GET['status'])) {
+            // Chuyển đổi chuỗi 'true' thành boolean true và 'false' thành boolean false
+            if ($_GET['status'] === 'true') {
+                $status = true;
+            } elseif ($_GET['status'] === 'false') {
+                $status = false;
+            }
+        }
 
-        $result = $this->productModel->getAllProductsAdmin($brandId, $categoryId, $search, $minPrice, $maxPrice, $limit, $offset);
+        // Sau đó gọi phương thức getAllProductsAdmin với $status đã được chuyển đổi
+
+        $result = $this->productModel->getAllProductsAdmin($brandId, $categoryId, $search, $status, $minPrice, $maxPrice, $limit, $offset);
         http_response_code(200);
         echo json_encode($result);
     }
@@ -122,47 +161,52 @@ class ProductController
         }
     }
 
-
-    // Cập nhật thông tin sản phẩm - gửi dữ liệu bằng formdata
-    public function updateProduct($id)
+    public function updateProduct($id, $parsedData)
     {
-        $data = $_POST; // Đối với FormData, bạn vẫn có thể dùng $_POST để lấy dữ liệu text và $_FILES cho file
 
-        // Kiểm tra nếu các trường bắt buộc được gửi qua form
-        if (
-            isset($_POST['productName'], $_POST['status'], $_POST['origin'], $_POST['capacity'], $_POST['abv'], $_POST['description'], $_POST['brandId'], $_POST['categoryId'])
-        ) {
-            $image = $_FILES['image']; // Lấy file hình ảnh
-            // Kiểm tra xem có ảnh được upload hay không
-            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                // Xử lý file upload (image)
-                $image = $_FILES['image']['name'];
-                // Di chuyển file đến thư mục mong muốn
-                move_uploaded_file($_FILES['image']['tmp_name'], 'path/to/save/' . $image);
-            } else {
-                // Nếu không có ảnh được upload, có thể giữ nguyên ảnh cũ
-                $image = null; // Hoặc lấy giá trị mặc định nếu muốn
-            }
+        // Khởi tạo biến cho hình ảnh
+        $image = null;
 
-            $result = $this->productModel->updateProduct(
-                $id,
-                $data['productName'],
-                $data['status'],
-                $image,  // Dùng file ảnh upload
-                $data['origin'],
-                $data['capacity'],
-                $data['abv'],
-                $data['description'],
-                $data['brandId'],
-                $data['categoryId']
-            );
-
-
-            http_response_code(200);
-            echo json_encode($result);
-        } else {
-            http_response_code(400);
-            echo json_encode(["status" => 400, "message" => "Invalid input data"]);
+        // Kiểm tra xem có file ảnh được upload hay không
+        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
+            // Xử lý file upload (image)
+            $image = $parsedData['image']['name'];
+            // Di chuyển file đến thư mục mong muốn
+            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
         }
+
+        // Gọi hàm cập nhật sản phẩm trong mô hình
+        $result = $this->productModel->updateProduct(
+            $id,
+            $image, // Trường hợp ảnh có thể là một chuỗi rỗng hoặc null
+            isset($parsedData['origin']) && !empty($parsedData['origin']) ? $parsedData['origin'] : null,
+            isset($parsedData['capacity']) && !empty($parsedData['capacity']) ? $parsedData['capacity'] : null,
+            isset($parsedData['abv']) && !empty($parsedData['abv']) ? $parsedData['abv'] : null,
+            isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
+            isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
+            isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
+            isset($parsedData['status']) ? $parsedData['status'] : null
+        );
+
+
+        // Trả về phản hồi thành công
+        return $this->response($result); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
+
+    }
+
+    private function response($result)
+    {
+        http_response_code($result->status);
+        $response = [
+            "message" => $result->message,
+            "data" => $result->data ?? null
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
+
+        echo json_encode($response);
     }
 }

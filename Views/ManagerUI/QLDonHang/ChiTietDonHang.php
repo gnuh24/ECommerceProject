@@ -101,27 +101,31 @@
             url: `../../../Controllers/OrderController.php`,
             type: 'GET',
             dataType: "json",
+            data: {
+                id: orderId
+            },
             headers: {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
             },
             success: function(response) {
-                var data = response;
-
+                var data = response.data;
+                console.log(data)
                 // Handle order details
                 var transaction_list = document.getElementById("transaction_list");
                 transaction_list.innerHTML = "";
                 var items = "";
 
-                data.orderDetails.forEach(element => {
+                data.details.forEach(element => {
+                    console.log(data)
                     items += `<div class='transaction_item'>
-                        <img src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${element.image}' alt=''>
+                        <img src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${element.Image}' alt=''>
                         <div class='item_info__wrapper'>
                             <div class='item_info'>
-                                <p class='name'>${element.productName}</p>
+                                <p class='name'>${element.ProductName}</p>
                             </div>
                             <div class='item_info'>
-                                <p class='quantity'>${element.quantity}</p>
-                                <p class='price'>${number_format_vnd(element.unitPrice)}</p>
+                                <p class='quantity'>${element.Quantity}</p>
+                                <p class='price'>${number_format_vnd(element.UnitPrice)}</p>
                             </div>
                         </div>
                     </div>
@@ -129,25 +133,25 @@
                 });
                 transaction_list.innerHTML = items;
 
-                document.getElementById("hoten").innerHTML = `<span>Họ tên:</span> ${data.userInformation.fullname}`;
-                document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.userInformation.address}`;
-                document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.userInformation.phoneNumber}`;
-                document.getElementById("note").innerText = data.note; // Added note
-                document.getElementById("totalPrice").innerText = number_format_vnd(data.totalPrice);
-                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${data.orderTime}`; // Added order time
+                document.getElementById("hoten").innerHTML = `<span>Họ tên:</span> ${data.infor.Fullname}`;
+                document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.infor.Address}`;
+                document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.infor.PhoneNumber}`;
+                document.getElementById("note").innerText = data.infor.Note; // Added note
+                document.getElementById("totalPrice").innerText = number_format_vnd(data.infor.TotalPrice);
+                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${data.infor.OrderTime}`; // Added order time
 
                 // Handle order status
                 var order_status = document.getElementById("order_status");
                 var order_status_content = '';
 
                 data.orderStatuses.forEach(status => {
-                    if (status.status === 'Huy') {
+                    if (status.Status === 'Huy') {
                         order_status_content += `<div class="order_status cancelled">
-                            <li>${getTenTrangThai(status.status)}<br>${status.updateTime}</li>
+                            <li>${getTenTrangThai(status.Status)}<br>${status.UpdateTime}</li>
                         </div>`;
                     } else {
                         order_status_content += `<div class="order_status completed">
-                            <li>${getTenTrangThai(status.status)}<br>${status.updateTime}</li>
+                            <li>${getTenTrangThai(status.Status)}<br>${status.UpdateTime}</li>
                         </div>`;
                     }
                 });

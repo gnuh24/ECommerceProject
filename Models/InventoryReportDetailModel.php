@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . "../../Configure/MysqlConfig.php";
 
 class InventoryReportDetailModel
 {
@@ -10,19 +10,19 @@ class InventoryReportDetailModel
         $this->connection = MysqlConfig::getConnection();
     }
 
-    // Lấy tất cả chi tiết báo cáo tồn kho theo InventoryReportId
-    public function getDetailsByReportId($inventoryReportId)
+    // Lấy chi tiết báo cáo tồn kho theo InventoryReportDetailId
+    public function getInventoryReportDetailById($inventoryReportDetailId)
     {
-        $query = "SELECT * FROM `InventoryReportDetail` WHERE `InventoryReportId` = :inventoryReportId";
+        $query = "SELECT * FROM `InventoryReportDetail` WHERE `InventoryReportDetailId` = :inventoryReportDetailId";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
+            $statement->bindValue(':inventoryReportDetailId', $inventoryReportDetailId, PDO::PARAM_INT);
             $statement->execute();
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
             return (object) [
                 "status" => 200,
-                "message" => "Details fetched successfully",
+                "message" => "Inventory report detail fetched successfully",
                 "data" => $result
             ];
         } catch (PDOException $e) {
@@ -33,79 +33,33 @@ class InventoryReportDetailModel
         }
     }
 
-    // Tạo chi tiết báo cáo tồn kho mới
-    public function createDetail($inventoryReportId, $productId, $quantity, $unitPrice, $total, $profit)
+    public function addInventoryReportDetails($inventoryReportId, $inventoryDetails)
     {
-        $query = "INSERT INTO `InventoryReportDetail` (`InventoryReportId`, `ProductId`, `Quantity`, `UnitPrice`, `Total`, `Profit`) 
-                  VALUES (:inventoryReportId, :productId, :quantity, :unitPrice, :total, :profit)";
+        $query = "INSERT INTO `InventoryReportDetail` 
+              (`InventoryReportId`, `ProductId`, `Quantity`, `UnitPrice`, `Total`, `Profit`) 
+              VALUES (:inventoryReportId, :productId, :quantity, :unitPrice, :total, :profit)";
 
         try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
-            $statement->bindValue(':productId', $productId, PDO::PARAM_INT);
-            $statement->bindValue(':quantity', $quantity, PDO::PARAM_INT);
-            $statement->bindValue(':unitPrice', $unitPrice, PDO::PARAM_INT);
-            $statement->bindValue(':total', $total, PDO::PARAM_INT);
-            $statement->bindValue(':profit', $profit, PDO::PARAM_INT);
-            $statement->execute();
+            $this->connection->beginTransaction();
+
+            foreach ($inventoryDetails as $detail) {
+                $statement = $this->connection->prepare($query);
+                $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
+                $statement->bindValue(':productId', $detail['ProductId'], PDO::PARAM_INT);
+                $statement->bindValue(':quantity', $detail['Quantity'], PDO::PARAM_INT);
+                $statement->bindValue(':unitPrice', $detail['UnitPrice'], PDO::PARAM_INT);
+                $statement->bindValue(':total', $detail['Total'], PDO::PARAM_INT);
+                $statement->bindValue(':profit', $detail['Profit'], PDO::PARAM_INT);
+                $statement->execute();
+            }
+
+            $this->connection->commit();
             return (object) [
                 "status" => 201,
-                "message" => "Inventory report detail created successfully"
+                "message" => "Inventory report details created successfully"
             ];
         } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
-
-    // Cập nhật chi tiết báo cáo tồn kho
-    public function updateDetail($inventoryReportId, $productId, $quantity, $unitPrice, $total, $profit)
-    {
-        $query = "UPDATE `InventoryReportDetail` 
-                  SET `Quantity` = :quantity, `UnitPrice` = :unitPrice, `Total` = :total, `Profit` = :profit 
-                  WHERE `InventoryReportId` = :inventoryReportId AND `ProductId` = :productId";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
-            $statement->bindValue(':productId', $productId, PDO::PARAM_INT);
-            $statement->bindValue(':quantity', $quantity, PDO::PARAM_INT);
-            $statement->bindValue(':unitPrice', $unitPrice, PDO::PARAM_INT);
-            $statement->bindValue(':total', $total, PDO::PARAM_INT);
-            $statement->bindValue(':profit', $profit, PDO::PARAM_INT);
-            $statement->execute();
-
-            return (object) [
-                "status" => 200,
-                "message" => "Inventory report detail updated successfully"
-            ];
-        } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
-
-    // Xóa chi tiết báo cáo tồn kho
-    public function deleteDetail($inventoryReportId, $productId)
-    {
-        $query = "DELETE FROM `InventoryReportDetail` 
-                  WHERE `InventoryReportId` = :inventoryReportId AND `ProductId` = :productId";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':inventoryReportId', $inventoryReportId, PDO::PARAM_INT);
-            $statement->bindValue(':productId', $productId, PDO::PARAM_INT);
-            $statement->execute();
-
-            return (object) [
-                "status" => 200,
-                "message" => "Inventory report detail deleted successfully"
-            ];
-        } catch (PDOException $e) {
+            $this->connection->rollBack();
             return (object) [
                 "status" => 400,
                 "message" => $e->getMessage()

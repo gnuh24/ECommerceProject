@@ -114,84 +114,68 @@
             return;
         }
 
-
-        //Kiểm tra tên thương hiệu
-        if (isTenNhaCungCapExists(brandName.value.trim())) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: 'Tên thương hiệu đã tồn tại',
-            });
-            brandName.focus();
-            event.preventDefault();
-            return;
-        }
         let isCreateNhaCungCapComplete = createNhaCungCap(
             brandName.value,
             // Email.value,
             // SoDienThoai.value
         );
 
-        //Sau khi tạo xong chuyển về trang QLNhaCungCap
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: 'Thêm thương hiệu mới thành công !!',
-        }).then(() => {
-            window.location.href = 'QLNhaCungCap.php';
-        });
-
     });
-
-    function isTenNhaCungCapExists(value) {
-        let exists = false;
-        var token = sessionStorage.getItem('token');
-        $.ajax({
-            url: '../../../Controllers/BrandController.php',
-            type: 'GET',
-            dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-            async: false, // Đảm bảo AJAX request được thực hiện đồng bộ
-            data: {
-                action: "isExists",
-                brandName: value
-            },
-            success: function(data) {
-                if (data.status === 200) {
-                    exists = data.isExists == 1;
-                } else {
-                    console.error('Error:', data.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error: ' + xhr.status + ' - ' + error);
-            }
-        });
-        return exists;
-    }
 
     function createNhaCungCap(brandName) {
         var token = sessionStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/Brand',
+            url: '../../../Controllers/BrandController.php', // Đường dẫn đến controller
             type: 'POST',
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
-            data: {
-                action: "create",
-                brandName: brandName
-                // Email: Email,
-                // SoDienThoai: SoDienThoai
-            },
+            data: JSON.stringify({
+                BrandName: brandName // Gửi thông tin thương hiệu
+            }),
             success: function(data) {
-                return data.status === 200;
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Tạo nhà cung cấp thành công!',
+                }).then(function() {
+                    window.location.href = 'QLNhaCungCap.php'; // Chuyển hướng đến trang quản lý nhà cung cấp
+                });
+
             },
-            error: function(xhr, status, error) {
-                console.error('Error: ' + xhr.status + ' - ' + error);
+            error: function(xhr) {
+                // Xử lý tất cả các status code khác
+                switch (xhr.status) {
+                    case 409:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Thương hiệu đã tồn tại.',
+                        });
+                        break;
+                    case 400:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Dữ liệu không hợp lệ.',
+                        });
+                        break;
+                    case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi tạo nhà cung cấp: ' + xhr.responseJSON.message,
+                        });
+                        break;
+                    default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi không xác định.',
+                        });
+                }
             }
         });
     }

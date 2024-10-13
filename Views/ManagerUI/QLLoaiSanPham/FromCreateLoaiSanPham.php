@@ -113,81 +113,66 @@
             return;
         }
 
-
-
-        //Kiểm tra tên loại sản phẩm
-        if (isTenLoaiSanPhamExists(categoryName.value.trim())) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: 'Tên loại sản phẩm đã tồn tại',
-            });
-            categoryName.focus();
-            event.preventDefault();
-            return;
-        }
-
-
-
         //Tạo thông tin nhà cung cấp
         let isCreateLoaiSanPhamComplete = createLoaiSanPham(
             categoryName.value
         );
 
-        //Sau khi tạo xong chuyển về trang QLLoaiSanPham
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: 'Thêm loại sản phẩm mới thành công !!',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'QLLoaiSanPham.php';
-            }
-        });
+
     });
 
-
-    function isTenLoaiSanPhamExists(value) {
-        let exists = false;
-        $.ajax({
-            url: '../../../Controllers/CategoryController.php',
-            type: 'GET',
-            dataType: "json",
-            async: false, // Đảm bảo AJAX request được thực hiện đồng bộ
-            data: {
-                categoryName: value
-            },
-            success: function(data) {
-                if (data.status === 200) {
-                    exists = data.isExists == 1;
-                } else {
-                    console.error('Error:', data.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error: ' + xhr.status + ' - ' + error);
-            }
-        });
-        return exists;
-    }
-
-    function createLoaiSanPham(categoryName) {
+    function createLoaiSanPham(CategoryName) {
         var token = sessionStorage.getItem('token');
+
+        // Kiểm tra nếu token không tồn tại
+
+
         $.ajax({
             url: '../../../Controllers/CategoryController.php',
-            type: 'POST',
+            type: 'POST', // POST để tạo mới
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json' // Gửi dữ liệu dưới dạng JSON
             },
-            data: {
-                categoryName: categoryName
-            },
+            data: JSON.stringify({
+                CategoryName: CategoryName // Chuẩn bị dữ liệu JSON
+            }),
             success: function(data) {
-                return data.status === 200;
+                console.log("Response from server:", data); // Thêm log để kiểm tra phản hồi
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Thêm loại sản phẩm thành công!',
+                }).then(function() {
+                    window.location.href = 'QLLoaiSanPham.php';
+                });
             },
-            error: function(xhr, status, error) {
-                console.error('Error: ' + xhr.status + ' - ' + error);
+            error: function(xhr) {
+                console.error("Error response:", xhr); // Thêm log lỗi để kiểm tra
+                // Xử lý tất cả các status code khác (ví dụ: 409, 500)
+                switch (xhr.status) {
+                    case 409:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Tên loại sản phẩm đã tồn tại',
+                        });
+                        break;
+                    case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi thêm loại sản phẩm: ' + xhr.responseJSON.message,
+                        });
+                        break;
+                    default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi không xác định',
+                        });
+                }
             }
         });
     }

@@ -91,6 +91,7 @@
     resetButton.addEventListener("click", () => {
         from.value = "";
         to.value = "";
+        limit.value = '10';
         thongKeSanPhamBanChay("2010-01-01", formattedDate, 10);
     });
 
@@ -104,36 +105,49 @@
 
     function thongKeSanPhamBanChay(from, to, topCount) {
         $.ajax({
-            url: 'http://localhost:8080/Statistic/BestSeller', // Cập nhật URL API
+            url: '../../../Controllers/StatisticController.php', // Cập nhật URL API nếu cần
             type: 'GET',
             dataType: "json",
             data: {
-                minDate: from,
-                maxDate: to,
-                limit: topCount,
-
-            },
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
+                type: 'bestSellingProducts',
+                startDate: from, // Sử dụng đúng tên tham số
+                endDate: to, // Sử dụng đúng tên tham số
+                topProducts: topCount // Sử dụng đúng tên tham số
             },
             success: function(response) {
                 var tableBody = document.querySelector("#sanPhamBanChayTable tbody");
-                tableBody.innerHTML = ""; // Clear existing rows
+                tableBody.innerHTML = ""; // Xóa các hàng cũ
 
-                response.forEach(item => {
+                if (response.data && response.data.length > 0) {
+                    response.data.forEach(item => {
+                        console.log(item.totalValue); // Kiểm tra giá trị totalValue
+                        var formattedValue = formatCurrency(parseFloat(item.totalValue) || 0); // Chuyển đổi về số
+                        var row = document.createElement("tr");
+                        row.innerHTML = `
+                                            <td>${item.Id}</td>
+                                            <td>${item.ProductName}</td>
+                                            <td>${item.totalQuantity}</td>
+                                            <td>${formattedValue}</td>  <!-- Định dạng tiền tệ -->
+                                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                } else {
                     var row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${item.productId}</td>
-                        <td>${item.productName}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.total}</td>
-                    `;
+                    row.innerHTML = `<td colspan="4">Không có dữ liệu</td>`;
                     tableBody.appendChild(row);
-                });
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);
             }
+        });
+    }
+
+    function formatCurrency(value) {
+        return value.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
         });
     }
 </script>

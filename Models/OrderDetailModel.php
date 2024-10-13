@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Configure/MysqlConfig.php";
+require_once __DIR__ . "../../Configure/MysqlConfig.php";
 
 class OrderDetailModel
 {
@@ -11,7 +11,7 @@ class OrderDetailModel
     }
 
     // Lấy chi tiết đơn hàng theo OrderId
-    public function getDetailsByOrderId($orderId)
+    public function getAllOrderDetailByOrderId($orderId)
     {
         $query = "SELECT * FROM `OrderDetail` WHERE `OrderId` = :orderId";
 
@@ -87,7 +87,7 @@ class OrderDetailModel
         }
     }
 
-    // Xóa chi tiết đơn hàng
+    // Xóa chi tiết đơn hàng (nếu cần)
     public function deleteOrderDetail($orderId, $productId)
     {
         $query = "DELETE FROM `OrderDetail` WHERE `OrderId` = :orderId AND `ProductId` = :productId";
