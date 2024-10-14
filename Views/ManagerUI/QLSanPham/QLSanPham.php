@@ -138,9 +138,7 @@
             url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
+
             data: data,
             success: function(response) {
 

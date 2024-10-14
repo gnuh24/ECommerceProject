@@ -97,16 +97,12 @@
     }
 
 
-    function getAllTaiKhoan( page, search, status) {
-        var token = sessionStorage.getItem('token');
+    function getAllTaiKhoan(page, search, status) {
         $.ajax({
             url: '../../../Controllers/AccountController.php',
             type: 'GET',
             dataType: "json",
-            headers: {
-        // Thêm JWT vào header
-        'Authorization': 'Bearer ' + token
-      },
+
             data: {
                 page: page,
                 search: search,
@@ -177,7 +173,6 @@
                 createPagination(page, response.totalPages);
             },
             error: function(xhr, status, error) {
-                // Nếu lỗi là do token hết hạn, chuyển hướng đến trang đăng nhập
                 if (xhr.status === 401) {
                     alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
                     window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -189,11 +184,11 @@
     }
 
 
-    function fetchDataAndUpdateTable( page, search, status) {
+    function fetchDataAndUpdateTable(page, search, status) {
         //Clear dữ liệu cũ
         clearTable();
 
-        getAllTaiKhoan( page, search, status);
+        getAllTaiKhoan(page, search, status);
     }
 
     // Hàm tạo nút phân trang
@@ -203,7 +198,7 @@
         var quyenValue = document.querySelector('#selectQuyen').value;
         // Xóa nút phân trang cũ (nếu có)
         paginationContainer.innerHTML = '';
-        if (totalPages > 1) {            
+        if (totalPages > 1) {
             // Tạo nút cho từng trang và thêm vào chuỗi HTML
             var paginationHTML = '';
             for (var i = 1; i <= totalPages; i++) {
@@ -214,18 +209,18 @@
             // Thêm sự kiện click cho từng nút phân trang
             paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
                 button.addEventListener('click', function() {
-                    
+
                     fetchDataAndUpdateTable(index + 1, searchValue, quyenValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
                 });
             });
 
             // Đảm bảo rằng currentPage nằm trong phạm vi hợp lệ
-        if (currentPage >= 1 && currentPage <= totalPages) {
-            // Đánh dấu trang hiện tại
-            paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active');
-        } else {
-            console.error('currentPage is out of bounds');
-        }
+            if (currentPage >= 1 && currentPage <= totalPages) {
+                // Đánh dấu trang hiện tại
+                paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active');
+            } else {
+                console.error('currentPage is out of bounds');
+            }
         }
     }
 
@@ -257,50 +252,46 @@
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maTaiKhoan, trangThai) {
-    // Xác định trạng thái mới dựa trên trạng thái hiện tại
-    var newTrangThai = trangThai === 0 ? 1 : 0;
+        // Xác định trạng thái mới dựa trên trạng thái hiện tại
+        var newTrangThai = trangThai === 0 ? 1 : 0;
 
-    Swal.fire({
-        title: `Bạn có muốn ${newTrangThai === 0 ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Đồng ý',
-        cancelButtonText: 'Hủy'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append('Id', maTaiKhoan);
-            formData.append('Status', newTrangThai); // Gửi đúng giá trị trạng thái mới (0 hoặc 1)
-            formData.append('action', 'updateAccount'); // Gửi thêm action cho server biết
+        Swal.fire({
+            title: `Bạn có muốn ${newTrangThai === 0 ? 'khóa' : 'mở khóa'} tài khoản ${maTaiKhoan} không?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('Id', maTaiKhoan);
+                formData.append('Status', newTrangThai); // Gửi đúng giá trị trạng thái mới (0 hoặc 1)
+                formData.append('action', 'updateAccount'); // Gửi thêm action cho server biết
 
-            $.ajax({
-                url: '../../../Controllers/AccountController.php',
-                type: 'POST',
-                dataType: 'json',
-                headers: {
-                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                },
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.status === 200) {
-                        var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";
-                        Swal.fire('Thành công!', `Bạn đã ${alertContent} thành công !!`, 'success');
-                        fetchDataAndUpdateTable(currentPage, "", null);
-                    } else {
-                        Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật trạng thái.', 'error');
+                $.ajax({
+                    url: '../../../Controllers/AccountController.php',
+                    type: 'POST',
+                    dataType: 'json',
+
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status === 200) {
+                            var alertContent = newTrangThai === 0 ? "khóa" : "mở khóa";
+                            Swal.fire('Thành công!', `Bạn đã ${alertContent} thành công !!`, 'success');
+                            fetchDataAndUpdateTable(currentPage, "", null);
+                        } else {
+                            Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật trạng thái.', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Lỗi khi gọi API: ', error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Lỗi khi gọi API: ', error);
-                }
-            });
-        }
-    });
-}
-
-
+                });
+            }
+        });
+    }
 </script>
 
 </html>

@@ -123,13 +123,11 @@
     });
 
     function createNhaCungCap(brandName) {
-        var token = sessionStorage.getItem('token');
         $.ajax({
             url: '../../../Controllers/BrandController.php', // Đường dẫn đến controller
             type: 'POST',
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
             data: JSON.stringify({

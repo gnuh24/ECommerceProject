@@ -38,9 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 // Lấy tài khoản theo ID
             case 'getAccountById':
-                $userInformationId = $_GET['UserInformationId'] ?? null;
                 $accountController = new AccountController();
-                $response = $accountController->getAccountById($userInformationId);
+                $response = $accountController->getAccountById();
                 echo $response;
 
                 break;
@@ -508,7 +507,7 @@ class AccountController
         $userInformationId = $_GET['UserInformationId'] ?? null;
         $email = $_GET['Email'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
-        $status = $_GET['status'];
+        $status = $_GET['status'] ?? null;
         $role = $_GET['Role'] ?? null;
         // Kiểm tra filter có phải mảng hay không, nếu không thì gán thành mảng rỗng
         $filter = isset($_GET['filter']) && is_array($_GET['filter']) ? $_GET['filter'] : [];
@@ -528,24 +527,8 @@ class AccountController
             $role,
             $status
         );
-        // Kiểm tra kết quả trả về từ model
-        if ($response && $response->status === 200) {
-            // Nếu thành công, trả về kết quả dưới dạng JSON
-            return json_encode([
-                'status' => 200,
-                'message' => 'Lấy thông tin tài khoản thành công!',
-                'data' => $response->data,
-                'totalPages' => $response->totalPages, // Trả về tổng số trang
-                'isExists' => $response->isExists // Kiểm tra dữ liệu có tồn tại hay không
-            ]);
-        } else {
-            // Nếu có lỗi, trả về lỗi
-            return json_encode([
-                'status' => 400,
-                'message' => 'Không thể lấy thông tin tài khoản!',
+        return $this->response($response); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
 
-            ]);
-        }
     }
 
     // Hàm cập nhật tài khoản
@@ -582,5 +565,21 @@ class AccountController
                 'message' => 'Không thể cập nhật tài khoản!'
             ]);
         }
+    }
+
+    private function response($result)
+    {
+        http_response_code($result->status);
+        $response = [
+            "message" => $result->message,
+            "data" => $result->data ?? null
+        ];
+
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalPages)) {
+            $response['totalPages'] = $result->totalPages;
+        }
+
+        echo json_encode($response);
     }
 }

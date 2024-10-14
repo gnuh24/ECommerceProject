@@ -376,7 +376,6 @@
             return false; // Dừng việc gửi form nếu productData trống
         }
 
-        const token = sessionStorage.getItem("token");
         var formData = new FormData();
         var totalPrice = parseInt(totalValue);
         if (isNaN(totalPrice)) {
@@ -408,9 +407,7 @@
             data: formData,
             contentType: false, // Không gửi tiêu đề Content-Type
             processData: false, // Không xử lý dữ liệu
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
+
             success: function(response) {
                 Swal.fire({
                     icon: 'success',
@@ -589,7 +586,6 @@
     }
 
     function loaddatasp(page, search) {
-        const token = sessionStorage.getItem("token");
 
         $('#tableBody1').empty(); // Xóa nội dung cũ của bảng
         let ajaxData = {
@@ -607,9 +603,7 @@
             type: 'GET',
             dataType: "json",
             data: ajaxData, // Truyền object ajaxData
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
+
             success: function(response) {
                 var data = response.content;
                 var tableBody = document.getElementById("tableBody1");
@@ -679,15 +673,12 @@
 
 
     function loadDataAllWhenUrlHaveId(maPhieu) {
-        const token = sessionStorage.getItem("token");
 
         $.ajax({
             url: '../../../Controllers/InventoryReportController.php',
             type: 'GET',
             dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
+
             data: {
                 Id: maPhieu
             },

@@ -164,8 +164,8 @@
     function filterProducts(page) {
         // Lấy giá trị từ thanh tìm kiếm (hoặc từ URL nếu có)
         var searchParams = new URLSearchParams(window.location.search);
-        var searchText = searchParams.get('search') || document.getElementById("searchSanPham").value || " ";
-
+        var searchText = '<?php echo isset($_GET["searchFromAnotherPage"]) ? $_GET["searchFromAnotherPage"] : ""; ?>' ||
+            document.getElementById("searchSanPham").value || "";
         // Lấy giá trị từ thanh lọc giá
         var priceFilter = document.getElementById("price-filter").value;
         var minPrice, maxPrice;
@@ -220,11 +220,12 @@
         // Gọi API để lấy dữ liệu sản phẩm
         console.log(page, search, minGia, maxGia, brandId, categoryId)
         $.ajax({
-            url: "http://localhost:8080/Product/CommonUser",
+            url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
             data: (function() {
                 var requestData = {
+                    action: "getAllProductsCommonUser",
                     page: page,
                     minPrice: minGia,
                     maxPrice: maxGia,
@@ -250,20 +251,20 @@
             })(),
             success: function(response) {
                 var productContainer = $('#product .products');
-                if (response.content && response.content.length > 0) {
+                if (response.data && response.data.length > 0) {
                     // Tạo biến lưu trữ nội dung HTML mới
                     var htmlContent = '';
                     // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
-                    $.each(response.content, function(index, product) {
+                    $.each(response.data, function(index, product) {
                         htmlContent += ` 
-                                    <form id="productForm_${product.id}" method="post" action="GuestProductDetail.php?maSanPham=${product.id}">
+                                    <form id="productForm_${product.Id}" method="post" action="GuestProductDetail.php?maSanPham=${product.Id}">
                                         <div class="row">
-                                            <a href="GuestProductDetail.php?maSanPham=${product.id}" class="text-center" style="display: block;">
-                                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.image}" alt="" style="height: 300px;">
+                                            <a href="GuestProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
+                                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                                 <div class="product-card-content">
                                                     <div class="price">
-                                                        <h4 class="name-product">${product.productName}</h4>
-                                                        <p class="price-tea">${formatCurrency(product.price)}</p>
+                                                        <h4 class="name-product">${product.ProductName}</h4>
+                                                        <p class="price-tea">${formatCurrency(product.UnitPrice)}</p>
                                                     </div>
                                                     <div class="buy-btn-container">
                                                         MUA NGAY
@@ -334,18 +335,18 @@
 
     function getCategories() {
         $.ajax({
-            url: "http://localhost:8080/Category/noPaging",
+            url: "../../../controllers/CategoryController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {
-                if (response && response.length > 0) {
+                if (response.data && response.data.length > 0) {
                     // Xóa tất cả các option hiện có trong dropdown
                     $('#category-filter').empty();
                     // Thêm option "Tất cả"
                     $('#category-filter').append('<option value="">Tất cả</option>');
                     // Duyệt qua danh sách loại sản phẩm và thêm từng option vào dropdown
-                    $.each(response, function(index, category) {
-                        $('#category-filter').append(`<option value="${category.id}">${category.categoryName}</option>`);
+                    $.each(response.data, function(index, category) {
+                        $('#category-filter').append(`<option value="${category.Id}">${category.CategoryName}</option>`);
                     });
                 } else {
                     console.log("Không có loại sản phẩm nào được trả về từ API.");
@@ -359,18 +360,18 @@
 
     function getBrands() {
         $.ajax({
-            url: "http://localhost:8080/Brand",
+            url: "../../../controllers/BrandController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {
-                if (response.content && response.content.length > 0) {
+                if (response.data && response.data.length > 0) {
                     // Xóa tất cả các option hiện có trong dropdown
                     $('#brand-filter').empty();
                     // Thêm option "Tất cả"
                     $('#brand-filter').append('<option value="">Tất cả</option>');
                     // Duyệt qua danh sách loại sản phẩm và thêm từng option vào dropdown
-                    $.each(response.content, function(index, category) {
-                        $('#brand-filter').append(`<option value="${category.brandId}">${category.brandName}</option>`);
+                    $.each(response.data, function(index, category) {
+                        $('#brand-filter').append(`<option value="${category.Id}">${category.BrandName}</option>`);
                     });
                 } else {
                     console.log("Không có loại sản phẩm nào được trả về từ API.");

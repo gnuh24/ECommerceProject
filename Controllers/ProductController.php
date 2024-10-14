@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $productController->getProductByIdAdmin($_GET['Id']);
         } else {
             $productController = new ProductController();
-            $productController->getProductByIdCommonUser($id);
+            $productController->getProductByIdCommonUser($_GET['Id']);
         }
     } else {
         echo json_encode(["status" => 400, "message" => "Invalid action"]);
@@ -82,7 +82,7 @@ class ProductController
         $minPrice = $_GET['minPrice'] ?? null;
         $maxPrice = $_GET['maxPrice'] ?? null;
         $limit = $_GET['limit'] ?? 20;
-        $offset = $_GET['offset'] ?? 0;
+        $offset = $_GET['page'] ?? 0;
 
         $result = $this->productModel->getAllProductsCommonUser($brandId, $categoryId, $search, $minPrice, $maxPrice, $limit, $offset);
         http_response_code(200);

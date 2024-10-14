@@ -257,26 +257,15 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
-                const refreshToken = sessionStorage.getItem("refreshToken");
 
-                if (refreshToken) {
-                    // Gọi API logout qua Ajax
-                        sessionStorage.removeItem("key");
-                        sessionStorage.removeItem("refreshToken");
+                // Gọi API logout qua Ajax
+                sessionStorage.removeItem("id");
 
-                        // Chuyển hướng về trang chủ khách
-                        window.location.href = "../GuestPage/GuestHomePage.php";
-            
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Lỗi',
-                        text: 'Không tìm thấy refreshToken',
-                    });
-                }
+                // Chuyển hướng về trang chủ khách
+                window.location.href = "../GuestPage/GuestHomePage.php";
+
+
             }
         });
     }
-
-
 </script>

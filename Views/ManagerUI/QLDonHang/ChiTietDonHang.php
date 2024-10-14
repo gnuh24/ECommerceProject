@@ -104,9 +104,7 @@
             data: {
                 id: orderId
             },
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
-            },
+
             success: function(response) {
                 var data = response.data;
                 console.log(data)

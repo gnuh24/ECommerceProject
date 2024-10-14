@@ -315,12 +315,20 @@
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result) {
+                            const quyen = response.data.role;
 
-
-
-                            window.location.href = `../SignedPage/SignedHomePage.php`;
-
-
+                            sessionStorage.setItem('id', response.data.id);
+                            switch (quyen) {
+                                case 'Admin':
+                                    window.location.href = `../../AdminUI/QLTaiKhoan.php`;
+                                    break;
+                                case 'Manager':
+                                    window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
+                                    break;
+                                default:
+                                    window.location.href = `../SignedPage/SignedHomePage.php`;
+                                    break;
+                            }
                         }
                     });
                 } else {

@@ -122,9 +122,7 @@
     });
 
     function createLoaiSanPham(CategoryName) {
-        var token = sessionStorage.getItem('token');
 
-        // Kiểm tra nếu token không tồn tại
 
 
         $.ajax({
@@ -132,7 +130,6 @@
             type: 'POST', // POST để tạo mới
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json' // Gửi dữ liệu dưới dạng JSON
             },
             data: JSON.stringify({

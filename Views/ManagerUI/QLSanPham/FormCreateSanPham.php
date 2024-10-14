@@ -339,9 +339,7 @@
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                "Authorization": "Bearer " + sessionStorage.getItem('token') // Gửi token trong header
-            },
+
             success: function(data) {
                 console.log(data); // Log dữ liệu trả về để kiểm tra
                 if (data) {

@@ -216,37 +216,36 @@
     }
 
     function loadOrderData(maOrder) {
-        const token = sessionStorage.getItem("token");
         $.ajax({
-            url: `http://localhost:8080/Order/MyOrder/${maOrder}`,
+            url: '../../../Controllers/OrderController.php', // Đường dẫn API lấy chi tiết đơn hàng
             method: 'GET',
             dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + token
+            data: {
+                idOrder: maOrder // Use 'Id' based on your response structure
             },
             success: function(response) {
                 let totalPrice_Shipping = 0;
                 let productListHtml = '';
                 let html = '';
                 // Xử lý từng sản phẩm trong kết quả trả về
-                response.orderDetails.forEach(function(cartProduct) {
-                    totalPrice_Shipping += cartProduct.total;
-                    const formattedPrice = formatMoney(cartProduct.unitPrice);
-                    const formattedTotalPrice = formatMoney(cartProduct.total);
+                response.data.details.forEach(function(cartProduct) {
+                    totalPrice_Shipping += cartProduct.Total;
+                    const formattedPrice = formatMoney(cartProduct.UnitPrice);
+                    const formattedTotalPrice = formatMoney(cartProduct.Total);
 
                     // Thêm sản phẩm vào danh sách HTML
                     productListHtml += `
                         <div class='radio__wrapper'>
                             <div>
-                                <div class='cartItem' id='${cartProduct.productId}'>
-                                    <a href='#' class='img'><img class='img' src='https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
+                                <div class='cartItem' id='${cartProduct.ProductId}'>
+                                    <a href='#' class='img'><img class='img' src='https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.Image}' /></a>
                                     <div class='inforCart'>
                                         <div class='nameAndPrice'>
-                                            <a href='#' class='nameCart'>${cartProduct.productName}</a>
+                                            <a href='#' class='nameCart'>${cartProduct.ProductName}</a>
                                             <p class='priceCart'>${formattedPrice}</p>
                                         </div>
                                         <div class='quantity'>
-                                            <div class='txtQuantity'>${cartProduct.quantity}</div>
+                                            <div class='txtQuantity'>${cartProduct.Quantity}</div>
                                         </div>
                                     </div>
                                     <div class='wrapTotalPriceOfCart'>
@@ -262,16 +261,16 @@
                 html = `
  <div class="container mt-4">
     <div class="info__wrapper order_info2">
-        <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.id}</span></p>
-        <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.orderTime}</span></p>
-        <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.note}</span></p>
+        <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.data.info.OrderId}</span></p>
+        <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.data.info.OrderTime}</span></p>
+        <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note}</span></p>
     </div>
 
     <div class="divider"></div>
 
     <div class="total__info">
         <p>Tổng cộng</p>
-        <p id="totalPrice">${response.totalPrice}</p>
+        <p id="totalPrice">${response.data.info.TotalPrice}</p>
     </div>
 </div>`
                 // Chèn danh sách sản phẩm vào phần tử HTML
@@ -279,14 +278,14 @@
                 $('.divider').html(html)
                 // Hiển thị tổng giá trị đơn hàng
                 $('#totalPrice').text(formatMoney(totalPrice_Shipping));
-                var trangThaiDonHang = response.orderStatuses;
+                var trangThaiDonHang = response.data.orderStatuses;
 
                 // Lặp qua mỗi trạng thái trong mảng
                 trangThaiDonHang.forEach(function(trangThai) {
 
                     // Lấy thông tin trạng thái và thời gian
-                    var trangThaiValue = trangThai.status;
-                    var thoiGianValue = trangThai.updateTime;
+                    var trangThaiValue = trangThai.Status;
+                    var thoiGianValue = trangThai.UpdateTime;
                     setColorAndTime(trangThaiValue, thoiGianValue);
                 });
             },

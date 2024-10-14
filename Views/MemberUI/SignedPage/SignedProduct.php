@@ -23,7 +23,7 @@
     <!-- Thanh lọc menu -->
     <div id="filter-menu" class="container-fluid bg-white p-3 rounded mb-4">
         <div class="row d-flex justify-content-around" style="width:80%">
-            <!-- <div class="col-12 col-md-3 mb-2 mb-md-0">
+            <div class="col-12 col-md-3 mb-2 mb-md-0">
                 <label for="price-filter" class="form-label fw-bold">Giá:</label>
                 <select id="price-filter" class="form-select form-select-sm bg-danger text-white">
                     <option value="">Tất cả</option>
@@ -31,7 +31,7 @@
                     <option value="medium">Từ 1 đến 3 triệu</option>
                     <option value="high">Trên 3 triệu</option>
                 </select>
-            </div> -->
+            </div>
 
             <div class="col-12 col-md-3 mb-2 mb-md-0">
                 <label for="brand-filter" class="form-label  fw-bold">Thương hiệu :</label>
@@ -79,7 +79,6 @@
             document.getElementById("category-filter").value = "";
             currentPage = 1;
 
-            // Gọi lại hàm getAllSanPham với các giá trị mặc định
             getAllSanPham(currentPage, "", 0, 10000000, 0, 0);
 
         });
@@ -98,13 +97,13 @@
         }
 
 
-        // // Lắng nghe sự kiện change cho thanh lọc giá
-        // document.getElementById("price-filter").addEventListener("change", function() {
-        //     currentPage = 1;
+        // Lắng nghe sự kiện change cho thanh lọc giá
+        document.getElementById("price-filter").addEventListener("change", function() {
+            currentPage = 1;
 
-        //     // Gọi lại hàm lọc sản phẩm khi giá trị thay đổi
-        //     filterProducts(currentPage);
-        // });
+            // Gọi lại hàm lọc sản phẩm khi giá trị thay đổi
+            filterProducts(currentPage);
+        });
 
         document.getElementById("brand-filter").addEventListener("change", function() {
             currentPage = 1;
@@ -126,27 +125,27 @@
             var searchText = '<?php echo isset($_GET["searchFromAnotherPage"]) ? $_GET["searchFromAnotherPage"] : ""; ?>' ||
                 document.getElementById("searchSanPham").value || "";
             // Lấy giá trị từ thanh lọc giá
-            // var priceFilter = document.getElementById("price-filter").value;
-            // var minPrice, maxPrice;
-            // // Thiết lập giá trị min và max dựa trên giá trị của thanh lọc giá
-            // switch (priceFilter) {
-            //     case "low":
-            //         minPrice = 0;
-            //         maxPrice = 1000000;
-            //         break;
-            //     case "medium":
-            //         minPrice = 1000000;
-            //         maxPrice = 3000000;
-            //         break;
-            //     case "high":
-            //         minPrice = 3000000;
-            //         maxPrice = 1000000000; // Trên 3 triệu, không giới hạn
-            //         break;
-            //     default:
-            //         minPrice = 0;
-            //         maxPrice = 1000000000; // Không giới hạn
-            //         break;
-            // }
+            var priceFilter = document.getElementById("price-filter").value;
+            var minPrice, maxPrice;
+            // Thiết lập giá trị min và max dựa trên giá trị của thanh lọc giá
+            switch (priceFilter) {
+                case "low":
+                    minPrice = 0;
+                    maxPrice = 1000000;
+                    break;
+                case "medium":
+                    minPrice = 1000000;
+                    maxPrice = 3000000;
+                    break;
+                case "high":
+                    minPrice = 3000000;
+                    maxPrice = 1000000000; // Trên 3 triệu, không giới hạn
+                    break;
+                default:
+                    minPrice = 0;
+                    maxPrice = 1000000000; // Không giới hạn
+                    break;
+            }
 
             // Lấy giá trị từ thanh lọc thương hiệu
             var brandFilter = document.getElementById("brand-filter").value;
@@ -161,8 +160,7 @@
             }
 
             // Gọi hàm lọc sản phẩm với các tham số vừa lấy được
-            getAllSanPham(page, searchText, brandFilter, categoryFilter);
-            // getAllSanPham(page, searchText, minPrice, maxPrice, brandFilter, categoryFilter);
+            getAllSanPham(page, searchText, minPrice, maxPrice, brandFilter, categoryFilter);
 
         }
 
@@ -174,28 +172,28 @@
             // Lấy giá trị từ thanh tìm kiếm
             var searchText = document.getElementById("searchSanPham").value;
             // // Lấy giá trị từ thanh lọc giá
-            // var priceFilter = document.getElementById("price-filter").value;
-            // var minPrice, maxPrice;
+            var priceFilter = document.getElementById("price-filter").value;
+            var minPrice, maxPrice;
 
-            // // Thiết lập giá trị min và max dựa trên giá trị của thanh lọc giá
-            // switch (priceFilter) {
-            //     case "low":
-            //         minPrice = 0;
-            //         maxPrice = 1000000;
-            //         break;
-            //     case "medium":
-            //         minPrice = 1000000;
-            //         maxPrice = 3000000;
-            //         break;
-            //     case "high":
-            //         minPrice = 3000000;
-            //         maxPrice = 1000000000; // Trên 3 triệu, không giới hạn
-            //         break;
-            //     default:
-            //         minPrice = 0;
-            //         maxPrice = 1000000000; // Không giới hạn
-            //         break;
-            // }
+            // Thiết lập giá trị min và max dựa trên giá trị của thanh lọc giá
+            switch (priceFilter) {
+                case "low":
+                    minPrice = 0;
+                    maxPrice = 1000000;
+                    break;
+                case "medium":
+                    minPrice = 1000000;
+                    maxPrice = 3000000;
+                    break;
+                case "high":
+                    minPrice = 3000000;
+                    maxPrice = 1000000000; // Trên 3 triệu, không giới hạn
+                    break;
+                default:
+                    minPrice = 0;
+                    maxPrice = 1000000000; // Không giới hạn
+                    break;
+            }
 
 
             var brandFilter = document.getElementById("brand-filter").value;
@@ -208,8 +206,7 @@
                 categoryFilter = 0;
             }
 
-            // getAllSanPham(currentPage, searchText, minPrice, maxPrice, brandFilter, categoryFilter);
-            getAllSanPham(currentPage, searchText, brandFilter, categoryFilter);
+            getAllSanPham(currentPage, searchText, minPrice, maxPrice, brandFilter, categoryFilter);
 
 
         });
@@ -224,28 +221,26 @@
 
         });
 
-        function getAllSanPham(page, search, brandId, categoryId) {
-
-
-
+        function getAllSanPham(page, search, minGia, maxGia, brandId, categoryId) {
             // Gọi API để lấy dữ liệu sản phẩm
+            console.log(page, search, minGia, maxGia, brandId, categoryId)
             $.ajax({
-                url: "http://localhost:8080/Product/CommonUser",
+                url: "../../../Controllers/ProductController.php",
                 method: "GET",
                 dataType: "json",
                 data: (function() {
                     var requestData = {
-                        pageNumber: page,
-                        pageSize: 12
+                        action: "getAllProductsCommonUser",
+                        page: page,
+                        minPrice: minGia,
+                        maxPrice: maxGia,
+                        pageSize: 12,
                     };
 
-
-                    // Nếu brandId khác 0, thêm vào requestData
-                    if (search !== "") {
+                    // Nếu search có giá trị, thêm vào requestData
+                    if (search && search.trim() !== "") {
                         requestData.search = search;
                     }
-
-
 
                     // Nếu brandId khác 0, thêm vào requestData
                     if (brandId !== 0) {
@@ -261,23 +256,23 @@
                 })(),
                 success: function(response) {
                     var productContainer = $('#product .products');
-                    if (response.content && response.content.length > 0) {
+                    if (response.data && response.data.length > 0) {
                         // Tạo biến lưu trữ nội dung HTML mới
                         var htmlContent = '';
                         // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
-                        $.each(response.content, function(index, product) {
+                        $.each(response.data, function(index, product) {
                             htmlContent += ` 
-                                    <form id="productForm_${product.id}" method="post" action="SignedProductDetail.php?maSanPham=${product.id}">
+                                    <form id="productForm_${product.Id}" method="post" action="SignedProductDetail.php.php?maSanPham=${product.Id}">
                                         <div class="row">
-                                            <a href="SignedProductDetail.php?maSanPham=${product.id}" class="text-center" style="display: block;">
-                                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.image}" alt="" style="height: 300px;">
+                                            <a href="SignedProductDetail.php.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
+                                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                                 <div class="product-card-content">
                                                     <div class="price">
-                                                        <h4 class="name-product">${product.productName}</h4>
-                                                        <p class="price-tea">${formatCurrency(product.price)}</p>
+                                                        <h4 class="name-product">${product.ProductName}</h4>
+                                                        <p class="price-tea">${formatCurrency(product.UnitPrice)}</p>
                                                     </div>
-                                                    <div class="buy-btn-container" >
-                                                        Mua ngay
+                                                    <div class="buy-btn-container">
+                                                        MUA NGAY
                                                     </div>
                                                 </div>
                                             </a>
@@ -309,6 +304,7 @@
                 }
             });
         }
+
 
         // Hàm tạo nút phân trang
         function createPagination(currentPage, totalPages) {
@@ -346,18 +342,18 @@
 
         function getCategories() {
             $.ajax({
-                url: "http://localhost:8080/Category/noPaging",
+                url: "../../../controllers/CategoryController.php",
                 method: "GET",
                 dataType: "json",
                 success: function(response) {
-                    if (response && response.length > 0) {
+                    if (response.data && response.data.length > 0) {
                         // Xóa tất cả các option hiện có trong dropdown
                         $('#category-filter').empty();
                         // Thêm option "Tất cả"
                         $('#category-filter').append('<option value="">Tất cả</option>');
                         // Duyệt qua danh sách loại sản phẩm và thêm từng option vào dropdown
-                        $.each(response, function(index, category) {
-                            $('#category-filter').append(`<option value="${category.id}">${category.categoryName}</option>`);
+                        $.each(response.data, function(index, category) {
+                            $('#category-filter').append(`<option value="${category.Id}">${category.CategoryName}</option>`);
                         });
                     } else {
                         console.log("Không có loại sản phẩm nào được trả về từ API.");
@@ -371,18 +367,18 @@
 
         function getBrands() {
             $.ajax({
-                url: "http://localhost:8080/Brand",
+                url: "../../../controllers/BrandController.php",
                 method: "GET",
                 dataType: "json",
                 success: function(response) {
-                    if (response.content && response.content.length > 0) {
+                    if (response.data && response.data.length > 0) {
                         // Xóa tất cả các option hiện có trong dropdown
                         $('#brand-filter').empty();
                         // Thêm option "Tất cả"
                         $('#brand-filter').append('<option value="">Tất cả</option>');
                         // Duyệt qua danh sách loại sản phẩm và thêm từng option vào dropdown
-                        $.each(response.content, function(index, category) {
-                            $('#brand-filter').append(`<option value="${category.brandId}">${category.brandName}</option>`);
+                        $.each(response.data, function(index, category) {
+                            $('#brand-filter').append(`<option value="${category.Id}">${category.BrandName}</option>`);
                         });
                     } else {
                         console.log("Không có loại sản phẩm nào được trả về từ API.");
@@ -393,6 +389,7 @@
                 }
             });
         }
+
 
         function detail(maSanPham) {
             window.location.href = `SignedProductDetail.php?maSanPham=${maSanPham}`;

@@ -12,6 +12,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } elseif (isset($_GET['accountId'])) {
             $response = $controller->getOrdersByAccountId($_GET['accountId']);
             echo $response;
+        } elseif (isset($_GET['idOrder'])) {
+            $response = $controller->getFullOrderById($_GET['idOrder']);
+            echo $response;
         } else {
             $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $size = isset($_GET['size']) ? (int)$_GET['size'] : 10;
@@ -73,7 +76,11 @@ class OrderController
         $response = $this->orderModel->getOrderById($orderId);
         $this->response($response);
     }
-
+    public function getFullOrderById($orderId)
+    {
+        $response = $this->orderModel->getFullOrderById($orderId);
+        $this->response($response);
+    }
     public function createOrder($data)
     {
         if (!isset($data['totalPrice'], $data['note'], $data['accountId'])) {

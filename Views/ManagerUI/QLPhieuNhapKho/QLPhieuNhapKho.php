@@ -145,7 +145,6 @@
 
     // Hàm getAllphieunhapkho
     function getAllphieunhapkho(page, dateFrom, dateTo, searchTerm) {
-      const token = sessionStorage.getItem("token");
 
       // Tạo object `data` và chỉ thêm các trường nếu chúng có giá trị
       let data = {
@@ -169,9 +168,7 @@
         type: 'GET',
         dataType: "json",
         data: data, // Truyền object data đã được kiểm tra
-        headers: {
-          'Authorization': 'Bearer ' + token
-        },
+
         success: function(response) {
           console.log(response)
           var data = response.data;
