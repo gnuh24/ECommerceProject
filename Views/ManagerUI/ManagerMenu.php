@@ -11,9 +11,6 @@
     <a class="MenuItemSidebar_menuItem__56b1m" href="../QLNhaCungCap/QLNhaCungCap.php">
         <span class="MenuItemSidebar_title__LLBtx">Thương hiệu</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLPhieuNhapKho/QLPhieuNhapKho.php">
-        <span class="MenuItemSidebar_title__LLBtx">Phiếu Nhập Kho</span>
-    </a>
     <a class="MenuItemSidebar_menuItem__56b1m" href="../QLDonHang/QLDonHang.php">
         <span class="MenuItemSidebar_title__LLBtx">Đơn Hàng</span>
     </a>
