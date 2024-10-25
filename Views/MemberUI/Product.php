@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="HomePage.css" />
     <link rel="stylesheet" href="login.css" />
-    <link rel="stylesheet" href="GuestProduct.css" />
+    <link rel="stylesheet" href="Product.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <?php require_once "../Header/GuestHeader.php"; ?>
+    <?php require_once "./Header.php"; ?>
     <!-- Thanh lọc menu -->
     <div id="filter-menu" class="container-fluid bg-white p-3 rounded mb-4">
         <div class="row d-flex justify-content-around" style="width:80%">
@@ -61,7 +61,7 @@
 
     </div>
 
-    <?php require_once "../Footer/Footer.php" ?>
+    <?php require_once "./Footer.php" ?>
 
 </body>
 
@@ -211,16 +211,14 @@
         getBrands();
         var currentPage = 1;
         filterProducts(currentPage);
-
     });
-
 
 
     function getAllSanPham(page, search, minGia, maxGia, brandId, categoryId) {
         // Gọi API để lấy dữ liệu sản phẩm
         console.log(page, search, minGia, maxGia, brandId, categoryId)
         $.ajax({
-            url: "../../../Controllers/ProductController.php",
+            url: "../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
             data: (function() {
@@ -257,9 +255,9 @@
                     // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
                     $.each(response.data, function(index, product) {
                         htmlContent += ` 
-                                    <form id="productForm_${product.Id}" method="post" action="GuestProductDetail.php?maSanPham=${product.Id}">
+                                    <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
                                         <div class="row">
-                                            <a href="GuestProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
+                                            <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
                                                 <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                                 <div class="product-card-content">
                                                     <div class="price">
@@ -276,9 +274,9 @@
                                 `;
 
                     });
+
                     // Trong hàm getAllSanPham, sau khi thay đổi nội dung HTML của sản phẩm, gọi lại hàm createPagination
                     productContainer.html(htmlContent);
-
 
                     // Đưa giao diện về đầu trang
                     window.scrollTo({
@@ -335,7 +333,7 @@
 
     function getCategories() {
         $.ajax({
-            url: "../../../controllers/CategoryController.php",
+            url: "../../controllers/CategoryController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {
@@ -360,7 +358,7 @@
 
     function getBrands() {
         $.ajax({
-            url: "../../../controllers/BrandController.php",
+            url: "../../controllers/BrandController.php",
             method: "GET",
             dataType: "json",
             success: function(response) {
@@ -384,13 +382,7 @@
     }
 
     function detail(maSanPham) {
-        window.location.href = `GuestProductDetail.php?maSanPham=${maSanPham}`;
-    }
-
-
-    function toLogin() {
-        // Chuyển hướng về trang chủ khi click vào hình ảnh
-        window.location.href = "../Login/LoginUI.php";
+        window.location.href = `ProductDetail.php?maSanPham=${maSanPham}`;
     }
 </script>
 

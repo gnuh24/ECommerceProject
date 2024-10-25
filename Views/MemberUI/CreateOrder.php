@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="SignedHomePage.css">
-    <link rel="stylesheet" href="CreateOrder.css">
+    <link rel="stylesheet" href="./HomePage.css">
+    <link rel="stylesheet" href="./CreateOrder.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>Thanh toán</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <?php require "../Header/SignedHeader.php"; ?>
+    <?php require "./Header.php"; ?>
 
     <div>
         <section>
@@ -78,7 +78,7 @@
                 </div>
             </div>
         </section>
-        <?php require_once "../Footer/Footer.php" ?>
+        <?php require_once "./Footer.php" ?>
     </div>
 </body>
 
@@ -101,65 +101,113 @@
 
     function loadCart() {
         var maTaiKhoan = sessionStorage.getItem("id");
-        $.ajax({
-            url: 'http://localhost:8080/CartItem/' + maTaiKhoan, // URL của file PHP API
-            method: 'GET',
-            dataType: 'json',
 
-            success: function(response) {
-                let cartHTML = '';
-                let totalPrice = 0;
+        // Check if there is a cart in LocalStorage
+        let localCart = JSON.parse(localStorage.getItem('cart')) || [];
 
-                // Duyệt qua các sản phẩm trong giỏ hàng và tạo HTML
-                response.forEach(function(cartProduct) {
-                    totalPrice += cartProduct.total;
-                    var maSanPham = cartProduct.productId;
-                    var donGia = cartProduct.unitPrice;
-                    var soLuong = cartProduct.quantity;
-                    var total1 = cartProduct.total;
+        if (localCart.length > 0) {
+            // If items are in LocalStorage, render them directly
+            renderCart(localCart);
+        } else {
+            // If no items in LocalStorage, fetch from API
+            $.ajax({
+                url: 'http://localhost:8080/CartItem/' + maTaiKhoan,
+                method: 'GET',
+                dataType: 'json',
 
-                    var productItem = {
-                        'idProductId': maSanPham,
-                        'unitPrice': donGia,
-                        'quantity': soLuong,
-                        'total': total1
-                    };
-                    listproduct.push(productItem);
-                    cartHTML += `
-                        <div class='radio__wrapper'>
-                            <div>
-                                <div class='cartItem' id='${cartProduct.productId}'>
-                                    <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
-                                    <div class='inforCart'>
-                                        <div class='nameAndPrice'>
-                                            <p class='priceCart'>${formatCurrency(cartProduct.unitPrice)}</p>
+                success: function(response) {
+                    let cartHTML = '';
+                    let totalPrice = 0;
+                    let listproduct = []; // Initialize or reset the listproduct array
+
+                    // Process the API response and generate HTML
+                    response.forEach(function(cartProduct) {
+                        totalPrice += cartProduct.total;
+                        var maSanPham = cartProduct.productId;
+                        var donGia = cartProduct.unitPrice;
+                        var soLuong = cartProduct.quantity;
+                        var total1 = cartProduct.total;
+
+                        var productItem = {
+                            'idProductId': maSanPham,
+                            'unitPrice': donGia,
+                            'quantity': soLuong,
+                            'total': total1
+                        };
+                        listproduct.push(productItem);
+                        cartHTML += `
+                            <div class='radio__wrapper'>
+                                <div>
+                                    <div class='cartItem' id='${cartProduct.productId}'>
+                                        <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
+                                        <div class='inforCart'>
+                                            <div class='nameAndPrice'>
+                                                <p class='priceCart'>${formatCurrency(cartProduct.unitPrice)}</p>
+                                            </div>
+                                            <div class='quantity'>
+                                                <div class='txtQuantity'>${cartProduct.quantity}</div>
+                                            </div>
                                         </div>
-                                        <div class='quantity'>
-                                            <div class='txtQuantity'>${cartProduct.quantity}</div>
-                                        </div>
-                                    </div>
-                                    <div class='wrapTotalPriceOfCart'>
-                                        <div class='totalPriceOfCart'>
-                                            <p class='lablelPrice'>Thành tiền</p>
-                                            <p class='valueTotalPrice'>${formatCurrency(cartProduct.total)}</p>
+                                        <div class='wrapTotalPriceOfCart'>
+                                            <div class='totalPriceOfCart'>
+                                                <p class='lablelPrice'>Thành tiền</p>
+                                                <p class='valueTotalPrice'>${formatCurrency(cartProduct.total)}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>`;
-                });
+                            </div>`;
+                    });
 
-                // Hiển thị giỏ hàng trên trang
-                $('#cartItems').html(cartHTML);
-                totalpriceall = totalPrice;
-                $('#totalPrice').text(formatCurrency(totalPrice));
+                    // Store the fetched cart in LocalStorage
+                    localStorage.setItem('cart', JSON.stringify(listproduct));
 
-            },
-            error: function(xhr, status, error) {
-                console.error('Có lỗi xảy ra: ', error);
-            }
-        });
+                    // Display cart on the page
+                    $('#cartItems').html(cartHTML);
+                    $('#totalPrice').text(formatCurrency(totalPrice));
+                },
+                error: function(xhr, status, error) {
+                    console.error('Có lỗi xảy ra: ', error);
+                }
+            });
+        }
     }
+
+    function renderCart(cart) {
+        let cartHTML = '';
+        let totalPrice = 0;
+
+        cart.forEach(function(cartProduct) {
+            totalPrice += cartProduct.total;
+
+            cartHTML += `
+                <div class='radio__wrapper'>
+                    <div>
+                        <div class='cartItem' id='${cartProduct.idProductId}'>
+                            <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
+                            <div class='inforCart'>
+                                <div class='nameAndPrice'>
+                                    <p class='priceCart'>${formatCurrency(cartProduct.unitPrice)}</p>
+                                </div>
+                                <div class='quantity'>
+                                    <div class='txtQuantity'>${cartProduct.quantity}</div>
+                                </div>
+                            </div>
+                            <div class='wrapTotalPriceOfCart'>
+                                <div class='totalPriceOfCart'>
+                                    <p class='lablelPrice'>Thành tiền</p>
+                                    <p class='valueTotalPrice'>${formatCurrency(cartProduct.total)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        $('#cartItems').html(cartHTML);
+        $('#totalPrice').text(formatCurrency(totalPrice));
+    }
+
 
     function formatCurrency(number) {
         // Chuyển đổi số thành chuỗi và đảm bảo nó là số nguyên

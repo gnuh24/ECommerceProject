@@ -4,21 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="../GuestPage/HomePage.css" />
-    <link rel="stylesheet" href="../GuestPage/login.css" />
+    <link rel="stylesheet" href="./HomePage.css" />
+    <link rel="stylesheet" href="./login.css" />
     <link rel="stylesheet" href="MyOrderInDetail.css" />
     <link rel="stylesheet" href="CreateOrder.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Chi tiết đơn hàng</title>
 </head>
 
 <body>
-    <?php require_once "../Header/SignedHeader.php" ?>
+    <?php require_once "./Header.php" ?>
 
     <section>
         <div class="center-text" style="margin-top: 20px;">
@@ -119,12 +116,11 @@
 </body>
 
 
-<?php require_once "../Footer/Footer.php" ?>
+<?php require_once "./Footer.php" ?>
 
 <script>
     // Hàm cập nhật màu sắc và thời gian cho container được chỉ định
     function setColorAndTime(trangThaiValue, thoiGianValue) {
-        console.log(`Đã vào được trong ${trangThaiValue} và ${thoiGianValue}`);
 
         // Chọn các phần tử sử dụng jQuery
         const $line1 = $('#line1');
@@ -217,7 +213,7 @@
 
     function loadOrderData(maOrder) {
         $.ajax({
-            url: '../../../Controllers/OrderController.php', // Đường dẫn API lấy chi tiết đơn hàng
+            url: '../../Controllers/OrderController.php', // Đường dẫn API lấy chi tiết đơn hàng
             method: 'GET',
             dataType: 'json',
             data: {

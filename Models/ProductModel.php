@@ -11,7 +11,7 @@ class ProductModel
     }
 
     // Lấy tất cả sản phẩm của CommonUser
-    public function getAllProductsCommonUser($brandId = null, $categoryId = null, $search = null, $minPrice = null, $maxPrice = null, $limit = 20, $offset = 0)
+    public function getAllProductsCommonUser($brandId = null, $categoryId = null, $search = null, $minPrice = null, $maxPrice = null, $limit = 16, $offset = 0)
     {
         // Lưu trữ điều kiện WHERE
         $conditions = [];
@@ -34,12 +34,12 @@ class ProductModel
         }
 
         if ($minPrice !== null) {
-            $conditions[] = "(SELECT MIN(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) >= :minPrice";
+            $conditions[] = "p.UnitPrice >= :minPrice";
             $params[':minPrice'] = $minPrice;
         }
 
         if ($maxPrice !== null) {
-            $conditions[] = "(SELECT MAX(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) <= :maxPrice";
+            $conditions[] = "p.UnitPrice <= :maxPrice";
             $params[':maxPrice'] = $maxPrice;
         }
 
@@ -51,13 +51,7 @@ class ProductModel
 
         // Truy vấn lấy sản phẩm
         $query = "
-                SELECT p.*, 
-                    (SELECT b.UnitPrice 
-                        FROM `batch` b 
-                        WHERE b.ProductId = p.Id 
-                        AND b.Quantity > 0 
-                        ORDER BY b.ReceivingTime DESC 
-                        LIMIT 1) AS UnitPrice
+                SELECT p.*
                 FROM `product` p
                 $whereClause
                 LIMIT :limit OFFSET :offset
@@ -133,12 +127,14 @@ class ProductModel
             $conditions[] = "p.Status = :trangthai";
             $params[':trangthai'] = $trangthai ? TRUE : FALSE; // true = 1, false = 0
         }
+
         if ($minPrice !== null) {
-            $conditions[] = "(SELECT MIN(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) >= :minPrice";
+            $conditions[] = "p.UnitPrice >= :minPrice";
             $params[':minPrice'] = $minPrice;
         }
+
         if ($maxPrice !== null) {
-            $conditions[] = "(SELECT MAX(b.UnitPrice) FROM `batch` b WHERE b.ProductId = p.Id AND b.Quantity > 0) <= :maxPrice";
+            $conditions[] = "p.UnitPrice <= :maxPrice";
             $params[':maxPrice'] = $maxPrice;
         }
 
@@ -151,19 +147,7 @@ class ProductModel
         $offset = ($page - 1) * $limit;
 
         $query = "
-            SELECT p.*, 
-                (SELECT b.UnitPrice 
-                    FROM `batch` b 
-                    WHERE b.ProductId = p.Id 
-                    AND b.Quantity > 0 
-                    ORDER BY b.ReceivingTime DESC 
-                    LIMIT 1) AS UnitPrice,
-                (SELECT b.Quantity 
-                    FROM `batch` b 
-                    WHERE b.ProductId = p.Id 
-                    AND b.Quantity > 0 
-                    ORDER BY b.ReceivingTime DESC 
-                    LIMIT 1) AS AvailableQuantity,
+            SELECT p.*,
                 (SELECT br.BrandName 
                     FROM `brand` br 
                     WHERE br.Id = p.BrandId) AS BrandName,
@@ -176,6 +160,8 @@ class ProductModel
         ";
 
         try {
+
+            //Setup tham số
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -184,6 +170,9 @@ class ProductModel
             }
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+
+            //Xử lý để lấy tổng số lượng sản phẩm
             $countQuery = "SELECT COUNT(*) AS total FROM `product` p $whereClause";
             $countStatement = $this->connection->prepare($countQuery);
             foreach ($params as $key => $value) {
@@ -191,7 +180,10 @@ class ProductModel
             }
             $countStatement->execute();
             $totalCount = $countStatement->fetchColumn();
+
+            //Tổng số trang
             $totalPages = ceil($totalCount / $limit);
+
             $content = array_map(function ($item) {
                 return [
                     "id" => $item['Id'],
@@ -200,6 +192,7 @@ class ProductModel
                     "quantity" => $item['AvailableQuantity'],
                     "price" => $item['UnitPrice'],
                     "image" => $item['Image'],
+                    "sale" => $item['Sale'],
                     "createTime" => date('H:i:s d/m/Y', strtotime($item['CreateTime'])),
                     "brand" => [
                         "id" => $item['BrandId'],
@@ -229,22 +222,21 @@ class ProductModel
     }
 
 
-
     // Lấy sản phẩm theo ID của Admin
     public function getProductByIdAdmin($id)
     {
         // Truy vấn sản phẩm dựa trên ID
         $query = "
-        SELECT p.*, 
-            (SELECT br.BrandName 
-                FROM `brand` br 
-                WHERE br.Id = p.BrandId) AS BrandName,
-            (SELECT c.CategoryName 
-                FROM `category` c 
-                WHERE c.Id = p.CategoryId) AS CategoryName
-        FROM `product` p
-        WHERE p.Id = :id
-    ";
+            SELECT p.*, 
+                (SELECT br.BrandName 
+                    FROM `brand` br 
+                    WHERE br.Id = p.BrandId) AS BrandName,
+                (SELECT c.CategoryName 
+                    FROM `category` c 
+                    WHERE c.Id = p.CategoryId) AS CategoryName
+            FROM `product` p
+            WHERE p.Id = :id
+        ";
 
         try {
             // Chuẩn bị và thực thi truy vấn sản phẩm
@@ -253,32 +245,8 @@ class ProductModel
             $statement->execute();
             $productResult = $statement->fetch(PDO::FETCH_ASSOC);
 
+            // Kiểm tra xem sản phẩm có tồn tại hay không
             if ($productResult) {
-                // Lấy thông tin từ bảng Batch liên quan tới ProductId
-                $batchesQuery = "
-                SELECT b.Id, b.UnitPrice AS price, b.Quantity, b.ReceivingTime 
-                FROM `batch` b 
-                WHERE b.ProductId = :productId 
-                AND b.Quantity > 0
-                ORDER BY b.ReceivingTime DESC
-            ";
-
-                // Chuẩn bị và thực thi truy vấn batches
-                $batchesStatement = $this->connection->prepare($batchesQuery);
-                $batchesStatement->bindValue(':productId', $id, PDO::PARAM_INT);
-                $batchesStatement->execute();
-                $batchesResult = $batchesStatement->fetchAll(PDO::FETCH_ASSOC);
-
-                // Lưu kết quả batches vào một biến riêng
-                $batches = array_map(function ($batch) {
-                    return [
-                        "id" => $batch['Id'],
-                        "price" => $batch['price'],
-                        "quantity" => $batch['Quantity'],
-                        "receivingTime" => date('H:i:s d/m/Y', strtotime($batch['ReceivingTime']))
-                    ];
-                }, $batchesResult);
-
                 // Định dạng dữ liệu trả về
                 $response = [
                     "id" => $productResult['Id'],
@@ -290,8 +258,9 @@ class ProductModel
                     "origin" => $productResult['Origin'],
                     "capacity" => $productResult['Capacity'],
                     "abv" => $productResult['ABV'],
-                    // Sử dụng biến $batches
-                    "batches" => $batches,
+                    "unitPrice" => $productResult['UnitPrice'],
+                    "quantity" => $productResult['Quantity'],
+                    "sale" => $productResult['Sale'],
                     "brand" => [
                         "id" => $productResult['BrandId'],
                         "brandName" => $productResult['BrandName']
@@ -326,19 +295,9 @@ class ProductModel
     public function getProductByIdCommonUser($id)
     {
         $query = "
-            SELECT p.*, 
-                (SELECT b.UnitPrice 
-                    FROM `batch` b 
-                    WHERE b.ProductId = p.Id 
-                    AND b.Quantity > 0 
-                    ORDER BY b.ReceivingTime DESC 
-                    LIMIT 1) AS UnitPrice,
-                (SELECT b.Quantity 
-                    FROM `batch` b 
-                    WHERE b.ProductId = p.Id 
-                    AND b.Quantity > 0 
-                    ORDER BY b.ReceivingTime DESC 
-                    LIMIT 1) AS AvailableQuantity,
+            SELECT p.*,
+                p.UnitPrice,
+                p.Quantity AS AvailableQuantity,
                 (SELECT br.BrandName 
                     FROM `brand` br 
                     WHERE br.Id = p.BrandId) AS BrandName,
@@ -367,6 +326,7 @@ class ProductModel
                     "capacity" => $result['Capacity'],
                     "abv" => $result['ABV'],
                     "quantity" => $result['AvailableQuantity'],
+                    "sale" => $result['Sale'],
                     "brand" => [
                         "id" => $result['BrandId'],
                         "brandName" => $result['BrandName']
@@ -385,7 +345,7 @@ class ProductModel
             } else {
                 return (object) [
                     "status" => 404,
-                    "message" => "Product not found or no available batch"
+                    "message" => "Product not found or no available"
                 ];
             }
         } catch (PDOException $e) {

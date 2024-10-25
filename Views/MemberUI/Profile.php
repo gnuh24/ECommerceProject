@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="SignedHomePage.css">
     <link rel="stylesheet" href="Profile.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>Thông tin cá nhân</title>
@@ -14,7 +13,7 @@
 </head>
 
 <body>
-    <?php require_once "../Header/SignedHeader.php" ?>
+    <?php require_once "./Header.php" ?>
     <div class="col-12">
         <div class="my-2 d-flex justify-content-center">
             <h3 style="z-index: 1; font-size: 32px; color: #7b181a; position: relative; background-color: white; padding: 0 20px; margin: 30px 0; font-family: Roboto; font-weight: bold !important;">My Profile</h3>
@@ -22,7 +21,7 @@
         </div>
         <div class="row mb-5 gx-5 d-flex justify-content-center" id="contentprofile" style="height: fit-content; margin: 0px;"></div>
     </div>
-    <?php require_once "../Footer/Footer.php" ?>
+    <?php require_once "./Footer.php" ?>
 </body>
 
 <script>
@@ -60,7 +59,7 @@
         }
 
         $.ajax({
-            url: '../../../Controllers/AccountController.php',
+            url: '../../Controllers/AccountController.php',
             method: "GET",
             dataType: "json",
             data: {

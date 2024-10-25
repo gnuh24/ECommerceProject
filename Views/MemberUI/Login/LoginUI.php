@@ -266,7 +266,6 @@
 
 <?php require_once __DIR__ . '/googleLoginConfig.php'; ?>";
 
-
 <script>
     const loginButton = document.getElementById("signInButton");
     const tenDangNhap = document.getElementById("tenDangNhapLogin");
@@ -337,6 +336,9 @@
                             const quyen = response.data.role;
 
                             sessionStorage.setItem('id', response.data.id);
+                            sessionStorage.setItem('email', response.data.email);
+                            sessionStorage.setItem('role', response.data.role);
+
                             switch (quyen) {
                                 case 'Admin':
                                     window.location.href = `../../AdminUI/QLTaiKhoan.php`;
@@ -345,13 +347,13 @@
                                     window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
                                     break;
                                 default:
-                                    window.location.href = `../SignedPage/SignedHomePage.php`;
+                                    window.location.href = `../HomePage.php`;
                                     break;
                             }
                         }
                     });
                 } else {
-                    console.log(response);
+                    console.error(response);
                     // Trường hợp đăng nhập thất bại
                     Swal.fire({
                         title: 'Lỗi!',

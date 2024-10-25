@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS `UserInformation`(
 
 -- DROP TABLE IF EXISTS `Account`;
 CREATE TABLE IF NOT EXISTS `Account`(
-    `Id`                INT UNSIGNED                                PRIMARY KEY         AUTO_INCREMENT,
-    `Password`          NVARCHAR(800)                               NOT NULL,
-    `CreateTime`        DATETIME                                    NOT NULL            DEFAULT NOW(),
-    `Status`            BOOLEAN                                     NOT NULL            DEFAULT TRUE,
-    `Role`              ENUM("User", "Admin")                       NOT NULL            DEFAULT "User",
-    `Type`              ENUM("Standard", "Google")                  NOT NULL            DEFAULT "Standard",
-    `UserInformationId` INT UNSIGNED                                NOT NULL,
+    `Id`                INT UNSIGNED                                	PRIMARY KEY         AUTO_INCREMENT,
+    `Password`          NVARCHAR(800)                               	NOT NULL,
+    `CreateTime`        DATETIME                                    	NOT NULL            DEFAULT NOW(),
+    `Status`            BOOLEAN                                     	NOT NULL            DEFAULT TRUE,
+    `Role`              ENUM("User", "Employee", "Manager", "Admin")    NOT NULL            DEFAULT "User",
+    `Type`              ENUM("Standard", "Google")                  	NOT NULL            DEFAULT "Standard",
+    `UserInformationId` INT UNSIGNED                                	NOT NULL,
     FOREIGN KEY (`UserInformationId`) REFERENCES `UserInformation`(`Id`)
 );
 
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS `Product`(
     `Image`             VARCHAR(255)        ,
 
     `Quantity`          INT UNSIGNED        NOT NULL,
-    `Price`				INT UNSIGNED        NOT NULL,
-	`Percentage`		INT UNSIGNED        NOT NULL	DEFAULT 0,	 
+    `UnitPrice`				INT UNSIGNED        NOT NULL,
+	`Sale`				INT UNSIGNED        NOT NULL	DEFAULT 0,	 
 
     `Origin`            NVARCHAR(255)       ,
     `Capacity`          INT UNSIGNED        ,

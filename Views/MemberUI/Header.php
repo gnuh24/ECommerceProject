@@ -16,7 +16,7 @@
 
     .search-input {
         padding-left: 25px;
-        /* background-image: url("../img/search.png"); */
+        background-image: url("../img/search.png");
         background-size: 20px;
         background-repeat: no-repeat;
         background-position: 5px center;
@@ -38,15 +38,19 @@
     }
 
     .header-option {
+        cursor: pointer;
+        font-size: 24px;
+        /* Adjust icon size */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20%;
+        height: 40px;
         background-color: white;
         color: rgb(146, 26, 26);
         padding: 5px 15px;
         border: none;
-        cursor: pointer;
         border-radius: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         margin-left: 5px;
     }
 
@@ -54,6 +58,8 @@
         color: inherit;
         text-decoration: none;
     }
+
+
 
     /* Responsive Styles */
     @media (max-width: 768px) {
@@ -98,90 +104,79 @@
             gap: 10px;
         }
     }
-
-    #Home-over-Header {
-        height: 100px;
-        /* Set a consistent height for the header */
-    }
-
-    #Home-img {
-        max-height: 80px;
-        /* Ensure the logo doesn't exceed a certain size */
-    }
-
-    .input__wrapper input,
-    .input__wrapper button {
-        height: 100%;
-        /* Ensure the search form fields take the full height */
-    }
-
-    .header-option {
-        cursor: pointer;
-        font-size: 24px;
-        /* Adjust icon size */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 20%;
-        height: 40px;
-    }
 </style>
-
 <header class="container-fluid bg-danger" style="background-color: rgb(146, 26, 26) !important;">
-    <div id="Home-over-Header" class="row align-items-center justify-content-between" style="height: fit-content;">
-
+    <div id="Home-over-Header" class="row align-items-center justify-content-center" style="height: fit-content;">
         <!-- Logo -->
-        <div class="col-12 col-md-2 text-center mb-2 mb-md-0 d-flex align-items-center justify-content-center">
-            <img id="Home-img" src="../GuestPage/img/logoWine.jpg" alt="Logo" class="img-fluid" />
+        <div class="col-12 col-md-2 text-center mb-2 mb-md-0">
+            <img id="Home-img" src="./img/logoWine.jpg" alt="Logo" class="img-fluid mx-auto" />
         </div>
 
         <!-- Search Form -->
-        <div class="col-12 col-md-6 mb-2 mb-md-0 d-flex justify-content-center align-items-center">
-            <form id="search" class="input__wrapper d-flex w-100" method="post" action="SignedProduct.php">
-                <input id="searchSanPham" name="searchFromAnotherPage" type="text" class="form-control me-2 search-input" placeholder="Tìm kiếm" style="width: 90%;" required="" />
-                <button id="filter-button" class="btn btn-primary" type="submit" style="width: 10%;padding:5px 0;">
+        <div class="col-12 col-md-6 mb-2 mb-md-0 d-flex justify-content-center">
+            <form id="search" class="input__wrapper d-flex justify-content-center" method="post" action="SignedProduct.php" style="width:100%">
+                <input id="searchSanPham" name="searchFromAnotherPage" type="text" class="form-control me-2 search-input" placeholder="Tìm kiếm" style="width:90%" required="" />
+                <button id="filter-button" class="btn btn-primary" type="submit" style="width:10%">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
         </div>
+
 
         <!-- Icons Section -->
         <div class="col-12 col-md-4 d-flex justify-content-center align-items-center gap-4" style="height: fit-content;">
             <div class="header-option" onclick="toCart()" style="height: fit-content;">
                 <i class="fa-solid fa-cart-shopping"></i>
             </div>
-            <div class="header-option" onclick="toMyOrder()" style="height: fit-content;">
+            <div class="header-option  header-option-login" onclick="toMyOrder()" style="height: fit-content;">
                 <i class="fa-solid fa-truck-fast"></i>
             </div>
-            <div class="header-option" onclick="toProfile()" style="height: fit-content;">
+            <div class="header-option  header-option-login" onclick="toProfile()" style="height: fit-content;">
                 <i class="fa-solid fa-user"></i>
             </div>
-            <div class="header-option" onclick="logout()" style="height: fit-content;">
+            <div class="header-option  header-option-login" onclick="logout()" style="height: fit-content;">
                 <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <div id="Home-login" class="col-6 col-md-2 text-end text-center">
+                <button class="btn btn-light text-danger" style="color:rgb(146, 26, 26) !important;font-weight:bold;">Login</button>
             </div>
         </div>
 
     </div>
 </header>
 
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src=" https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
-    //Click vào ảnh về trang chủ
+    // Kiểm tra xem 'role' có tồn tại trong Session Storage không
+    if (sessionStorage.getItem('role')) {
+        // Nếu role tồn tại, ẩn nút bằng cách thêm thuộc tính 'hidden'
+        document.getElementById("Home-login").style.display = 'none';
+
+    } else {
+        // Nếu tồn tại, ẩn các nút bằng cách thiết lập display: none
+        document.querySelectorAll('.header-option-login').forEach((element) => {
+            element.style.display = 'none';
+        });
+    }
+
+    // Lắng nghe sự kiện click vào id "Home-login"
+    document.getElementById("Home-login").addEventListener("click", function() {
+        window.location.href = './Login/LoginUI.php';
+    });
+
     document.getElementById("Home-img").addEventListener("click", function() {
         // Chuyển hướng về trang chủ khi click vào hình ảnh
-        window.location.href = "SignedHomePage.php";
+        window.location.href = "./HomePage.php";
     });
 
     // Sự kiện tìm kiếm search 
-    document.getElementById("filter-button").addEventListener("click", function(event) {
+    document.getElementById("filter-button").addEventListener("click", (event) => {
         event.preventDefault();
         const form = document.getElementById("search");
         const searchValue = document.getElementById("searchSanPham").value;
-        console.log(searchValue);
         if (searchValue != "") {
-            form.action = `SignedProduct.php?searchFromAnotherPage=${searchValue}`;
+            form.action = `Product.php?searchFromAnotherPage=${searchValue}`;
             form.submit();
         } else {
             Swal.fire({
@@ -191,6 +186,7 @@
                 confirmButtonText: 'OK'
             });
         }
+
     });
 
     //Sự kiện giỏ hàng
@@ -210,6 +206,7 @@
             console.error("Form not found!");
         }
     }
+
     //profile
     function toProfile() {
         const form = document.getElementById("search");
@@ -225,6 +222,7 @@
             console.error("Form not found!");
         }
     }
+
     //Sự kiện đơn hàng cá nhân
     function toMyOrder() {
         const form = document.getElementById("search");
@@ -243,7 +241,6 @@
         }
     }
 
-
     // Sự kiện đăng xuất
     function logout() {
         Swal.fire({
@@ -260,9 +257,11 @@
 
                 // Gọi API logout qua Ajax
                 sessionStorage.removeItem("id");
+                sessionStorage.removeItem("email");
+                sessionStorage.removeItem("role");
 
                 // Chuyển hướng về trang chủ khách
-                window.location.href = "../GuestPage/GuestHomePage.php";
+                window.location.href = "./HomePage.php";
 
 
             }

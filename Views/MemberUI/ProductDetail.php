@@ -5,11 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="../GuestPage/HomePage.css" />
-    <link rel="stylesheet" href="SignedProductDetail.css" />
+    <link rel="stylesheet" href="./ProductDetail.css" />
+    <link rel="stylesheet" href="./HomePage.css" />
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="../GuestPage/login.css" />
+    <link rel="stylesheet" href="./login.css" />
     <title>Chi tiết sản phẩm</title>
     <style>
         .quantity-available {
@@ -62,7 +63,7 @@
 
 <body>
 
-    <?php require_once "../Header/SignedHeader.php" ?>
+    <?php require_once "./Header.php" ?>
 
     <section>
         <div class="center-text">
@@ -82,7 +83,7 @@
     </section>
 
     <!-- Footer -->
-    <?php require_once "../Footer/Footer.php" ?>
+    <?php require_once "./Footer.php" ?>
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -116,7 +117,7 @@
         const maSanPham = urlParams.get('maSanPham');
         if (maSanPham) {
             $.ajax({
-                url: "../../../Controllers/ProductController.php",
+                url: "../../Controllers/ProductController.php",
                 method: "GET",
                 dataType: "json",
                 data: {
@@ -196,11 +197,9 @@
 
 
 
-
-
                     if (soLuongConLai > 0) {
                         htmlContent += `
-                            <button class="btn btn-secondary"  onclick="addToCart(${product.id}, ${price})">
+                            <button class="btn btn-secondary"  onclick="addToCart(${product.id}, '${productName}', '${productImage}', ${price})">
                                 <span>Thêm vào giỏ hàng</span>
                             </button>`;
                     }
@@ -255,8 +254,7 @@
         });
     }
 
-    function addToCart(productId, unitPrice) {
-        const accountId = sessionStorage.getItem("id");
+    function addToCart(productId, productName, productImage, unitPrice) {
         const quantity = parseInt(document.getElementById("quantityAddToCart").value, 10); // Chuyển đổi thành số
 
         if (isNaN(quantity) || quantity <= 0) {
@@ -269,47 +267,37 @@
             return; // Dừng hàm nếu số lượng không hợp lệ
         }
 
-        // Tạo object chứa dữ liệu form
-        const formData = new FormData();
-        formData.append('accountId', accountId);
-        formData.append('productId', productId);
-        formData.append('unitPrice', unitPrice);
-        formData.append('quantity', quantity); // Đã được chuyển thành số
+        // Lấy giỏ hàng từ localStorage (nếu chưa có giỏ hàng thì tạo mảng rỗng)
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        fetch('../../../Controllers/CartItemController.php', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Kiểm tra phản hồi từ server
-                if (data.status === 201) {
-                    Swal.fire({
-                        title: 'Thành công!',
-                        text: 'Sản phẩm đã được thêm vào giỏ hàng.',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    // Nếu có lỗi từ server
-                    Swal.fire({
-                        title: 'Lỗi!',
-                        text: data.message || 'Có lỗi xảy ra, vui lòng thử lại sau.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Thông báo lỗi khi có exception
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: 'Có lỗi xảy ra, vui lòng thử lại sau.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            });
+        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+        const existingProductIndex = cart.findIndex(item => item.productId === productId);
+
+        if (existingProductIndex !== -1) {
+            // Nếu sản phẩm đã tồn tại, tăng số lượng sản phẩm đó
+            cart[existingProductIndex].quantity += quantity;
+        } else {
+            // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào giỏ hàng
+            const cartItem = {
+                productId: productId,
+                productName: productName,
+                image: productImage,
+                unitPrice: unitPrice,
+                quantity: quantity
+            };
+            cart.push(cartItem);
+        }
+
+        // Lưu giỏ hàng trở lại vào localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Hiển thị thông báo thành công
+        Swal.fire({
+            title: 'Thành công!',
+            text: 'Sản phẩm đã được thêm vào giỏ hàng.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
     }
 </script>
 

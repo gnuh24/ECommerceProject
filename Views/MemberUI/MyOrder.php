@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="../GuestPage/HomePage.css" />
-    <link rel="stylesheet" href="../GuestPage/login.css" />
+    <link rel="stylesheet" href="./HomePage.css" />
+    <link rel="stylesheet" href="./login.css" />
     <link rel="stylesheet" href="MyOrder.css" />
 
-    <!-- <link rel="stylesheet" href="MyOrder.css" /> -->
     <title>Đơn hàng của tôi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -17,7 +16,7 @@
 </head>
 
 <body>
-    <?php require_once "../Header/SignedHeader.php" ?>
+    <?php require_once "./Header.php" ?>
 
     <section>
         <div class="center-text" style="margin-top: 20px;">
@@ -37,13 +36,13 @@
 </body>
 
 
-<?php require_once "../Footer/Footer.php" ?>
+<?php require_once "./Footer.php" ?>
 <script>
     function loadOrders() {
         var customerId = sessionStorage.getItem("id");
 
         $.ajax({
-            url: '../../../Controllers/OrderController.php', // Đường dẫn API lấy đơn hàng
+            url: '../../Controllers/OrderController.php', // Đường dẫn API lấy đơn hàng
             type: 'GET',
             data: {
                 accountId: customerId
@@ -91,7 +90,7 @@
 
             // Fetch order details for each order (make sure to use hoaDon.Id, not hoaDon.id)
             $.ajax({
-                url: '../../../Controllers/OrderController.php', // Đường dẫn API lấy chi tiết đơn hàng
+                url: '../../Controllers/OrderController.php', // Đường dẫn API lấy chi tiết đơn hàng
                 type: 'GET',
                 data: {
                     id: hoaDon.OrderId // Use 'Id' based on your response structure
@@ -177,7 +176,7 @@
             // Nếu người dùng xác nhận hủy đơn hàng
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '../../../Controllers/OrderStatusController.php?orderId=' + maDonHang, // Đường dẫn API lấy chi tiết đơn hàng
+                    url: '../../Controllers/OrderStatusController.php?orderId=' + maDonHang, // Đường dẫn API lấy chi tiết đơn hàng
                     type: 'PATCH',
 
                     data: JSON.stringify({

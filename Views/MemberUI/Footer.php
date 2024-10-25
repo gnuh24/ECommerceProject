@@ -36,16 +36,13 @@
                 <a href="https://twitter.com/?lang=vi" class="text-dark me-2">
                     <i class="fa-brands fa-square-twitter"></i>
                 </a>
-                <a href="http://online.gov.vn/Home/WebDetails/36260" class="text-dark">
-                    <img src="#" alt="Government Approval" class="img-fluid" />
-                </a>
             </div>
         </div>
 
         <!-- Footer Bottom -->
         <div class="row" style="height: fit-content;">
             <div class="col-12 text-center">
-                <p class="mt-4 mb-0">Copyrights © 2019 by comebuy_vn. All rights reserved.</p>
+                <p class="mt-4 mb-0">Copyrights © 2019 by Thug24. All rights reserved.</p>
             </div>
         </div>
     </div>

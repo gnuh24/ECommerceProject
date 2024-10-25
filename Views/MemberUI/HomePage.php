@@ -4,17 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="SignedHomePage.css" />
-    <title>Kinh doanh rượu</title>
+    <link rel="stylesheet" href="HomePage.css" />
+    <link rel="stylesheet" href="login.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <title>Kinh doanh rượu</title>
 </head>
 
 <body>
-    <?php require_once "../Header/SignedHeader.php" ?>
+
+    <?php require_once "./Header.php"; ?>
 
     <section id="poster" style="width: 100%; height: auto; padding: 0 5%;">
-        <img src="../GuestPage/img/poster.jpg" style="max-width: 100%;">
+        <img src="img/poster.jpg" style="max-width: 100%;">
     </section>
 
 
@@ -31,7 +34,6 @@
     </section>
 
 
-
     <section id="product">
         <div class="container">
             <div class="row products">
@@ -39,52 +41,61 @@
             </div>
         </div>
     </section>
-    <div style="display: flex; align-items: center; justify-content: center;">
-        <button id="btn-load-more">Xem thêm các sản phẩm</button>
+    <div class="text-center my-4">
+        <button id="btn-load-more" class="btn btn-primary">Xem thêm các sản phẩm</button>
     </div>
 
     <!-- Tin tức -->
     <section class="Home-titleSection">
         <div class="Home-lineSection-2"></div>
-        <h2 class="Home-txtTitle">TIN TỨC</h2>
+        <h2 class="Home-txtTitle">DỊCH VỤ</h2>
         <div class="Home-lineSection-2"></div>
     </section>
 
-
-
     <!-- Dịch vụ -->
-    <section class="Home-service">
-        <div class="Home-service-child">
-            <div><img class="Home-service-img" src="../GuestPage/img/service-1.jpg" alt="" /></div>
-            <h2 class="home-heading-sercive">Giao Hàng nhanh</h2>
-            <p class="home-txt-sercive">
-                Winemart sẽ luôn cố gắng giao hàng nhanh nhất có thể
-            </p>
-        </div>
-        <div class="Home-service-child">
-            <div><img class="Home-service-img" src="../GuestPage/img/service2.jpg" alt="" /></div>
-            <h2 class="home-heading-sercive">Hỗ trợ khách hàng</h2>
-            <p class="home-txt-sercive">
-                Chăm sóc, tư vấn và hỗ trợ khách hàng gọi ngay <br>
-                1900.636.035
-            </p>
-        </div>
-        <div class="Home-service-child">
-            <div><img class="Home-service-img" src="../GuestPage/img/service3.jpg" alt="" /></div>
-            <h2 class="home-heading-sercive">Thanh toán thuận tiện</h2>
-            <p class="home-txt-sercive">
-                Winemart hỗ trợ thanh toán
-                <br />
-                COD "Trong nội thành TP.HCM" và chuyển khoản
-            </p>
+    <section class="Home-service container py-5" style="height: fit-content;">
+        <div class="row" style="width:100%;height:fit-content;">
+            <!-- Service 1 -->
+            <div class="Home-service-child col-12 col-md-4 text-center mb-4">
+                <div>
+                    <img class="Home-service-img img-fluid" src="img/service-1.jpg" alt="" />
+                </div>
+                <h2 class="home-heading-service">Giao Hàng nhanh</h2>
+                <p class="home-txt-service">
+                    Winemart sẽ luôn cố gắng giao hàng nhanh nhất có thể
+                </p>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="Home-service-child col-12 col-md-4 text-center mb-4">
+                <div>
+                    <img class="Home-service-img img-fluid" src="img/service2.jpg" alt="" />
+                </div>
+                <h2 class="home-heading-service">Hỗ trợ khách hàng</h2>
+                <p class="home-txt-service">
+                    Chăm sóc, tư vấn và hỗ trợ khách hàng gọi ngay <br>
+                    1900.636.035
+                </p>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="Home-service-child col-12 col-md-4 text-center mb-4">
+                <div>
+                    <img class="Home-service-img img-fluid" src="img/service3.jpg" alt="" />
+                </div>
+                <h2 class="home-heading-service">Thanh toán thuận tiện</h2>
+                <p class="home-txt-service">
+                    Winemart hỗ trợ thanh toán<br />
+                    COD "Trong nội thành TP.HCM" và chuyển khoản
+                </p>
+            </div>
         </div>
     </section>
 
-    <?php require_once "../Footer/Footer.php" ?>
 
+    <?php require_once "./Footer.php" ?>
 </body>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     function formatCurrency(number) {
@@ -99,22 +110,20 @@
         });
     }
 
-
     // Lắng nghe sự kiện click vào Poster
     document
         .getElementById("poster")
         .addEventListener("click", function() {
-            window.location.href = 'SignedProduct.php';
+            window.location.href = 'Product.php';
         });
 
 
-
-
     // Lắng nghe sự kiện click vào Xem thêm
-    document.getElementById("btn-load-more").addEventListener("click", function() {
-        window.location.href = 'SignedProduct.php';
-    });
-
+    document
+        .getElementById("btn-load-more")
+        .addEventListener("click", function() {
+            window.location.href = 'Product.php';
+        });
 
     // Gọi hàm getAllLoaiSanPham khi trang được tải
     $(document).ready(function() {
@@ -122,11 +131,11 @@
     });
 
 
-    // Hàm getAllSanPham -> Load sản phẩm nổi bật
+    // Hàm getAllSanPham
     function getAllSanPham() {
         // Gọi API để lấy dữ liệu sản phẩm
         $.ajax({
-            url: "../../../Controllers/ProductController.php",
+            url: "../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
             data: {
@@ -142,13 +151,14 @@
                     // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
                     $.each(response.data, function(index, product) {
                         // Kiểm tra nếu số lượng sản phẩm đã đạt tới 4 thì dừng lại
-                        if (count >= 3) {
+                        if (count >= 6) {
                             return false;
                         }
+                        var imageSrc = product.Image;
                         htmlContent += `
-                        <div class="col-md-4 col-sm-6 mb-4">
+                       <div class="col-md-4 col-sm-6 mb-4">
                             <div class="product-card-content">
-                                <a href="SignedProductDetail.php?maSanPham=${product.Id}">
+                                <a href="ProductDetail.php?maSanPham=${product.Id}">
                                     <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                     <div class="product-card-details">
                                         <h4 class="name-product">${product.ProductName}</h4>
@@ -177,13 +187,9 @@
         });
     }
 
-
-
-    //Sự kiện xem chi tiết sản phẩm
     function detail(maSanPham) {
-        const form = document.getElementById(`productForm_${maSanPham}`);
-
-        form.submit();
+        // Chuyển hướng về trang chủ khi click vào hình ảnh
+        window.location.href = `ProductDetail.php?maSanPham=${maSanPham}`;
     }
 </script>
 

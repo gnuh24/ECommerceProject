@@ -6,8 +6,8 @@ INSERT INTO `UserInformation` 	(`Id`, 		`Email`, 							`Address`, 			`Birthday`
 								(1, 		'admin@gmail.com', 					'123 Main St', 		'2004-04-01', 		'Ngô Tuấn Hưng', 	'Male', 		'123-456-7890'),
 								(2, 		'nguyenphucminh880@gmail.com', 		'456 Elm St', 		'2004-11-15', 		'Nguyễn Minh Phúc', 'Male', 		'234-567-8901'),
 								(3, 		'hungnt.020404@gmail.com', 			'123 Main St', 		'2004-04-01', 		'Ngô Tuấn Hưng', 	'Male', 		'123-456-7890'),
-								(4, 		'admin004@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 004', 			'Male', 		'123-456-7890'),
-								(5, 		'admin005@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 005', 			'Male', 		'123-456-7890'),
+								(4, 		'manager004@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 004', 			'Male', 		'123-456-7890'),
+								(5, 		'employee005@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 005', 			'Male', 		'123-456-7890'),
 								(6, 		'user006@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 006', 			'Male', 		'123-456-7890'),
 								(7, 		'user007@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 007', 			'Male', 		'123-456-7890'),
 								(8, 		'user008@gmail.com', 				'123 Main St', 		'2004-04-01', 		'Mr 008', 			'Male', 		'123-456-7890'),
@@ -21,8 +21,8 @@ INSERT INTO `Account` 	(`Id`,			`Password`,														 `Status`, 		`Role`,		`
 						(1,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'Admin',					1,			'2023-01-01 00:00:00'),
 						(2,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	0, 			'User',						2,			'2024-01-01 00:00:00'),
 						(3,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'User',						3,			'2024-01-01 00:00:00'),
-						(4,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'Admin',					4,			'2024-01-01 00:00:00'),
-						(5,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'Admin',					5,			'2024-01-01 00:00:00'),
+						(4,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'Manager',					4,			'2024-01-01 00:00:00'),
+						(5,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'Employee',					5,			'2024-01-01 00:00:00'),
 						(6,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'User',						6,			'2024-01-01 00:00:00'),
 						(7,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'User',						7,			'2024-01-01 00:00:00'),
 						(8,				'$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', 	1, 			'User',						8,			'2024-01-01 00:00:00'),
@@ -58,7 +58,7 @@ INSERT INTO `Brand` (`BrandName`) VALUES
                     
 -- INSERT INTO Product	
 INSERT INTO `Product` 
-(`Id`, `ProductName`,                  `Status`, `CreateTime`,              `Image`,                                        `Origin`,   `Capacity`,    `ABV`,   `Description`,               `BrandId`, `CategoryId`, `Quantity`,   `Price`,     `Percentage`) 
+(`Id`, `ProductName`,                  `Status`, `CreateTime`,              `Image`,                                        `Origin`,   `Capacity`,    `ABV`,   `Description`,               `BrandId`, `CategoryId`, `Quantity`,   `UnitPrice`,     `Sale`) 
 VALUES
 (1,  'HaKu Vodka',                     TRUE,    '2024-07-03 10:00:00',     'SoftwareTestingProject/hakuvodka',             'Japan',        700,        40,     'A smooth Japanese vodka.',           2,          2,          100,        1000,          0),
 (2,  'HaNoi VodKa',                    TRUE,    '2024-07-05 10:00:00',     'SoftwareTestingProject/hanoiVodka',            'Vietnam',      500,        39,     'Classic Vietnamese vodka.',          3,          2,           50,      150000,          0),
