@@ -39,7 +39,6 @@
                     <div class="col-lg-8 mb-4">
                         <div class="wrapListCart">
                             <div class="listCart">
-                                <!-- Cart items will be dynamically loaded here via Ajax -->
                             </div>
                         </div>
                     </div>
@@ -71,7 +70,6 @@
 
 <script>
     var maTaiKhoan = JSON.parse(sessionStorage.getItem("id"));
-    var token = sessionStorage.getItem("token");
 
     function toCreateOrder() {
         var numberOfItemsInCart = $('.cartItem').length;
@@ -123,82 +121,112 @@
 
         $('.btnRemove').on('click', function() {
             var productId = $(this).closest('.cartItem').attr('id');
+
+            // Tạo URL với query string để gửi dữ liệu
+            var url = '../../../Controllers/CartItemController.php?productId=' + productId + '&accountId=' + maTaiKhoan;
+
             $.ajax({
-                url: `http://localhost:8080/CartItem`,
+                url: url, // Gửi dữ liệu thông qua query string
                 method: 'DELETE',
-                data: {
-                    accountId: maTaiKhoan,
-                    productId: productId
-                },
+                dataType: "json",
+
                 success: function(response) {
-                    $('#' + productId).remove();
-                    $('.priceTotal').text(formatMoney(response.totalAmount));
+                    if (response.status === 200) {
+                        $('#' + productId).remove(); // Xóa item khỏi giao diện
+                        $('.priceTotal').text(formatMoney(response.data)); // Cập nhật tổng tiền
+                    } else {
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: response.message || 'Có lỗi xảy ra, vui lòng thử lại.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Có lỗi xảy ra khi xóa sản phẩm.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
         });
+
     }
 
     function fetchCartItems() {
         $.ajax({
-            url: `http://localhost:8080/CartItem/${maTaiKhoan}`,
+            url: '../../../Controllers/CartItemController.php',
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
+            data: {
+                id: maTaiKhoan
             },
+            dataType: 'json', // Đảm bảo rằng response được xử lý là JSON
             success: function(response) {
+                // Kiểm tra xem phản hồi có dữ liệu hay không
+                if (!Array.isArray(response.data) || response.data.length === 0) {
+                    $('.listCart').html('<p>Giỏ hàng của bạn đang trống.</p>'); // Thông báo giỏ hàng trống
+                    $('.priceTotal').text(formatMoney(0));
+                    $('.btnCheckout').addClass('hidden');
+                    return; // Dừng hàm nếu không có sản phẩm
+                }
+
                 var cartHTML = '';
                 var totalAmount = 0;
 
-                response.forEach(function(item) {
+                response.data.forEach(function(item) {
                     cartHTML += `
-                            <div class='cartItem' id='${item.productId}'>
-                                <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${item.image}' /></a>
-                                <div class='inforCart'>
-                                    <div class='quantity'>
-                                        <label for='quantity_${item.productId}' class='labelQuantity'>Số lượng:</label>
-                                        <div style="display:flex;">
-                                            <button class='btnQuantity decrease' data-id='${item.productId}'>-</button>
-                                            <div class='txtQuantity' id='quantity_${item.productId}'>${item.quantity}</div>
-                                            <button class='btnQuantity increase' data-id='${item.productId}'>+</button>
-                                        </div>
-                                    </div>
-                                    <div class='unitPrice'>
-                                        <label for='unitPrice_${item.productId}' class='labelUnitPrice'>Đơn giá:</label>
-                                        <div class='txtUnitPrice' id='unitPrice_${item.productId}'>${formatMoney(item.unitPrice)}</div>
-                                    </div>
+                    <div class='cartItem' id='${item.ProductId}'>
+                        <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${item.Image}' /></a>
+                        <div class='inforCart'>
+                            <div class='quantity'>
+                                <label for='quantity_${item.ProductId}' class='labelQuantity'>Số lượng:</label>
+                                <div style="display:flex;">
+                                    <button class='btnQuantity decrease' data-id='${item.ProductId}'>-</button>
+                                    <div class='txtQuantity' id='quantity_${item.ProductId}'>${item.Quantity}</div>
+                                    <button class='btnQuantity increase' data-id='${item.ProductId}'>+</button>
                                 </div>
-                                <div class='wrapTotalPriceOfCart'>
-                                    <div class='totalPriceOfCart' style="height:100%">
-                                        <label for='totalPrice_${item.productId}' class='labelTotalPrice'>Thành tiền:</label>
-                                        <p class='valueTotalPrice' id='totalPrice_${item.productId}'>${formatMoney(item.total)}</p>
-                                    </div>
-                                    <button class='btnRemove'>
-                                        <i class='fa-solid fa-xmark'></i>
-                                    </button>
-                                </div>
-                            </div>`;
-                    totalAmount += item.total;
+                            </div>
+                            <div class='unitPrice'>
+                                <label for='unitPrice_${item.ProductId}' class='labelUnitPrice'>Đơn giá:</label>
+                                <div class='txtUnitPrice' id='unitPrice_${item.ProductId}'>${formatMoney(item.UnitPrice)}</div>
+                            </div>
+                        </div>
+                        <div class='wrapTotalPriceOfCart'>
+                            <div class='totalPriceOfCart' style="height:100%">
+                                <label for='totalPrice_${item.ProductId}' class='labelTotalPrice'>Thành tiền:</label>
+                                <p class='valueTotalPrice' id='totalPrice_${item.ProductId}'>${formatMoney(item.Total)}</p>
+                            </div>
+                            <button class='btnRemove' data-id='${item.ProductId}'>
+                                <i class='fa-solid fa-xmark'></i>
+                            </button>
+                        </div>
+                    </div>`;
+                    totalAmount += item.Total;
                 });
 
                 $('.listCart').html(cartHTML);
                 $('.priceTotal').text(formatMoney(totalAmount));
 
-                if (response.length === 0) {
-                    $('.btnCheckout').addClass('hidden');
-                } else {
-                    $('.btnCheckout').removeClass('hidden');
-                }
+                $('.btnCheckout').toggleClass('hidden', totalAmount === 0); // Ẩn hoặc hiện nút thanh toán
 
-                bindCartItemEvents();
+                bindCartItemEvents(); // Gọi hàm gán sự kiện
             },
             error: function(xhr, status, error) {
                 console.error(error);
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi lấy giỏ hàng, vui lòng thử lại.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     }
+
 
     function formatMoney(amount) {
         return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
@@ -208,33 +236,51 @@
     });
 
     function updateQuantity(productId, quantity) {
-        var token = sessionStorage.getItem("token");
-        var unitPriceElem = document.getElementById(`unitPrice_${productId}`);
-        var unitPrice = parseInt(unitPriceElem ? unitPriceElem.innerText.replace(/[^0-9]/g, '') : 0);
+        const unitPriceElem = document.getElementById(`unitPrice_${productId}`);
+        const unitPrice = parseInt(unitPriceElem ? unitPriceElem.innerText.replace(/[^0-9]/g, '') : 0);
+        const totalPrice = unitPrice * quantity;
 
-        var totalPrice = unitPrice * quantity;
+        const jsonData = JSON.stringify({
+            accountId: maTaiKhoan,
+            productId: productId,
+            unitPrice: unitPrice,
+            quantity: quantity,
+            total: totalPrice
+        });
 
-        var form = new FormData();
-        form.append("accountId", maTaiKhoan);
-        form.append("productId", productId);
-        form.append("unitPrice", unitPrice);
-        form.append('quantity', quantity);
-        form.append('total', totalPrice);
         $.ajax({
-            url: `http://localhost:8080/CartItem`,
+            url: '../../../Controllers/CartItemController.php?orderId=' + productId,
             type: 'PATCH',
             dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
-            data: form,
-            processData: false,
-            contentType: false,
+            data: jsonData, // Gửi dữ liệu dưới dạng JSON
+            contentType: 'application/json', // Thiết lập content type
             success: function(response) {
-                fetchCartItems();
+
+                fetchCartItems(); // Cập nhật giỏ hàng
             },
             error: function(xhr, status, error) {
                 console.error(error);
+                // Kiểm tra mã trạng thái phản hồi
+                if (xhr.status === 400) {
+                    // Nếu mã trạng thái là 400, hiển thị thông báo lỗi cụ thể
+                    const response = JSON.parse(xhr.responseText); // Phân tích phản hồi JSON
+                    const errorMessage = response.message || 'Có lỗi xảy ra, vui lòng thử lại.';
+
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: errorMessage, // Hiển thị thông báo cụ thể
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    // Xử lý các lỗi khác nếu cần
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Có lỗi xảy ra khi cập nhật số lượng.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             }
         });
     }

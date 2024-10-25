@@ -116,11 +116,14 @@
         const maSanPham = urlParams.get('maSanPham');
         if (maSanPham) {
             $.ajax({
-                url: `http://localhost:8080/Product/CommonUser/` + maSanPham,
+                url: "../../../Controllers/ProductController.php",
                 method: "GET",
                 dataType: "json",
+                data: {
+                    Id: maSanPham
+                },
                 success: function(response) {
-                    const product = response;
+                    const product = response.data;
                     const soLuongConLai = product.quantity;
                     const quantityMessage = soLuongConLai > 0 ?
                         `Còn ${soLuongConLai} sản phẩm` :
@@ -147,7 +150,7 @@
                                 <h2 class="title__wrapper">${productName}</h2>
                             </div>
                             <div class="price__wrapper">
-                                <p class="price">${formatCurrency(product.price)}</p>
+                                <p class="price">${formatCurrency(price)}</p>
                             </div>
                             <div class="quantity-available">
                                 <p class="title">${quantityMessage}</p>
@@ -253,39 +256,49 @@
     }
 
     function addToCart(productId, unitPrice) {
+        const accountId = sessionStorage.getItem("id");
+        const quantity = parseInt(document.getElementById("quantityAddToCart").value, 10); // Chuyển đổi thành số
 
-        const token = sessionStorage.getItem("token");
-        const accountId = sessionStorage.getItem("id")
-        const quantity = document.getElementById("quantityAddToCart").value;
-
-
-        // Tính tổng
-        const total = unitPrice * quantity; // Chuyển đổi sang số
+        if (isNaN(quantity) || quantity <= 0) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Số lượng không hợp lệ.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return; // Dừng hàm nếu số lượng không hợp lệ
+        }
 
         // Tạo object chứa dữ liệu form
         const formData = new FormData();
         formData.append('accountId', accountId);
         formData.append('productId', productId);
-        formData.append('unitPrice', unitPrice); // Ép kiểu unitPrice về số
-        formData.append('quantity', quantity); // Ép kiểu quantity về số
-        formData.append('total', total); // Ép kiểu total về số
+        formData.append('unitPrice', unitPrice);
+        formData.append('quantity', quantity); // Đã được chuyển thành số
 
-        // Gọi API POST với token trong headers
-        fetch('http://localhost:8080/CartItem', {
+        fetch('../../../Controllers/CartItemController.php', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
-                }
             })
             .then(response => response.json())
             .then(data => {
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: 'Sản phẩm đã được thêm vào giỏ hàng.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
+                // Kiểm tra phản hồi từ server
+                if (data.status === 201) {
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Sản phẩm đã được thêm vào giỏ hàng.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    // Nếu có lỗi từ server
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: data.message || 'Có lỗi xảy ra, vui lòng thử lại sau.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -297,7 +310,7 @@
                     confirmButtonText: 'OK'
                 });
             });
-    };
+    }
 </script>
 
 </html>

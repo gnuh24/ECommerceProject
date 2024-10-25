@@ -160,9 +160,7 @@
                 $.ajax({
                     type: "PATCH",
                     url: "../../../Controllers/OrderStatusController.php?orderId=" + orderId, // Thêm orderId vào URL
-                    headers: {
-                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                    },
+
                     contentType: "application/json", // Định dạng dữ liệu là JSON
                     data: JSON.stringify({
                         status: currentStatus,
@@ -280,9 +278,7 @@
             type: "GET",
             url: "../../../Controllers/OrderController.php",
             dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
+
             data: {
                 page: page,
                 from: minNgayTao,

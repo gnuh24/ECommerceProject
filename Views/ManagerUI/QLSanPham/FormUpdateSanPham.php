@@ -195,9 +195,7 @@
                 Id: productId,
                 action: 'getProductByIdAdmin'
             },
-            headers: {
-                "Authorization": "Bearer " + sessionStorage.getItem('token') // Gửi token trong header
-            },
+
             success: function(data) {
                 // Điền dữ liệu vào form
                 $('#tenSanPham').val(data.data.productName);

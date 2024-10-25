@@ -335,27 +335,26 @@
     // Hàm chuyển đổi ngày tháng từ yyyy-MM-dd sang dd/MM/yyyy
     function formatNgay(ngay) {
         var parts = ngay.split('-');
-        return parts[2] + '/' + parts[1] + '/' + parts[0];
+        return parts[0] + '-' + parts[1] + '-' + parts[2]; // Y-M-D
     }
+
 
 
 
     //Call API Thống kê đơn hàng
     function thongKeDonHang(from, to) {
         $.ajax({
-            url: 'http://localhost:8080/Statistic/OrderStatus',
+            url: '../../../Controllers/StatisticController.php',
             type: 'GET',
             dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Thay 'yourTokenKey' bằng khóa lưu token của bạn
-            },
             data: {
+                type: 'orderStatusSummary', // Thêm tham số type
                 minDate: formatNgay(from),
                 maxDate: formatNgay(to),
             },
             success: function(response) {
                 // Xử lý dữ liệu trả về từ API ở đây
-                fetchTable(response);
+                fetchTable(response.data);
             },
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);

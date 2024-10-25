@@ -105,15 +105,11 @@
 
 
   function getAllNhaCungCap(page, search) {
-    var token = sessionStorage.getItem('token');
     $.ajax({
       url: '../../../Controllers/BrandController.php',
       type: 'GET',
       dataType: "json",
-      headers: {
-        // Thêm JWT vào header
-        'Authorization': 'Bearer ' + token
-      },
+
       data: {
         page: page,
         search: search
@@ -154,7 +150,6 @@
       },
 
       error: function(xhr, status, error) {
-        // Nếu lỗi là do token hết hạn, chuyển hướng đến trang đăng nhập
         if (xhr.status === 401) {
           alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -255,13 +250,10 @@
       // Nếu người dùng nhấn nút Xóa
       if (result.isConfirmed) {
         // Thực hiện gọi Ajax để xóa nhà cung cấp
-        var token = sessionStorage.getItem('token');
         $.ajax({
           url: '../../../Controllers/BrandController.php?id=' + brandId,
           type: 'DELETE',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          },
+
           success: function(response) {
             Swal.fire({
               icon: 'success',

@@ -51,17 +51,17 @@ class ProductModel
 
         // Truy vấn lấy sản phẩm
         $query = "
-                    SELECT p.*, 
-                        (SELECT b.UnitPrice 
-                            FROM `batch` b 
-                            WHERE b.ProductId = p.Id 
-                            AND b.Quantity > 0 
-                            ORDER BY b.ReceivingTime DESC 
-                            LIMIT 1) AS UnitPrice
-                    FROM `product` p
-                    $whereClause
-                    LIMIT :limit OFFSET :offset
-                ";
+                SELECT p.*, 
+                    (SELECT b.UnitPrice 
+                        FROM `batch` b 
+                        WHERE b.ProductId = p.Id 
+                        AND b.Quantity > 0 
+                        ORDER BY b.ReceivingTime DESC 
+                        LIMIT 1) AS UnitPrice
+                FROM `product` p
+                $whereClause
+                LIMIT :limit OFFSET :offset
+            ";
 
         try {
             $statement = $this->connection->prepare($query);
@@ -87,11 +87,16 @@ class ProductModel
             $countStatement->execute();
             $totalCount = $countStatement->fetchColumn();
 
+            // Tính số trang
+            $totalPages = ceil($totalCount / $limit);
+
             return (object) [
                 "status" => 200,
                 "message" => "Products fetched successfully",
                 "data" => $result,
-                "total" => $totalCount
+                "totalPages" => $totalPages,
+                "totalElements" => $totalCount,
+                "size" => $limit
             ];
         } catch (PDOException $e) {
             return (object) [
@@ -100,6 +105,7 @@ class ProductModel
             ];
         }
     }
+
 
 
     // Lấy tất cả sản phẩm của Admin

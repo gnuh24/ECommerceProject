@@ -67,7 +67,7 @@
     <section>
         <div class="text-center mb-4">
             <div class="title_section">
-                <h2 class="text-danger">Chi tiết sản phẩm</h2>
+                <h2 class="text-danger" style="color: #7b181a !important;">Chi tiết sản phẩm</h2>
             </div>
         </div>
     </section>
@@ -111,11 +111,14 @@
 
         if (maSanPham) {
             $.ajax({
-                url: `http://localhost:8080/Product/CommonUser/` + maSanPham,
+                url: "../../../Controllers/ProductController.php",
                 method: "GET",
                 dataType: "json",
+                data: {
+                    Id: maSanPham
+                },
                 success: function(response) {
-                    const product = response;
+                    const product = response.data;
                     const soLuongConLai = product.quantity;
                     const quantityMessage = soLuongConLai > 0 ?
                         `Còn ${soLuongConLai} sản phẩm` :
@@ -133,7 +136,7 @@
                     let htmlContent = `
                         <div class="product_images__wrapper">
                             <div class="image">
-                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${productImage}" alt="${product.productName}" class="product_img">
+                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${productImage}" alt="${productName}" class="product_img">
                             </div>
                         </div>
                         <div class="info__wrapper">
@@ -192,15 +195,13 @@
                             </button>`;
                     }
 
-                    // htmlContent += `
-                    //         <button class="btn btn-primary" >
-                    //             <span>Mua ngay</span>
-                    //         </button>
-                    //     </div>
-                    // </div>
-                    // </div>
+                    htmlContent += `
+                           
+                        </div>
+                    </div>
+                    </div>
 
-                    // `;
+                    `;
                     htmlContent += `<div class="description text-center"><h1>Thông tin chi tiết</h1>
                     <div> ${description}</div>
                     </div>`;

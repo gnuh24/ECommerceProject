@@ -102,7 +102,6 @@
     })
 
     function updateNhaCungCap(brandId, brandName) {
-        var token = sessionStorage.getItem('token');
         // Dữ liệu gửi đi được định dạng dưới dạng JSON
         var data = JSON.stringify({
             Id: brandId,
@@ -114,7 +113,6 @@
             type: 'PATCH',
             dataType: "json",
             headers: {
-                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
             data: data,

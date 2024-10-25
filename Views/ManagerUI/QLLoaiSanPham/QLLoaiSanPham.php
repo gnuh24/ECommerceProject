@@ -103,14 +103,11 @@
 
 
   function getAllLoaiSanPham(page, search) {
-    var token = sessionStorage.getItem('token');
     $.ajax({
       url: "../../../Controllers/CategoryController.php",
       type: "GET",
       dataType: "json",
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
+
       data: {
         page: page,
         search: search
@@ -150,7 +147,6 @@
       },
 
       error: function(xhr, status, error) {
-        // Nếu lỗi là do token hết hạn, chuyển hướng đến trang đăng nhập
         if (xhr.status === 401) {
           alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -244,13 +240,10 @@
     }).then((result) => {
       if (result.isConfirmed) {
         // Gọi Ajax để xóa loại sản phẩm
-        var token = sessionStorage.getItem('token');
         $.ajax({
           url: `../../../Controllers/CategoryController.php?id=${id}`, // Chèn đúng ID vào URL
           type: 'DELETE',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          },
+
           success: function(response) {
             // Hiển thị thông báo thành công bằng SweetAlert2
             Swal.fire('Thành công!', 'Xóa loại sản phẩm thành công !!', 'success').then(() => {

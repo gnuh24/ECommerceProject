@@ -139,14 +139,6 @@ class OrderModel
         }
     }
 
-    // Lấy tất cả đơn hàng của một người dùng dựa trên token
-    public function getAllOrderByUser($token)
-    {
-        // Giả định rằng bạn đã xác thực token và lấy được AccountId từ nó
-        $accountId = $this->getAccountIdFromToken($token);
-
-        return $this->getOrdersByAccountId($accountId);
-    }
 
     // Tạo đơn hàng mới
     public function createOrder($form)
@@ -159,38 +151,39 @@ class OrderModel
 
         return $this->createNewOrder($orderId, $orderTime, $totalPrice, $note, $accountId);
     }
-    // Phương thức riêng để lấy đơn hàng theo Id
+
+
     public function getOrderById($orderId)
     {
         // Truy vấn chính lấy thông tin đơn hàng và chi tiết sản phẩm
         $orderQuery = "
-        SELECT o.*, 
-            od.ProductId, 
-            od.Quantity, 
-            od.UnitPrice, 
-            od.Total,
-            u.Email, 
-            u.Address, 
-            u.Birthday, 
-            u.Fullname, 
-            u.Gender, 
-            u.PhoneNumber,
-            p.Image,
-            p.ProductName
-        FROM `Order` o
-        LEFT JOIN `OrderDetail` od ON o.Id = od.OrderId
-        LEFT JOIN `UserInformation` u ON o.AccountId = u.Id
-        LEFT JOIN `Product` p ON od.ProductId = p.Id
-        WHERE o.Id = :orderId
-    ";
+                        SELECT o.*, 
+                            od.ProductId, 
+                            od.Quantity, 
+                            od.UnitPrice, 
+                            od.Total,
+                            ui.Email, 
+                            ui.Address, 
+                            ui.Birthday, 
+                            ui.Fullname, 
+                            ui.Gender, 
+                            ui.PhoneNumber,
+                            p.Image,
+                            p.ProductName
+                        FROM `Order` o
+                        LEFT JOIN `OrderDetail` od ON o.Id = od.OrderId
+                        LEFT JOIN `UserInformation` ui ON o.AccountId = ui.Id
+                        LEFT JOIN `Product` p ON od.ProductId = p.Id
+                        WHERE o.Id = :orderId
+                    ";
 
         // Truy vấn lấy toàn bộ trạng thái đơn hàng
         $statusQuery = "
-        SELECT os.Status, os.UpdateTime
-        FROM `OrderStatus` os
-        WHERE os.OrderId = :orderId
-        ORDER BY os.UpdateTime ASC
-    ";
+                        SELECT os.Status, os.UpdateTime
+                        FROM `OrderStatus` os
+                        WHERE os.OrderId = :orderId
+                        ORDER BY os.UpdateTime ASC
+                    ";
 
         try {
             // Thực hiện truy vấn cho chi tiết đơn hàng
@@ -220,7 +213,6 @@ class OrderModel
             // Tạo danh sách chi tiết sản phẩm (loại bỏ trùng lặp)
             $details = [];
             foreach ($orderResults as $row) {
-                // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách chi tiết chưa
                 if (!isset($details[$row['ProductId']])) {
                     $details[$row['ProductId']] = [
                         "ProductId" => $row['ProductId'],
@@ -253,9 +245,9 @@ class OrderModel
                 "status" => 200,
                 "message" => "Order fetched successfully",
                 "data" => [
-                    "infor" => $info,    // Thông tin đơn hàng chính và người dùng
-                    "details" => array_values($details), // Các chi tiết sản phẩm (loại bỏ key để có mảng chuẩn)
-                    "orderStatuses" => $orderStatuses // Danh sách các trạng thái đơn hàng kèm thời gian
+                    "info" => $info,  // Thông tin đơn hàng chính và người dùng
+                    "details" => array_values($details), // Các chi tiết sản phẩm
+                    "orderStatuses" => $orderStatuses // Danh sách các trạng thái đơn hàng
                 ]
             ];
         } catch (PDOException $e) {
@@ -268,6 +260,111 @@ class OrderModel
 
 
 
+    public function getFullOrderById($orderId)
+    {
+        // Truy vấn chính lấy thông tin đơn hàng, chi tiết sản phẩm, thông tin người dùng và thông tin sản phẩm
+        $orderQuery = "
+        SELECT o.*, 
+               od.ProductId, 
+               od.Quantity, 
+               od.UnitPrice, 
+               od.Total,
+               ui.Email, 
+               ui.Address, 
+               ui.Birthday, 
+               ui.Fullname, 
+               ui.Gender, 
+               ui.PhoneNumber,
+               p.Image, 
+               p.ProductName
+        FROM `Order` o
+        LEFT JOIN `OrderDetail` od ON o.Id = od.OrderId
+        LEFT JOIN `UserInformation` ui ON o.AccountId = ui.Id
+        LEFT JOIN `Product` p ON od.ProductId = p.Id
+        WHERE o.Id = :orderId
+    ";
+
+        // Truy vấn lấy toàn bộ trạng thái đơn hàng
+        $statusQuery = "
+        SELECT os.Status, os.UpdateTime
+        FROM `OrderStatus` os
+        WHERE os.OrderId = :orderId
+        ORDER BY os.UpdateTime ASC
+    ";
+
+        try {
+            // Thực hiện truy vấn cho thông tin đơn hàng
+            $statement = $this->connection->prepare($orderQuery);
+            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
+            $statement->execute();
+            $orderResults = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            // Kiểm tra nếu không có kết quả
+            if (empty($orderResults)) {
+                return (object) [
+                    "status" => 404,
+                    "message" => "Order not found"
+                ];
+            }
+
+            // Tách biệt thông tin chính của đơn hàng
+            $info = [
+                "OrderId" => $orderResults[0]['Id'],
+                "OrderTime" => $orderResults[0]['OrderTime'],
+                "TotalPrice" => $orderResults[0]['TotalPrice'],
+                "Note" => $orderResults[0]['Note'],
+                "Address" => $orderResults[0]['Address'],
+                "Fullname" => $orderResults[0]['Fullname'],
+                "PhoneNumber" => $orderResults[0]['PhoneNumber'],
+            ];
+
+            // Tạo danh sách chi tiết sản phẩm (loại bỏ trùng lặp)
+            $details = [];
+            foreach ($orderResults as $row) {
+                if (!isset($details[$row['ProductId']])) {
+                    $details[$row['ProductId']] = [
+                        "ProductId" => $row['ProductId'],
+                        "ProductName" => $row['ProductName'], // Thêm tên sản phẩm
+                        "Quantity" => $row['Quantity'],
+                        "UnitPrice" => $row['UnitPrice'],
+                        "Total" => $row['Total'],
+                        "Image" => $row['Image'] // Thêm hình ảnh sản phẩm
+                    ];
+                }
+            }
+
+            // Thực hiện truy vấn cho trạng thái đơn hàng
+            $statusStatement = $this->connection->prepare($statusQuery);
+            $statusStatement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
+            $statusStatement->execute();
+            $statusResults = $statusStatement->fetchAll(PDO::FETCH_ASSOC);
+
+            // Tạo danh sách trạng thái đơn hàng
+            $orderStatuses = [];
+            foreach ($statusResults as $statusRow) {
+                $orderStatuses[] = [
+                    "Status" => $statusRow['Status'],
+                    "UpdateTime" => $statusRow['UpdateTime']
+                ];
+            }
+
+            // Trả về dữ liệu theo cấu trúc mới
+            return (object) [
+                "status" => 200,
+                "message" => "Order fetched successfully",
+                "data" => [
+                    "info" => $info,  // Thông tin đơn hàng chính và người dùng
+                    "details" => array_values($details), // Các chi tiết sản phẩm
+                    "orderStatuses" => $orderStatuses // Danh sách tất cả các trạng thái đơn hàng
+                ]
+            ];
+        } catch (PDOException $e) {
+            return (object) [
+                "status" => 400,
+                "message" => $e->getMessage()
+            ];
+        }
+    }
 
 
     // Tạo đơn hàng mới
@@ -321,7 +418,37 @@ class OrderModel
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId
     public function getOrdersByAccountId($accountId)
     {
-        $query = "SELECT * FROM `order` WHERE `AccountId` = :accountId";
+        $query = "
+        SELECT 
+            o.Id AS OrderId,
+            o.OrderTime,
+            o.TotalPrice,
+            o.Note,
+            os.Status,
+            os.UpdateTime
+        FROM 
+            `order` o
+        LEFT JOIN 
+            (
+                SELECT 
+                    os.OrderId,         -- Thêm tiền tố cho cột OrderId
+                    os.Status,
+                    os.UpdateTime
+                FROM 
+                    OrderStatus os
+                JOIN 
+                    (
+                        SELECT 
+                            OrderId, 
+                            MAX(UpdateTime) AS LatestUpdate
+                        FROM 
+                            OrderStatus
+                        GROUP BY 
+                            OrderId
+                    ) latest ON os.OrderId = latest.OrderId AND os.UpdateTime = latest.LatestUpdate
+            ) os ON o.Id = os.OrderId
+        WHERE 
+            o.AccountId = :accountId";
 
         try {
             $statement = $this->connection->prepare($query);
@@ -331,7 +458,7 @@ class OrderModel
 
             return (object) [
                 "status" => 200,
-                "message" => "Orders fetched successfully",
+                "message" => "Orders with latest statuses fetched successfully",
                 "data" => $result
             ];
         } catch (PDOException $e) {

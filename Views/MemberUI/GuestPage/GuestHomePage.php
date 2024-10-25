@@ -130,32 +130,34 @@
     function getAllSanPham() {
         // Gọi API để lấy dữ liệu sản phẩm
         $.ajax({
-            url: "http://localhost:8080/Product/CommonUser",
+            url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
-
+            data: {
+                action: "getAllProductsCommonUser"
+            },
             success: function(response) {
                 var productContainer = $('#product .products');
-                if (response.content && response.content.length > 0) {
+                if (response.data && response.data.length > 0) {
                     // Tạo biến lưu trữ nội dung HTML mới
                     var htmlContent = '';
                     // Biến đếm số lượng sản phẩm
                     var count = 0;
                     // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
-                    $.each(response.content, function(index, product) {
+                    $.each(response.data, function(index, product) {
                         // Kiểm tra nếu số lượng sản phẩm đã đạt tới 4 thì dừng lại
                         if (count >= 3) {
                             return false;
                         }
-                        var imageSrc = product.AnhMinhHoa;
+                        var imageSrc = product.Image;
                         htmlContent += `
                        <div class="col-md-4 col-sm-6 mb-4">
                             <div class="product-card-content">
-                                <a href="GuestProductDetail.php?maSanPham=${product.id}">
-                                    <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.image}" alt="" style="height: 300px;">
+                                <a href="GuestProductDetail.php?maSanPham=${product.Id}">
+                                    <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                     <div class="product-card-details">
-                                        <h4 class="name-product">${product.productName}</h4>
-                                        <p class="price-tea text-center">${formatCurrency(product.price)}</p>
+                                        <h4 class="name-product">${product.ProductName}</h4>
+                                        <p class="price-tea text-center">${formatCurrency(product.UnitPrice)}</p>
                                         <div class="buy-btn-container">
                                             Mua ngay
                                         </div>

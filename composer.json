@@ -1,5 +1,9 @@
 {
     "require": {
-        "phpmailer/phpmailer": "^6.9"
+        "phpmailer/phpmailer": "^6.9",
+        "google/apiclient": "^2.0",
+        "guzzlehttp/guzzle": "^6.5",
+        "ext-json": "*",
+        "ext-curl": "*"
     }
 }

@@ -31,8 +31,14 @@
                 <input type="password" placeholder="Password" id="passwordLogin" />
                 <button type="button" class="btn btn-danger" id="signInButton">Đăng nhập</button>
                 <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
+
+                <!-- Google Login Button with correct icon -->
+                <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
+                    <i class="fab fa-google"></i> Đăng nhập bằng Google
+                </button>
             </form>
         </div>
+
         <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
@@ -68,6 +74,8 @@
         </div>
     </div>
 </body>
+
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -256,13 +264,24 @@
 </script>
 
 
-
+<?php require_once __DIR__ . '/googleLoginConfig.php'; ?>";
 
 
 <script>
     const loginButton = document.getElementById("signInButton");
     const tenDangNhap = document.getElementById("tenDangNhapLogin");
     const matKhau = document.getElementById("passwordLogin");
+
+    const googleSignInButton = document.getElementById('googleSignInButton');
+
+    // Add event listener to the button
+    googleSignInButton.addEventListener('click', function() {
+        // Your login logic here
+        const googleAuthUrl = "<?php echo $client->createAuthUrl(); ?>";
+
+        window.location.href = googleAuthUrl;
+
+    });
 
     loginButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -315,12 +334,20 @@
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result) {
+                            const quyen = response.data.role;
 
-
-
-                            window.location.href = `../SignedPage/SignedHomePage.php`;
-
-
+                            sessionStorage.setItem('id', response.data.id);
+                            switch (quyen) {
+                                case 'Admin':
+                                    window.location.href = `../../AdminUI/QLTaiKhoan.php`;
+                                    break;
+                                case 'Manager':
+                                    window.location.href = `../../ManagerUI/QLLoaiSanPham/QLLoaiSanPham.php`;
+                                    break;
+                                default:
+                                    window.location.href = `../SignedPage/SignedHomePage.php`;
+                                    break;
+                            }
                         }
                     });
                 } else {

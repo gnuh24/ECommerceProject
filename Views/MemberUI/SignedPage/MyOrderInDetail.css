@@ -35,13 +35,13 @@
 }
 
 .trangThai{
-    font-size: 20px;
+    font-size: 15px;
     color: grey;
 
 }
 
 .thoiGian {
-    max-width: 60px;
+    max-width: 100px;
     font-size: 15px;
     color: grey;
     display: flex;

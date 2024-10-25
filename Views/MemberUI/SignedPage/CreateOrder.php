@@ -100,15 +100,12 @@
     }
 
     function loadCart() {
-        var token = sessionStorage.getItem("token");
         var maTaiKhoan = sessionStorage.getItem("id");
         $.ajax({
             url: 'http://localhost:8080/CartItem/' + maTaiKhoan, // URL của file PHP API
             method: 'GET',
             dataType: 'json',
-            headers: {
-                'Authorization': `Bearer ${token}` // Thêm JWT token vào header
-            },
+
             success: function(response) {
                 let cartHTML = '';
                 let totalPrice = 0;
@@ -189,15 +186,11 @@
     });
 
     function loadUserInfoFromsessionStorage() {
-        const token = sessionStorage.getItem("token");
         var userData = sessionStorage.getItem("id");
         $.ajax({
             url: "http://localhost:8080/Account/" + userData,
             method: "GET",
             dataType: "json",
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
             success: function(response) {
                 console.log(response)
                 document.getElementById('spanHoTen').textContent = response.fullname;
@@ -279,16 +272,13 @@
         formData.append('fullname', document.getElementById('username').value);
         formData.append('phone', document.getElementById('phonenumber').value);
         formData.append('address', document.getElementById('address1').value);
-        const token = sessionStorage.getItem("token");
         $.ajax({
             url: 'http://localhost:8080/Account/UpdateInformation',
             type: 'PATCH',
             data: formData,
             contentType: false,
             processData: false,
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
+
             success: function(response) {},
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -298,7 +288,6 @@
 
 
     function createDonHang() {
-        var token = sessionStorage.getItem("token");
         var userData = sessionStorage.getItem("id");
         var formData = new FormData();
         formData.append('totalPrice', totalpriceall);
@@ -319,9 +308,7 @@
             data: formData,
             processData: false, // Ngăn jQuery xử lý dữ liệu
             contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
+
             success: function(response) {},
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -337,9 +324,7 @@
                 data: formData1,
                 processData: false, // Ngăn jQuery xử lý dữ liệu
                 contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                },
+
                 success: function(response) {},
                 error: function(xhr, status, error) {
                     console.error("Error:", error);
