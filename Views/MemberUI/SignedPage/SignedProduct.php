@@ -262,9 +262,9 @@
                         // Duyệt qua từng sản phẩm và tạo nội dung HTML tương ứng
                         $.each(response.data, function(index, product) {
                             htmlContent += ` 
-                                    <form id="productForm_${product.Id}" method="post" action="SignedProductDetail.php.php?maSanPham=${product.Id}">
+                                    <form id="productForm_${product.Id}" method="post" action="SignedProductDetail.php?maSanPham=${product.Id}">
                                         <div class="row">
-                                            <a href="SignedProductDetail.php.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
+                                            <a href="SignedProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
                                                 <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
                                                 <div class="product-card-content">
                                                     <div class="price">

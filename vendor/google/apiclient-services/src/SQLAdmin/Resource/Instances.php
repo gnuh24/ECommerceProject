@@ -71,7 +71,7 @@ class Instances extends \Google\Service\Resource
   /**
    * Rotates the server certificate version to one previously added with the
    * addServerCertificate method. For instances not using Certificate Authority
-   * Service (CAS) server CA, please use RotateServerCa instead.
+   * Service (CAS) server CA, use RotateServerCa instead.
    * (instances.RotateServerCertificate)
    *
    * @param string $project Required. Project ID of the project that contains the
@@ -116,7 +116,7 @@ class Instances extends \Google\Service\Resource
    * previously added but never used in a certificate rotation, this operation
    * replaces that version. There cannot be more than one CA version waiting to be
    * rotated in. For instances that have enabled Certificate Authority Service
-   * (CAS) based server CA, please use AddServerCertificate to add a new server
+   * (CAS) based server CA, use AddServerCertificate to add a new server
    * certificate. (instances.addServerCa)
    *
    * @param string $project Project ID of the project that contains the instance.
@@ -138,8 +138,8 @@ class Instances extends \Google\Service\Resource
    * certificate rotation. If a server certificate version was previously added
    * but never used in a certificate rotation, this operation replaces that
    * version. There cannot be more than one certificate version waiting to be
-   * rotated in. For instances not using CAS server CA, please use AddServerCa
-   * instead. (instances.addServerCertificate)
+   * rotated in. For instances not using CAS server CA, use AddServerCa instead.
+   * (instances.addServerCertificate)
    *
    * @param string $project Project ID of the project that contains the instance.
    * @param string $instance Cloud SQL instance ID. This does not include the
@@ -501,7 +501,7 @@ class Instances extends \Google\Service\Resource
   /**
    * Rotates the server certificate to one signed by the Certificate Authority
    * (CA) version previously added with the addServerCA method. For instances that
-   * have enabled Certificate Authority Service (CAS) based server CA, please use
+   * have enabled Certificate Authority Service (CAS) based server CA, use
    * RotateServerCertificate to rotate the server certificate.
    * (instances.rotateServerCa)
    *

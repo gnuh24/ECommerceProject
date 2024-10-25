@@ -19,14 +19,18 @@
  * under the License.
  */
 
-class examples_indexTest extends BaseTest
-{
-  public function testIndex()
-  {
-    $crawler = $this->loadExample('index.php');
+namespace Google\Tests\Examples;
 
-    $nodes = $crawler->filter('li');
-    $this->assertEquals(8, count($nodes));
-    $this->assertEquals('A query using simple API access', $nodes->first()->text());
-  }
+use Google\Tests\BaseTest;
+
+class indexTest extends BaseTest
+{
+    public function testIndex()
+    {
+        $crawler = $this->loadExample('index.php');
+
+        $nodes = $crawler->filter('li');
+        $this->assertCount(8, $nodes);
+        $this->assertEquals('A query using simple API access', $nodes->first()->text());
+    }
 }

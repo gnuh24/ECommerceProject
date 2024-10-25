@@ -1,22 +1,29 @@
 <?php
+
 namespace GuzzleHttp\Tests\Psr7;
 
 use GuzzleHttp\Psr7\LazyOpenStream;
 
-class LazyOpenStreamTest extends \PHPUnit_Framework_TestCase
+class LazyOpenStreamTest extends BaseTest
 {
     private $fname;
 
-    public function setup()
+    /**
+     * @before
+     */
+    public function setUpTest()
     {
-        $this->fname = tempnam('/tmp', 'tfile');
+        $this->fname = tempnam(sys_get_temp_dir(), 'tfile');
 
         if (file_exists($this->fname)) {
             unlink($this->fname);
         }
     }
 
-    public function tearDown()
+    /**
+     * @after
+     */
+    public function tearDownTest()
     {
         if (file_exists($this->fname)) {
             unlink($this->fname);
@@ -27,27 +34,27 @@ class LazyOpenStreamTest extends \PHPUnit_Framework_TestCase
     {
         $l = new LazyOpenStream($this->fname, 'w+');
         $l->write('foo');
-        $this->assertInternalType('array', $l->getMetadata());
-        $this->assertFileExists($this->fname);
-        $this->assertEquals('foo', file_get_contents($this->fname));
-        $this->assertEquals('foo', (string) $l);
+        $this->assertInternalTypeGuzzle('array', $l->getMetadata());
+        self::assertFileExists($this->fname);
+        self::assertSame('foo', file_get_contents($this->fname));
+        self::assertSame('foo', (string) $l);
     }
 
     public function testProxiesToFile()
     {
         file_put_contents($this->fname, 'foo');
         $l = new LazyOpenStream($this->fname, 'r');
-        $this->assertEquals('foo', $l->read(4));
-        $this->assertTrue($l->eof());
-        $this->assertEquals(3, $l->tell());
-        $this->assertTrue($l->isReadable());
-        $this->assertTrue($l->isSeekable());
-        $this->assertFalse($l->isWritable());
+        self::assertSame('foo', $l->read(4));
+        self::assertTrue($l->eof());
+        self::assertSame(3, $l->tell());
+        self::assertTrue($l->isReadable());
+        self::assertTrue($l->isSeekable());
+        self::assertFalse($l->isWritable());
         $l->seek(1);
-        $this->assertEquals('oo', $l->getContents());
-        $this->assertEquals('foo', (string) $l);
-        $this->assertEquals(3, $l->getSize());
-        $this->assertInternalType('array', $l->getMetadata());
+        self::assertSame('oo', $l->getContents());
+        self::assertSame('foo', (string) $l);
+        self::assertSame(3, $l->getSize());
+        $this->assertInternalTypeGuzzle('array', $l->getMetadata());
         $l->close();
     }
 
@@ -56,9 +63,9 @@ class LazyOpenStreamTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->fname, 'foo');
         $l = new LazyOpenStream($this->fname, 'r');
         $r = $l->detach();
-        $this->assertInternalType('resource', $r);
+        $this->assertInternalTypeGuzzle('resource', $r);
         fseek($r, 0);
-        $this->assertEquals('foo', stream_get_contents($r));
+        self::assertSame('foo', stream_get_contents($r));
         fclose($r);
     }
 }

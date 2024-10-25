@@ -19,16 +19,20 @@
  * under the License.
  */
 
-class examples_serviceAccountTest extends BaseTest
+namespace Google\Tests\Examples;
+
+use Google\Tests\BaseTest;
+
+class serviceAccountTest extends BaseTest
 {
-  public function testServiceAccount()
-  {
-    $this->checkServiceAccountCredentials();
+    public function testServiceAccount()
+    {
+        $this->checkServiceAccountCredentials();
 
-    $crawler = $this->loadExample('service-account.php');
+        $crawler = $this->loadExample('service-account.php');
 
-    $nodes = $crawler->filter('br');
-    $this->assertEquals(10, count($nodes));
-    $this->assertContains('Life of Henry David Thoreau', $crawler->text());
-  }
+        $nodes = $crawler->filter('br');
+        $this->assertCount(10, $nodes);
+        $this->assertContains('Walden', $crawler->text());
+    }
 }

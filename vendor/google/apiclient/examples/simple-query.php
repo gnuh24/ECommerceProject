@@ -26,17 +26,17 @@ echo pageHeader("Simple API Access");
   setDeveloperKey, the request may still succeed
   using the anonymous quota.
  ************************************************/
-$client = new Google_Client();
+$client = new Google\Client();
 $client->setApplicationName("Client_Library_Examples");
 
 // Warn if the API key isn't set.
 if (!$apiKey = getApiKey()) {
-  echo missingApiKeyWarning();
-  return;
+    echo missingApiKeyWarning();
+    return;
 }
 $client->setDeveloperKey($apiKey);
 
-$service = new Google_Service_Books($client);
+$service = new Google\Service\Books($client);
 
 /************************************************
   We make a call to our service, which will
@@ -47,15 +47,21 @@ $service = new Google_Service_Books($client);
   (the query), and an array of named optional
   parameters.
  ************************************************/
-$optParams = array('filter' => 'free-ebooks');
-$results = $service->volumes->listVolumes('Henry David Thoreau', $optParams);
+$query = 'Henry David Thoreau';
+$optParams = [
+    'filter' => 'free-ebooks',
+];
+$results = $service->volumes->listVolumes($query, $optParams);
 
  /************************************************
   This is an example of deferring a call.
  ***********************************************/
 $client->setDefer(true);
-$optParams = array('filter' => 'free-ebooks');
-$request = $service->volumes->listVolumes('Henry David Thoreau', $optParams);
+$query = 'Henry David Thoreau';
+$optParams = [
+    'filter' => 'free-ebooks',
+];
+$request = $service->volumes->listVolumes($query, $optParams);
 $resultsDeferred = $client->execute($request);
 
 /************************************************
@@ -64,21 +70,21 @@ $resultsDeferred = $client->execute($request);
   array.
   Some calls will return a single item which we
   can immediately use. The individual responses
-  are typed as Google_Service_Books_Volume, but
+  are typed as Google\Service\Books_Volume, but
   can be treated as an array.
  ************************************************/
 ?>
 
 <h3>Results Of Call:</h3>
-<?php foreach ($results as $item): ?>
-  <?= $item['volumeInfo']['title'] ?>
+<?php foreach ($results as $item) : ?>
+    <?= $item['volumeInfo']['title'] ?>
   <br />
 <?php endforeach ?>
 
 <h3>Results Of Deferred Call:</h3>
-<?php foreach ($resultsDeferred as $item): ?>
-  <?= $item['volumeInfo']['title'] ?>
+<?php foreach ($resultsDeferred as $item) : ?>
+    <?= $item['volumeInfo']['title'] ?>
   <br />
 <?php endforeach ?>
 
-<?= pageFooter(__FILE__) ?>
+<?= pageFooter(__FILE__);

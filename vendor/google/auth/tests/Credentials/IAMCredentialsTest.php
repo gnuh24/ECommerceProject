@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
-namespace Google\Auth\Tests;
+namespace Google\Auth\Tests\Credentials;
 
 use Google\Auth\Credentials\IAMCredentials;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class IAMConstructorTest extends \PHPUnit_Framework_TestCase
+/**
+ * @group credentials
+ * @group credentials-iam
+ */
+class IAMConstructorTest extends TestCase
 {
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testShouldFailIfSelectorIsNotString()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $notAString = new \stdClass();
         $iam = new IAMCredentials(
             $notAString,
@@ -33,11 +38,10 @@ class IAMConstructorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testShouldFailIfTokenIsNotString()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $notAString = new \stdClass();
         $iam = new IAMCredentials(
             '',
@@ -53,7 +57,7 @@ class IAMConstructorTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class IAMUpdateMetadataCallbackTest extends \PHPUnit_Framework_TestCase
+class IAMUpdateMetadataCallbackTest extends TestCase
 {
     public function testUpdateMetadataFunc()
     {
@@ -67,17 +71,19 @@ class IAMUpdateMetadataCallbackTest extends \PHPUnit_Framework_TestCase
         $update_metadata = $iam->getUpdateMetadataFunc();
         $this->assertTrue(is_callable($update_metadata));
 
-        $actual_metadata = call_user_func($update_metadata,
-            $metadata = array('foo' => 'bar'));
-        $this->assertTrue(
-            isset($actual_metadata[IAMCredentials::SELECTOR_KEY]));
+        $actual_metadata = call_user_func(
+            $update_metadata,
+            $metadata = ['foo' => 'bar']
+        );
+        $this->assertArrayHasKey(IAMCredentials::SELECTOR_KEY, $actual_metadata);
         $this->assertEquals(
             $actual_metadata[IAMCredentials::SELECTOR_KEY],
-            $selector);
-        $this->assertTrue(
-            isset($actual_metadata[IAMCredentials::TOKEN_KEY]));
+            $selector
+        );
+        $this->assertArrayHasKey(IAMCredentials::TOKEN_KEY, $actual_metadata);
         $this->assertEquals(
             $actual_metadata[IAMCredentials::TOKEN_KEY],
-            $token);
+            $token
+        );
     }
 }

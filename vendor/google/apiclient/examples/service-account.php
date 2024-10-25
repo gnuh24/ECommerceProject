@@ -25,7 +25,7 @@ echo pageHeader("Service Account Access");
   account.
  ************************************************/
 
-$client = new Google_Client();
+$client = new Google\Client();
 
 /************************************************
   ATTENTION: Fill in these values, or make sure you
@@ -41,32 +41,35 @@ $client = new Google_Client();
  ************************************************/
 
 if ($credentials_file = checkServiceAccountCredentialsFile()) {
-  // set the location manually
-  $client->setAuthConfig($credentials_file);
+    // set the location manually
+    $client->setAuthConfig($credentials_file);
 } elseif (getenv('GOOGLE_APPLICATION_CREDENTIALS')) {
-  // use the application default credentials
-  $client->useApplicationDefaultCredentials();
+    // use the application default credentials
+    $client->useApplicationDefaultCredentials();
 } else {
-  echo missingServiceAccountDetailsWarning();
-  return;
+    echo missingServiceAccountDetailsWarning();
+    return;
 }
 
 $client->setApplicationName("Client_Library_Examples");
 $client->setScopes(['https://www.googleapis.com/auth/books']);
-$service = new Google_Service_Books($client);
+$service = new Google\Service\Books($client);
 
 /************************************************
   We're just going to make the same call as in the
   simple query as an example.
  ************************************************/
-$optParams = array('filter' => 'free-ebooks');
-$results = $service->volumes->listVolumes('Henry David Thoreau', $optParams);
+$query = 'Henry David Thoreau';
+$optParams = [
+    'filter' => 'free-ebooks',
+];
+$results = $service->volumes->listVolumes($query, $optParams);
 ?>
 
 <h3>Results Of Call:</h3>
-<?php foreach ($results as $item): ?>
-  <?= $item['volumeInfo']['title'] ?>
+<?php foreach ($results as $item) : ?>
+    <?= $item['volumeInfo']['title'] ?>
   <br />
 <?php endforeach ?>
 
-<?php pageFooter(__FILE__); ?>
+<?php pageFooter(__FILE__);

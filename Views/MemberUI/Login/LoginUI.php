@@ -73,9 +73,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Font Awesome (for Google icon) -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 
 
@@ -267,13 +264,24 @@
 </script>
 
 
-
+<?php require_once __DIR__ . '/googleLoginConfig.php'; ?>";
 
 
 <script>
     const loginButton = document.getElementById("signInButton");
     const tenDangNhap = document.getElementById("tenDangNhapLogin");
     const matKhau = document.getElementById("passwordLogin");
+
+    const googleSignInButton = document.getElementById('googleSignInButton');
+
+    // Add event listener to the button
+    googleSignInButton.addEventListener('click', function() {
+        // Your login logic here
+        const googleAuthUrl = "<?php echo $client->createAuthUrl(); ?>";
+
+        window.location.href = googleAuthUrl;
+
+    });
 
     loginButton.addEventListener("click", (event) => {
         event.preventDefault();

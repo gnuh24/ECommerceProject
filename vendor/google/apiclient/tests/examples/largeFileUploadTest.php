@@ -19,20 +19,27 @@
  * under the License.
  */
 
-class examples_largeFileUploadTest extends BaseTest
+namespace Google\Tests\Examples;
+
+use Google\Tests\BaseTest;
+
+class largeFileUploadTest extends BaseTest
 {
-  public function testLargeFileUpload()
-  {
-    $this->checkServiceAccountCredentials();
+    /**
+   * @runInSeparateProcess
+   */
+    public function testLargeFileUpload()
+    {
+        $this->checkServiceAccountCredentials();
 
-    $crawler = $this->loadExample('large-file-upload.php');
+        $crawler = $this->loadExample('large-file-upload.php');
 
-    $nodes = $crawler->filter('h1');
-    $this->assertEquals(1, count($nodes));
-    $this->assertEquals('File Upload - Uploading a large file', $nodes->first()->text());
+        $nodes = $crawler->filter('h1');
+        $this->assertCount(1, $nodes);
+        $this->assertEquals('File Upload - Uploading a large file', $nodes->first()->text());
 
-    $nodes = $crawler->filter('a.login');
-    $this->assertEquals(1, count($nodes));
-    $this->assertEquals('Connect Me!', $nodes->first()->text());
-  }
+        $nodes = $crawler->filter('a.login');
+        $this->assertCount(1, $nodes);
+        $this->assertEquals('Connect Me!', $nodes->first()->text());
+    }
 }

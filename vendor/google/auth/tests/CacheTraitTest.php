@@ -18,68 +18,87 @@
 namespace Google\Auth\Tests;
 
 use Google\Auth\CacheTrait;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
-class CacheTraitTest extends \PHPUnit_Framework_TestCase
+class CacheTraitTest extends TestCase
 {
     private $mockFetcher;
     private $mockCacheItem;
     private $mockCache;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->mockFetcher =
-            $this
-                ->getMockBuilder('Google\Auth\FetchAuthTokenInterface')
-                ->getMock();
-        $this->mockCacheItem =
-            $this
-                ->getMockBuilder('Psr\Cache\CacheItemInterface')
-                ->getMock();
-        $this->mockCache =
-            $this
-                ->getMockBuilder('Psr\Cache\CacheItemPoolInterface')
-                ->getMock();
+        $this->mockFetcher = $this->prophesize('Google\Auth\FetchAuthTokenInterface');
+        $this->mockCacheItem = $this->prophesize('Psr\Cache\CacheItemInterface');
+        $this->mockCache = $this->prophesize('Psr\Cache\CacheItemPoolInterface');
     }
 
-    public function testSuccessfullyPullsFromCacheWithoutFetcher()
+    public function testSuccessfullyPullsFromCache()
     {
         $expectedValue = '1234';
-        $this->mockCacheItem
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($expectedValue));
-        $this->mockCache
-            ->expects($this->once())
-            ->method('getItem')
-            ->will($this->returnValue($this->mockCacheItem));
+        $this->mockCacheItem->isHit()
+            ->shouldBeCalledTimes(1)
+            ->willReturn(true);
+        $this->mockCacheItem->get()
+            ->shouldBeCalledTimes(1)
+            ->willReturn($expectedValue);
+        $this->mockCache->getItem(Argument::type('string'))
+            ->shouldBeCalledTimes(1)
+            ->willReturn($this->mockCacheItem->reveal());
 
         $implementation = new CacheTraitImplementation([
-            'cache' => $this->mockCache,
+            'cache' => $this->mockCache->reveal(),
         ]);
 
         $cachedValue = $implementation->gCachedValue();
         $this->assertEquals($expectedValue, $cachedValue);
     }
 
-    public function testSuccessfullyPullsFromCacheWithFetcher()
+    public function testSuccessfullyPullsFromCacheWithInvalidKey()
     {
+        $key = 'this-key-has-@-illegal-characters';
+        $expectedKey = 'thiskeyhasillegalcharacters';
         $expectedValue = '1234';
-        $this->mockCacheItem
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($expectedValue));
-        $this->mockCache
-            ->expects($this->once())
-            ->method('getItem')
-            ->will($this->returnValue($this->mockCacheItem));
-        $this->mockFetcher
-            ->expects($this->once())
-            ->method('getCacheKey')
-            ->will($this->returnValue('key'));
+        $this->mockCacheItem->isHit()
+            ->shouldBeCalledTimes(1)
+            ->willReturn(true);
+        $this->mockCacheItem->get()
+            ->shouldBeCalledTimes(1)
+            ->willReturn($expectedValue);
+        $this->mockCache->getItem($expectedKey)
+            ->shouldBeCalledTimes(1)
+            ->willReturn($this->mockCacheItem->reveal());
 
         $implementation = new CacheTraitImplementation([
-            'cache' => $this->mockCache,
-            'fetcher' => $this->mockFetcher,
+            'cache' => $this->mockCache->reveal(),
+            'key' => $key,
+        ]);
+
+        $cachedValue = $implementation->gCachedValue();
+        $this->assertEquals($expectedValue, $cachedValue);
+    }
+
+    public function testSuccessfullyPullsFromCacheWithLongKey()
+    {
+        $key = 'this-key-is-over-64-characters-and-it-will-still-work'
+            . '-but-it-will-be-hashed-and-shortened';
+        $expectedKey = str_replace('-', '', $key);
+        $expectedKey = substr(hash('sha256', $expectedKey), 0, 64);
+        $expectedValue = '1234';
+        $this->mockCacheItem->isHit()
+            ->shouldBeCalledTimes(1)
+            ->willReturn(true);
+        $this->mockCacheItem->get()
+            ->shouldBeCalledTimes(1)
+            ->willReturn($expectedValue);
+        $this->mockCache->getItem($expectedKey)
+            ->shouldBeCalledTimes(1)
+            ->willReturn($this->mockCacheItem->reveal());
+
+        $implementation = new CacheTraitImplementation([
+            'cache' => $this->mockCache->reveal(),
+            'key' => $key
         ]);
 
         $cachedValue = $implementation->gCachedValue();
@@ -96,59 +115,31 @@ class CacheTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testFailsPullFromCacheWithoutKey()
     {
-        $this->mockFetcher
-            ->expects($this->once())
-            ->method('getCacheKey')
-            ->will($this->returnValue(null));
-
         $implementation = new CacheTraitImplementation([
-            'cache' => $this->mockCache,
-            'fetcher' => $this->mockFetcher,
+            'cache' => $this->mockCache->reveal(),
+            'key'   => null,
         ]);
 
         $cachedValue = $implementation->gCachedValue();
+        $this->assertEquals(null, $cachedValue);
     }
 
-    public function testSuccessfullySetsToCacheWithoutFetcher()
+    public function testSuccessfullySetsToCache()
     {
         $value = '1234';
-        $this->mockCacheItem
-            ->expects($this->once())
-            ->method('set')
-            ->with($value);
-        $this->mockCache
-            ->expects($this->once())
-            ->method('getItem')
-            ->with($this->equalTo('key'))
-            ->will($this->returnValue($this->mockCacheItem));
+        $this->mockCacheItem->set($value)
+            ->shouldBeCalled()
+            ->willReturn($this->mockCacheItem->reveal());
+        $this->mockCacheItem->expiresAfter(Argument::any())
+            ->shouldBeCalled()
+            ->willReturn($this->mockCacheItem->reveal());
+        $this->mockCache->getItem('key')
+            ->willReturn($this->mockCacheItem->reveal());
+        $this->mockCache->save(Argument::type('Psr\Cache\CacheItemInterface'))
+            ->shouldBeCalled();
 
         $implementation = new CacheTraitImplementation([
-            'cache' => $this->mockCache,
-        ]);
-
-        $implementation->sCachedValue($value);
-    }
-
-    public function testSuccessfullySetsToCacheWithFetcher()
-    {
-        $value = '1234';
-        $this->mockCacheItem
-            ->expects($this->once())
-            ->method('set')
-            ->with($value);
-        $this->mockCache
-            ->expects($this->once())
-            ->method('getItem')
-            ->with($this->equalTo('key'))
-            ->will($this->returnValue($this->mockCacheItem));
-        $this->mockFetcher
-            ->expects($this->once())
-            ->method('getCacheKey')
-            ->will($this->returnValue('key'));
-
-        $implementation = new CacheTraitImplementation([
-            'cache' => $this->mockCache,
-            'fetcher' => $this->mockFetcher,
+            'cache' => $this->mockCache->reveal(),
         ]);
 
         $implementation->sCachedValue($value);
@@ -156,27 +147,19 @@ class CacheTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testFailsSetToCacheWithNoCache()
     {
-        $this->mockFetcher
-            ->expects($this->never())
-            ->method('getCacheKey');
-
-        $implementation = new CacheTraitImplementation([
-            'fetcher' => $this->mockFetcher,
-        ]);
+        $implementation = new CacheTraitImplementation();
 
         $implementation->sCachedValue('1234');
+
+        $cachedValue = $implementation->sCachedValue('1234');
+        $this->assertNull($cachedValue);
     }
 
     public function testFailsSetToCacheWithoutKey()
     {
-        $this->mockFetcher
-            ->expects($this->once())
-            ->method('getCacheKey')
-            ->will($this->returnValue(null));
-
         $implementation = new CacheTraitImplementation([
             'cache' => $this->mockCache,
-            'fetcher' => $this->mockFetcher,
+            'key'   => null,
         ]);
 
         $cachedValue = $implementation->sCachedValue('1234');
@@ -188,14 +171,10 @@ class CacheTraitImplementation
 {
     use CacheTrait;
 
-    private $cache;
-    private $fetcher;
-    private $cacheConfig;
-
     public function __construct(array $config = [])
     {
+        $this->key = array_key_exists('key', $config) ? $config['key'] : 'key';
         $this->cache = isset($config['cache']) ? $config['cache'] : null;
-        $this->fetcher = isset($config['fetcher']) ? $config['fetcher'] : null;
         $this->cacheConfig = [
             'prefix' => '',
             'lifetime' => 1000,
@@ -205,16 +184,11 @@ class CacheTraitImplementation
     // allows us to keep trait methods private
     public function gCachedValue()
     {
-        return $this->getCachedValue();
+        return $this->getCachedValue($this->key);
     }
 
     public function sCachedValue($v)
     {
-        $this->setCachedValue($v);
-    }
-
-    private function getCacheKey()
-    {
-        return 'key';
+        $this->setCachedValue($this->key, $v);
     }
 }

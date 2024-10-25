@@ -17,11 +17,17 @@
 
 namespace Google\Auth\Tests;
 
+use DomainException;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Google\Auth\OAuth2;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Query;
+use GuzzleHttp\Psr7\Utils;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
-class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
+class OAuth2AuthorizationUriTest extends TestCase
 {
     private $minimal = [
         'authorizationUri' => 'https://accounts.test.org/insecure/url',
@@ -29,20 +35,18 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'aClientID',
     ];
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testIsNullIfAuthorizationUriIsNull()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([]);
         $this->assertNull($o->buildFullAuthorizationUri());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRequiresTheClientId()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([
             'authorizationUri' => 'https://accounts.test.org/auth/url',
             'redirectUri' => 'https://accounts.test.org/redirect/url',
@@ -50,11 +54,10 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         $o->buildFullAuthorizationUri();
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRequiresTheRedirectUri()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([
             'authorizationUri' => 'https://accounts.test.org/auth/url',
             'clientId' => 'aClientID',
@@ -62,11 +65,10 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         $o->buildFullAuthorizationUri();
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testCannotHavePromptAndApprovalPrompt()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([
             'authorizationUri' => 'https://accounts.test.org/auth/url',
             'clientId' => 'aClientID',
@@ -77,11 +79,10 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testCannotHaveInsecureAuthorizationUri()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([
             'authorizationUri' => 'http://accounts.test.org/insecure/url',
             'redirectUri' => 'https://accounts.test.org/redirect/url',
@@ -90,11 +91,10 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         $o->buildFullAuthorizationUri();
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testCannotHaveRelativeRedirectUri()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2([
             'authorizationUri' => 'http://accounts.test.org/insecure/url',
             'redirectUri' => '/redirect/url',
@@ -103,10 +103,21 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         $o->buildFullAuthorizationUri();
     }
 
+    public function testAudOrScopeIsRequiredForJwt()
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('one of scope or aud should not be null');
+        $o = new OAuth2([]);
+        $o->setSigningKey('a key');
+        $o->setSigningAlgorithm('RS256');
+        $o->setIssuer('an issuer');
+        $o->toJwt();
+    }
+
     public function testHasDefaultXXXTypeParams()
     {
         $o = new OAuth2($this->minimal);
-        $q = Psr7\parse_query($o->buildFullAuthorizationUri()->getQuery());
+        $q = Query::parse($o->buildFullAuthorizationUri()->getQuery());
         $this->assertEquals('code', $q['response_type']);
         $this->assertEquals('offline', $q['access_type']);
     }
@@ -114,7 +125,7 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
     public function testCanBeUrlObject()
     {
         $config = array_merge($this->minimal, [
-            'authorizationUri' => Psr7\uri_for('https://another/uri'),
+            'authorizationUri' => Utils::uriFor('https://another/uri'),
         ]);
         $o = new OAuth2($config);
         $this->assertEquals('/uri', $o->buildFullAuthorizationUri()->getPath());
@@ -131,7 +142,7 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
         ];
         $config = array_merge($this->minimal, ['state' => 'the_state']);
         $o = new OAuth2($config);
-        $q = Psr7\parse_query($o->buildFullAuthorizationUri($overrides)->getQuery());
+        $q = Query::parse($o->buildFullAuthorizationUri($overrides)->getQuery());
         $this->assertEquals('o_access_type', $q['access_type']);
         $this->assertEquals('o_client_id', $q['client_id']);
         $this->assertEquals('o_redirect_uri', $q['redirect_uri']);
@@ -143,14 +154,14 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
     {
         $with_strings = array_merge($this->minimal, ['scope' => 'scope1 scope2']);
         $o = new OAuth2($with_strings);
-        $q = Psr7\parse_query($o->buildFullAuthorizationUri()->getQuery());
+        $q = Query::parse($o->buildFullAuthorizationUri()->getQuery());
         $this->assertEquals('scope1 scope2', $q['scope']);
 
         $with_array = array_merge($this->minimal, [
             'scope' => ['scope1', 'scope2'],
         ]);
         $o = new OAuth2($with_array);
-        $q = Psr7\parse_query($o->buildFullAuthorizationUri()->getQuery());
+        $q = Query::parse($o->buildFullAuthorizationUri()->getQuery());
         $this->assertEquals('scope1 scope2', $q['scope']);
     }
 
@@ -170,7 +181,7 @@ class OAuth2AuthorizationUriTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class OAuth2GrantTypeTest extends \PHPUnit_Framework_TestCase
+class OAuth2GrantTypeTest extends TestCase
 {
     private $minimal = [
         'authorizationUri' => 'https://accounts.test.org/insecure/url',
@@ -211,8 +222,10 @@ class OAuth2GrantTypeTest extends \PHPUnit_Framework_TestCase
         $o = new OAuth2($this->minimal);
         $o->setIssuer('an issuer');
         $o->setSigningKey('a key');
-        $this->assertEquals('urn:ietf:params:oauth:grant-type:jwt-bearer',
-            $o->getGrantType());
+        $this->assertEquals(
+            'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            $o->getGrantType()
+        );
     }
 
     public function testSetsKnownTypes()
@@ -232,13 +245,13 @@ class OAuth2GrantTypeTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class OAuth2GetCacheKeyTest extends \PHPUnit_Framework_TestCase
+class OAuth2GetCacheKeyTest extends TestCase
 {
     private $minimal = [
         'clientID' => 'aClientID',
     ];
 
-    public function testIsNullWithNoScopes()
+    public function testIsNullWithNoScopesOrAudience()
     {
         $o = new OAuth2($this->minimal);
         $this->assertNull($o->getCacheKey());
@@ -257,9 +270,17 @@ class OAuth2GetCacheKeyTest extends \PHPUnit_Framework_TestCase
         $o->setScope(['test/scope/1', 'test/scope/2']);
         $this->assertEquals('test/scope/1:test/scope/2', $o->getCacheKey());
     }
+
+    public function testIsAudienceWhenScopeIsNull()
+    {
+        $aud = 'https://drive.googleapis.com';
+        $o = new OAuth2($this->minimal);
+        $o->setAudience($aud);
+        $this->assertEquals($aud, $o->getCacheKey());
+    }
 }
 
-class OAuth2TimingTest extends \PHPUnit_Framework_TestCase
+class OAuth2TimingTest extends TestCase
 {
     private $minimal = [
         'authorizationUri' => 'https://accounts.test.org/insecure/url',
@@ -319,7 +340,7 @@ class OAuth2TimingTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class OAuth2GeneralTest extends \PHPUnit_Framework_TestCase
+class OAuth2GeneralTest extends TestCase
 {
     private $minimal = [
         'authorizationUri' => 'https://accounts.test.org/insecure/url',
@@ -327,11 +348,10 @@ class OAuth2GeneralTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'aClientID',
     ];
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFailsOnUnknownSigningAlgorithm()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2($this->minimal);
         $o->setSigningAlgorithm('this is definitely not an algorithm name');
     }
@@ -345,11 +365,10 @@ class OAuth2GeneralTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFailsOnRelativeRedirectUri()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $o = new OAuth2($this->minimal);
         $o->setRedirectUri('/relative/url');
     }
@@ -363,7 +382,7 @@ class OAuth2GeneralTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class OAuth2JwtTest extends \PHPUnit_Framework_TestCase
+class OAuth2JwtTest extends TestCase
 {
     private $signingMinimal = [
         'signingKey' => 'example_key',
@@ -374,58 +393,92 @@ class OAuth2JwtTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'aClientID',
     ];
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsWithMissingAudience()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->signingMinimal;
         unset($testConfig['audience']);
+        unset($testConfig['scope']);
         $o = new OAuth2($testConfig);
         $o->toJwt();
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsWithMissingIssuer()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->signingMinimal;
         unset($testConfig['issuer']);
         $o = new OAuth2($testConfig);
         $o->toJwt();
     }
 
-    /**
-     */
     public function testCanHaveNoScope()
     {
         $testConfig = $this->signingMinimal;
         unset($testConfig['scope']);
         $o = new OAuth2($testConfig);
-        $o->toJwt();
+        $jwt = $o->toJwt();
+        $this->assertTrue(is_string($jwt));
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsWithMissingSigningKey()
     {
+        $this->expectException(DomainException::class);
+
         $testConfig = $this->signingMinimal;
         unset($testConfig['signingKey']);
         $o = new OAuth2($testConfig);
         $o->toJwt();
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsWithMissingSigningAlgorithm()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->signingMinimal;
         unset($testConfig['signingAlgorithm']);
         $o = new OAuth2($testConfig);
         $o->toJwt();
+    }
+
+    public function testCanHS256EncodeAValidPayloadWithSigningKeyId()
+    {
+        $testConfig = $this->signingMinimal;
+        $keys = [
+            'example_key_id1' => new Key('example_key1', 'HS256'),
+            'example_key_id2' => new Key('example_key2', 'HS256'),
+        ];
+        $testConfig['signingKey'] = $keys['example_key_id2']->getKeyMaterial();
+        $testConfig['signingKeyId'] = 'example_key_id2';
+        $o = new OAuth2($testConfig);
+        $payload = $o->toJwt();
+        $roundTrip = JWT::decode($payload, $keys);
+        $this->assertEquals($roundTrip->iss, $testConfig['issuer']);
+        $this->assertEquals($roundTrip->aud, $testConfig['audience']);
+        $this->assertEquals($roundTrip->scope, $testConfig['scope']);
+    }
+
+    public function testFailDecodeWithoutSigningKeyId()
+    {
+        $testConfig = $this->signingMinimal;
+        $keys = [
+            'example_key_id1' => new Key('example_key1', 'HS256'),
+            'example_key_id2' => new Key('example_key2', 'HS256'),
+        ];
+        $testConfig['signingKey'] = $keys['example_key_id2']->getKeyMaterial();
+        $o = new OAuth2($testConfig);
+        $payload = $o->toJwt();
+
+        try {
+            JWT::decode($payload, $keys);
+        } catch (\Exception $e) {
+            // Workaround: In old JWT versions throws DomainException
+            $this->assertTrue(
+                ($e instanceof \DomainException || $e instanceof \UnexpectedValueException)
+                && $e->getMessage() === '"kid" empty, unable to lookup correct key'
+            );
+            return;
+        }
+        $this->fail('Expected exception about problem with decode');
     }
 
     public function testCanHS256EncodeAValidPayload()
@@ -433,7 +486,7 @@ class OAuth2JwtTest extends \PHPUnit_Framework_TestCase
         $testConfig = $this->signingMinimal;
         $o = new OAuth2($testConfig);
         $payload = $o->toJwt();
-        $roundTrip = $this->jwtDecode($payload, $testConfig['signingKey'], array('HS256'));
+        $roundTrip = JWT::decode($payload, new Key($testConfig['signingKey'], 'HS256'));
         $this->assertEquals($roundTrip->iss, $testConfig['issuer']);
         $this->assertEquals($roundTrip->aud, $testConfig['audience']);
         $this->assertEquals($roundTrip->scope, $testConfig['scope']);
@@ -448,25 +501,29 @@ class OAuth2JwtTest extends \PHPUnit_Framework_TestCase
         $o->setSigningAlgorithm('RS256');
         $o->setSigningKey($privateKey);
         $payload = $o->toJwt();
-        $roundTrip = $this->jwtDecode($payload, $publicKey, array('RS256'));
+        $roundTrip = JWT::decode($payload, new Key($publicKey, 'RS256'));
         $this->assertEquals($roundTrip->iss, $testConfig['issuer']);
         $this->assertEquals($roundTrip->aud, $testConfig['audience']);
         $this->assertEquals($roundTrip->scope, $testConfig['scope']);
     }
 
-    private function jwtDecode()
+    public function testCanHaveAdditionalClaims()
     {
-        $args = func_get_args();
-        $class = 'JWT';
-        if (class_exists('Firebase\JWT\JWT')) {
-            $class = 'Firebase\JWT\JWT';
-        }
-
-        return call_user_func_array("$class::decode", $args);
+        $publicKey = file_get_contents(__DIR__ . '/fixtures' . '/public.pem');
+        $privateKey = file_get_contents(__DIR__ . '/fixtures' . '/private.pem');
+        $testConfig = $this->signingMinimal;
+        $targetAud = '123@456.com';
+        $testConfig['additionalClaims'] = ['target_audience' => $targetAud];
+        $o = new OAuth2($testConfig);
+        $o->setSigningAlgorithm('RS256');
+        $o->setSigningKey($privateKey);
+        $payload = $o->toJwt();
+        $roundTrip = JWT::decode($payload, new Key($publicKey, 'RS256'));
+        $this->assertEquals($roundTrip->target_audience, $targetAud);
     }
 }
 
-class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
+class OAuth2GenerateAccessTokenRequestTest extends TestCase
 {
     private $tokenRequestMinimal = [
         'tokenCredentialUri' => 'https://tokens_r_us/test',
@@ -476,22 +533,18 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'aClientID',
     ];
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsIfNoTokenCredentialUri()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->tokenRequestMinimal;
         unset($testConfig['tokenCredentialUri']);
         $o = new OAuth2($testConfig);
         $o->generateCredentialsRequest();
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsIfAuthorizationCodeIsMissing()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->tokenRequestMinimal;
         $testConfig['redirectUri'] = 'https://has/redirect/uri';
         $o = new OAuth2($testConfig);
@@ -509,7 +562,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf('Psr\Http\Message\RequestInterface', $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Query::parse((string)$req->getBody());
         $this->assertEquals('authorization_code', $fields['grant_type']);
         $this->assertEquals('an_auth_code', $fields['code']);
     }
@@ -525,7 +578,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf('Psr\Http\Message\RequestInterface', $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Query::parse((string)$req->getBody());
         $this->assertEquals('password', $fields['grant_type']);
         $this->assertEquals('a_password', $fields['password']);
         $this->assertEquals('a_username', $fields['username']);
@@ -541,7 +594,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf('Psr\Http\Message\RequestInterface', $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Query::parse((string)$req->getBody());
         $this->assertEquals('refresh_token', $fields['grant_type']);
         $this->assertEquals('a_refresh_token', $fields['refresh_token']);
     }
@@ -554,7 +607,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $o = new OAuth2($testConfig);
         $o->setCode('an_auth_code');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Query::parse((string)$request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -565,7 +618,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $o = new OAuth2($testConfig);
         $o->setRefreshToken('a_refresh_token');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Query::parse((string)$request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -577,7 +630,7 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $o->setUsername('a_username');
         $o->setPassword('a_password');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Query::parse((string)$request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -592,9 +645,9 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf('Psr\Http\Message\RequestInterface', $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Query::parse((string)$req->getBody());
         $this->assertEquals(OAuth2::JWT_URN, $fields['grant_type']);
-        $this->assertTrue(array_key_exists('assertion', $fields));
+        $this->assertArrayHasKey('assertion', $fields);
     }
 
     public function testGeneratesExtendedRequests()
@@ -608,13 +661,13 @@ class OAuth2GenerateAccessTokenRequestTest extends \PHPUnit_Framework_TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf('Psr\Http\Message\RequestInterface', $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Query::parse((string)$req->getBody());
         $this->assertEquals('my_value', $fields['my_param']);
         $this->assertEquals('urn:my_test_grant_type', $fields['grant_type']);
     }
 }
 
-class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
+class OAuth2FetchAuthTokenTest extends TestCase
 {
     private $fetchAuthTokenMinimal = [
         'tokenCredentialUri' => 'https://tokens_r_us/test',
@@ -626,11 +679,10 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'aClientID',
     ];
 
-    /**
-     * @expectedException GuzzleHttp\Exception\ClientException
-     */
     public function testFailsOn400()
     {
+        $this->expectException(\GuzzleHttp\Exception\ClientException::class);
+
         $testConfig = $this->fetchAuthTokenMinimal;
         $httpHandler = getHandler([
             buildResponse(400),
@@ -639,11 +691,10 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
         $o->fetchAuthToken($httpHandler);
     }
 
-    /**
-     * @expectedException GuzzleHttp\Exception\ServerException
-     */
     public function testFailsOn500()
     {
+        $this->expectException(\GuzzleHttp\Exception\ServerException::class);
+
         $testConfig = $this->fetchAuthTokenMinimal;
         $httpHandler = getHandler([
             buildResponse(500),
@@ -652,16 +703,15 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
         $o->fetchAuthToken($httpHandler);
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Invalid JSON response
-     */
     public function testFailsOnNoContentTypeIfResponseIsNotJSON()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid JSON response');
+
         $testConfig = $this->fetchAuthTokenMinimal;
         $notJson = '{"foo": , this is cannot be passed as json" "bar"}';
         $httpHandler = getHandler([
-            buildResponse(200, [], Psr7\stream_for($notJson)),
+            buildResponse(200, [], Utils::streamFor($notJson)),
         ]);
         $o = new OAuth2($testConfig);
         $o->fetchAuthToken($httpHandler);
@@ -672,7 +722,7 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
         $testConfig = $this->fetchAuthTokenMinimal;
         $json = '{"foo": "bar"}';
         $httpHandler = getHandler([
-            buildResponse(200, [], Psr7\stream_for($json)),
+            buildResponse(200, [], Utils::streamFor($json)),
         ]);
         $o = new OAuth2($testConfig);
         $tokens = $o->fetchAuthToken($httpHandler);
@@ -687,7 +737,7 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
             buildResponse(
                 200,
                 ['Content-Type' => 'application/x-www-form-urlencoded'],
-                Psr7\stream_for($json)
+                Utils::streamFor($json)
             ),
         ]);
         $o = new OAuth2($testConfig);
@@ -706,10 +756,11 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
             'access_token' => 'an_access_token',
             'id_token' => 'an_id_token',
             'refresh_token' => 'a_refresh_token',
+            'scope' => 'scope1 scope2',
         ];
         $json = json_encode($wanted_updates);
         $httpHandler = getHandler([
-            buildResponse(200, [], Psr7\stream_for($json)),
+            buildResponse(200, [], Utils::streamFor($json)),
         ]);
         $o = new OAuth2($testConfig);
         $this->assertNull($o->getExpiresAt());
@@ -725,10 +776,114 @@ class OAuth2FetchAuthTokenTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('an_access_token', $o->getAccessToken());
         $this->assertEquals('an_id_token', $o->getIdToken());
         $this->assertEquals('a_refresh_token', $o->getRefreshToken());
+        $this->assertEquals('scope1 scope2', $o->getGrantedScope());
+    }
+
+    public function testUpdatesTokenFieldsOnFetchMissingRefreshToken()
+    {
+        $testConfig = $this->fetchAuthTokenMinimal;
+        $testConfig['refresh_token'] = 'a_refresh_token';
+        $wanted_updates = [
+            'expires_at' => '1',
+            'expires_in' => '57',
+            'issued_at' => '2',
+            'access_token' => 'an_access_token',
+            'id_token' => 'an_id_token',
+        ];
+        $json = json_encode($wanted_updates);
+        $httpHandler = getHandler([
+            buildResponse(200, [], Utils::streamFor($json)),
+        ]);
+        $o = new OAuth2($testConfig);
+        $this->assertNull($o->getExpiresAt());
+        $this->assertNull($o->getExpiresIn());
+        $this->assertNull($o->getIssuedAt());
+        $this->assertNull($o->getAccessToken());
+        $this->assertNull($o->getIdToken());
+        $this->assertEquals('a_refresh_token', $o->getRefreshToken());
+        $tokens = $o->fetchAuthToken($httpHandler);
+        $this->assertEquals(1, $o->getExpiresAt());
+        $this->assertEquals(57, $o->getExpiresIn());
+        $this->assertEquals(2, $o->getIssuedAt());
+        $this->assertEquals('an_access_token', $o->getAccessToken());
+        $this->assertEquals('an_id_token', $o->getIdToken());
+        $this->assertEquals('a_refresh_token', $o->getRefreshToken());
+    }
+
+    /**
+     * @dataProvider provideGetLastReceivedToken
+     */
+    public function testGetLastReceivedToken(
+        $updateToken,
+        $expectedToken = null
+    ) {
+        $testConfig = $this->fetchAuthTokenMinimal;
+        $o = new OAuth2($testConfig);
+        $o->updateToken($updateToken);
+        $this->assertEquals(
+            $expectedToken ?: $updateToken,
+            $o->getLastReceivedToken()
+        );
+    }
+
+    public function provideGetLastReceivedToken()
+    {
+        $time = time();
+        return [
+            [
+                ['access_token' => 'abc'],
+                ['access_token' => 'abc', 'expires_at' => null],
+            ],
+            [
+                ['access_token' => 'abc', 'invalid-field' => 'foo'],
+                ['access_token' => 'abc', 'expires_at' => null],
+            ],
+            [
+                ['access_token' => 'abc', 'expires_at' => 1234567890],
+                ['access_token' => 'abc', 'expires_at' => 1234567890],
+            ],
+            [
+                ['id_token' => 'def'],
+                ['id_token' => 'def', 'expires_at' => null],
+            ],
+            [
+                ['id_token' => 'def', 'expires_at' => 1234567890],
+                ['id_token' => 'def', 'expires_at' => 1234567890],
+            ],
+            [
+                [
+                    'access_token' => 'abc',
+                    'expires_in' => 3600,
+                    'issued_at' => $time
+                ],
+                [
+                    'access_token' => 'abc',
+                    'expires_at' => $time + 3600,
+                    'expires_in' => 3600,
+                    'issued_at' => $time
+                ],
+            ],
+            [
+                ['access_token' => 'abc', 'issued_at' => 1234567890],
+                [
+                    'access_token' => 'abc',
+                    'expires_at' => null,
+                    'issued_at' => 1234567890
+                ],
+            ],
+            [
+                ['access_token' => 'abc', 'refresh_token' => 'xyz'],
+                [
+                    'access_token' => 'abc',
+                    'expires_at' => null,
+                    'refresh_token' => 'xyz'
+                ],
+            ],
+        ];
     }
 }
 
-class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
+class OAuth2VerifyIdTokenTest extends TestCase
 {
     private $publicKey;
     private $privateKey;
@@ -739,7 +894,7 @@ class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
         'clientId' => 'myaccount.on.host.issuer.com',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->publicKey =
             file_get_contents(__DIR__ . '/fixtures' . '/public.pem');
@@ -747,23 +902,20 @@ class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
             file_get_contents(__DIR__ . '/fixtures' . '/private.pem');
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
     public function testFailsIfIdTokenIsInvalid()
     {
+        $this->expectException(UnexpectedValueException::class);
+
         $testConfig = $this->verifyIdTokenMinimal;
         $not_a_jwt = 'not a jot';
         $o = new OAuth2($testConfig);
         $o->setIdToken($not_a_jwt);
-        $o->verifyIdToken($this->publicKey);
+        $o->verifyIdToken($this->publicKey, ['RS256']);
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsIfAudienceIsMissing()
     {
+        $this->expectException(DomainException::class);
         $testConfig = $this->verifyIdTokenMinimal;
         $now = time();
         $origIdToken = [
@@ -772,16 +924,14 @@ class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
             'iat' => $now,
         ];
         $o = new OAuth2($testConfig);
-        $jwtIdToken = $this->jwtEncode($origIdToken, $this->privateKey, 'RS256');
+        $jwtIdToken = JWT::encode($origIdToken, $this->privateKey, 'RS256');
         $o->setIdToken($jwtIdToken);
-        $o->verifyIdToken($this->publicKey);
+        $o->verifyIdToken($this->publicKey, ['RS256']);
     }
 
-    /**
-     * @expectedException DomainException
-     */
     public function testFailsIfAudienceIsWrong()
     {
+        $this->expectException(DomainException::class);
         $now = time();
         $testConfig = $this->verifyIdTokenMinimal;
         $origIdToken = [
@@ -791,9 +941,60 @@ class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
             'iat' => $now,
         ];
         $o = new OAuth2($testConfig);
-        $jwtIdToken = $this->jwtEncode($origIdToken, $this->privateKey, 'RS256');
+        $jwtIdToken = JWT::encode($origIdToken, $this->privateKey, 'RS256');
         $o->setIdToken($jwtIdToken);
-        $o->verifyIdToken($this->publicKey);
+        $o->verifyIdToken($this->publicKey, ['RS256']);
+    }
+
+    public function testFailsWithStringPublicKeyAndAllowedAlgsGreaterThanOne()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('To have multiple allowed algorithms');
+
+        $testConfig = $this->verifyIdTokenMinimal;
+        $not_a_jwt = 'not a jot';
+        $o = new OAuth2($testConfig);
+        $o->setIdToken($not_a_jwt);
+        $o->verifyIdToken($this->publicKey, ['RS256', 'ES256']);
+    }
+
+    public function testFailsWithStringPublicKeyAndNoAllowedAlgs()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('When allowed algorithms is empty');
+
+        $testConfig = $this->verifyIdTokenMinimal;
+        $not_a_jwt = 'not a jot';
+        $o = new OAuth2($testConfig);
+        $o->setIdToken($not_a_jwt);
+        $o->verifyIdToken($this->publicKey, []);
+    }
+
+    public function testFailsWithStringInPublicKeyArrayAndNoAllowedAlgs()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('When allowed algorithms is empty');
+
+        $testConfig = $this->verifyIdTokenMinimal;
+        $not_a_jwt = 'not a jot';
+        $o = new OAuth2($testConfig);
+        $o->setIdToken($not_a_jwt);
+        $o->verifyIdToken([
+            new Key($this->publicKey, 'RS256'),
+            $this->publicKey,
+        ], []);
+    }
+
+    public function testFailsWithInvalidTypeForAllowedAlgs()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('allowed algorithms must be a string or array');
+
+        $testConfig = $this->verifyIdTokenMinimal;
+        $not_a_jwt = 'not a jot';
+        $o = new OAuth2($testConfig);
+        $o->setIdToken($not_a_jwt);
+        $o->verifyIdToken($this->publicKey, 123);
     }
 
     public function testShouldReturnAValidIdToken()
@@ -808,20 +1009,9 @@ class OAuth2VerifyIdTokenTest extends \PHPUnit_Framework_TestCase
         ];
         $o = new OAuth2($testConfig);
         $alg = 'RS256';
-        $jwtIdToken = $this->jwtEncode($origIdToken, $this->privateKey, $alg);
+        $jwtIdToken = JWT::encode($origIdToken, $this->privateKey, $alg);
         $o->setIdToken($jwtIdToken);
-        $roundTrip = $o->verifyIdToken($this->publicKey, array($alg));
+        $roundTrip = $o->verifyIdToken($this->publicKey, [$alg]);
         $this->assertEquals($origIdToken['aud'], $roundTrip->aud);
-    }
-
-    private function jwtEncode()
-    {
-        $args = func_get_args();
-        $class = 'JWT';
-        if (class_exists('Firebase\JWT\JWT')) {
-            $class = 'Firebase\JWT\JWT';
-        }
-
-        return call_user_func_array("$class::encode", $args);
     }
 }

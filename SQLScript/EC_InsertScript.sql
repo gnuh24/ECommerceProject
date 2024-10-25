@@ -57,130 +57,85 @@ INSERT INTO `Brand` (`BrandName`) VALUES
 
                     
 -- INSERT INTO Product	
-INSERT INTO `Product` (`Id`, `ProductName`, 						`Status`, 		`CreateTime`, 			`Image`, 											`Origin`, 		`Capacity`, 	`ABV`, 					`Description`, 					`BrandId`, `CategoryId`) VALUES
-						(1, 'HaKu Vodka', 							TRUE, 			'2024-07-03 10:00:00', 'SoftwareTestingProject/hakuvodka', 					'Japan',		 	700, 			40, 		 		'A smooth Japanese vodka.', 		2, 				2),
-						(2, 'HaNoi VodKa', 							TRUE, 			'2024-07-05 10:00:00', 'SoftwareTestingProject/hanoiVodka', 				'Vietnam', 			500, 			39, 		 		'Classic Vietnamese vodka.', 		3, 				2),
-						(3, 'Beluga Noble', 						TRUE, 			'2024-07-05 10:00:00', 'SoftwareTestingProject/belugaNoble', 				'Russia', 			700,			40, 		 		'Premium Russian vodka.', 			4, 				2),
-						(4, 'Grey Goose', 							TRUE, 			'2024-07-05 10:00:00', 'SoftwareTestingProject/greyGoose', 					'France', 			750, 			40, 				'French luxury vodka.', 			5, 				2),
-						(5, 'Beluga Allure', 						TRUE, 			'2024-07-05 10:00:00', 'SoftwareTestingProject/belugaAllure', 				'Russia', 			700, 			40, 		 		'Luxurious Russian vodka.', 		4, 				2),
-						(6, 'King Robert', 							FALSE, 			'2024-07-06 08:45:00', 'SoftwareTestingProject/kingRobert', 				'Scotland', 		750, 			43, 		 		'Strong Scottish vodka.', 			2, 				2),
-						(7, 'Smirnoff Red Vodka', 					TRUE, 			'2024-07-06 08:45:00', 'SoftwareTestingProject/smirnoffRedVodka', 			'USA', 				750, 			37, 				'Popular American vodka.',			5, 				2),
-						(8, 'Stolichnaya Vodka',					TRUE, 			'2024-07-06 08:45:00', 'SoftwareTestingProject/Stolichnaya', 				'Russia', 			700, 			38, 				'Famous Russian vodka.',			6, 				2),
-						(9, 'Vodka Danzka', 						TRUE, 			'2024-07-06 08:45:00', 'SoftwareTestingProject/vodkaDanzka', 				'Denmark', 			700, 			40, 				'Danish vodka.', 					7, 				2),
-						(10, "Glen'S Platinum", 					TRUE, 			'2024-07-06 08:45:00', 'SoftwareTestingProject/glenPlatinum', 				'Scotland', 		700,			40, 				'Scottish vodka.', 					8, 				2),
+INSERT INTO `Product` 
+(`Id`, `ProductName`,                  `Status`, `CreateTime`,              `Image`,                                        `Origin`,   `Capacity`,    `ABV`,   `Description`,               `BrandId`, `CategoryId`, `Quantity`,   `Price`,     `Percentage`) 
+VALUES
+(1,  'HaKu Vodka',                     TRUE,    '2024-07-03 10:00:00',     'SoftwareTestingProject/hakuvodka',             'Japan',        700,        40,     'A smooth Japanese vodka.',           2,          2,          100,        1000,          0),
+(2,  'HaNoi VodKa',                    TRUE,    '2024-07-05 10:00:00',     'SoftwareTestingProject/hanoiVodka',            'Vietnam',      500,        39,     'Classic Vietnamese vodka.',          3,          2,           50,      150000,          0),
+(3,  'Beluga Noble',                   TRUE,    '2024-07-05 10:00:00',     'SoftwareTestingProject/belugaNoble',           'Russia',       700,        40,     'Premium Russian vodka.',             4,          2,           75,      220000,          0),
+(4,  'Grey Goose',                     TRUE,    '2024-07-05 10:00:00',     'SoftwareTestingProject/greyGoose',             'France',       750,        40,     'French luxury vodka.',               5,          2,           90,      450000,          0),
+(5,  'Beluga Allure',                  TRUE,    '2024-07-05 10:00:00',     'SoftwareTestingProject/belugaAllure',          'Russia',       700,        40,     'Luxurious Russian vodka.',           4,          2,           60,      500000,          0),
+(6,  'King Robert',                    FALSE,   '2024-07-06 08:45:00',     'SoftwareTestingProject/kingRobert',            'Scotland',     750,        43,     'Strong Scottish vodka.',             2,          2,           30,       90000,          0),
+(7,  'Smirnoff Red Vodka',             TRUE,    '2024-07-06 08:45:00',     'SoftwareTestingProject/smirnoffRedVodka',      'USA',          750,        37,     'Popular American vodka.',            5,          2,          120,      200000,          0),
+(8,  'Stolichnaya Vodka',              TRUE,    '2024-07-06 08:45:00',     'SoftwareTestingProject/Stolichnaya',           'Russia',       700,        38,     'Famous Russian vodka.',              6,          2,          110,      175000,          0),
+(9,  'Vodka Danzka',                   TRUE,    '2024-07-06 08:45:00',     'SoftwareTestingProject/vodkaDanzka',           'Denmark',      700,        40,     'Danish vodka.',                      7,          2,          100,      230000,          0),
+(10, "Glen'S Platinum",                TRUE,    '2024-07-06 08:45:00',     'SoftwareTestingProject/glenPlatinum',          'Scotland',     700,        40,     'Scottish vodka.',                    8,          2,           85,      320000,          0),
+(12, 'Don Julio 1942',                 TRUE,    '2024-07-06 09:50:00',     'SoftwareTestingProject/donJulio',              'Mexico',       750,        40,     'Luxury Añejo Tequila.',              10,         3,           70,      750000,          0),
+(13, 'Patrón Silver',                  TRUE,    '2024-07-06 09:50:00',     'SoftwareTestingProject/patronSilver',          'Mexico',       750,        40,     'Smooth Silver Tequila.',             11,         3,           60,      600000,          0),
+(14, 'Maestro Dobel Diamante',         FALSE,   '2024-07-06 09:50:00',     'SoftwareTestingProject/maestroDobel',          'Mexico',       750,        40,     'Premium Cristalino Tequila.',        12,         3,           55,      900000,          0),
+(15, 'Gran Centenario Plata',          TRUE,    '2024-07-06 09:50:00',     'SoftwareTestingProject/granCentenario',        'Mexico',       750,        40,     'Smooth Plata Tequila.',              13,         3,           80,      500000,          0),
+(16, 'Tequila 1800 Añejo',             TRUE,    '2024-07-07 10:30:00',     'SoftwareTestingProject/tequila1800Anejo',      'Mexico',       750,        40,     'Aged Añejo Tequila.',                14,         3,           90,      550000,          0),
+(17, 'Tequila Clase Azul Plata',       TRUE,    '2024-07-07 10:30:00',     'SoftwareTestingProject/tequilaClaseAzuiPlata', 'Mexico',       750,        40,     'Premium Plata Tequila.',             9,          3,           65,      670000,          0),
+(18, 'Don Julio Blanco',               TRUE,    '2024-07-07 10:30:00',     'SoftwareTestingProject/donJulioBlanco',        'Mexico',       750,        40,     'Smooth Blanco Tequila.',             10,         3,           70,      590000,          0),
+(19, 'Patrón Añejo',                   TRUE,    '2024-07-07 10:30:00',     'SoftwareTestingProject/patronAnejo',           'Mexico',       750,        40,     'Rich Añejo Tequila.',                11,         3,           60,      730000,          0),
+(20, 'Tequila 1800 Silver',            TRUE,    '2024-07-07 10:30:00',     'SoftwareTestingProject/Tequila1800Silver',     'Mexico',       750,        40,     'Popular Silver Tequila.',            14,         3,           75,      470000,          0),
 
-						-- Tequila products
-						(11, 'Tequila Clase Azul Reposado', 		TRUE, 			'2024-07-06 09:50:00', 'SoftwareTestingProject/tequilaClaseAzuiReposado', 	'Mexico', 			750,			40, 				'Premium Reposado Tequila.', 		9, 				3),
-						(12, 'Don Julio 1942', 						TRUE, 			'2024-07-06 09:50:00', 'SoftwareTestingProject/donJulio', 					'Mexico', 			750, 			40, 				'Luxury Añejo Tequila.', 			10, 			3),
-						(13, 'Patrón Silver', 						TRUE, 			'2024-07-06 09:50:00', 'SoftwareTestingProject/patronSilver',				'Mexico',			750, 			40, 				'Smooth Silver Tequila.', 			11, 			3),
-						(14, 'Maestro Dobel Diamante', 				FALSE, 			'2024-07-06 09:50:00', 'SoftwareTestingProject/maestroDobel', 		 		'Mexico', 			750,			40, 				'Premium Cristalino Tequila.', 		12, 			3),
-						(15, 'Gran Centenario Plata', 				TRUE, 			'2024-07-06 09:50:00', 'SoftwareTestingProject/granCentenario', 			'Mexico', 			750, 			40, 		 		'Smooth Plata Tequila.', 			13, 			3),
-						(16, 'Tequila 1800 Añejo', 					TRUE, 			'2024-07-07 10:30:00', 'SoftwareTestingProject/tequila1800Anejo', 			'Mexico', 			750, 			40, 		 		'Aged Añejo Tequila.', 				14, 			3),
-						(17, 'Tequila Clase Azul Plata', 			TRUE, 			'2024-07-07 10:30:00', 'SoftwareTestingProject/tequilaClaseAzuiPlata', 		'Mexico', 			750, 			40, 			 	'Premium Plata Tequila.', 			9, 				3),
-						(18, 'Don Julio Blanco', 					TRUE, 			'2024-07-07 10:30:00', 'SoftwareTestingProject/donJulioBlanco', 			'Mexico', 			750, 			40, 		 		'Smooth Blanco Tequila.', 			10, 			3),
-						(19, 'Patrón Añejo', 						TRUE, 			'2024-07-07 10:30:00', 'SoftwareTestingProject/patronAnejo',				'Mexico', 			750, 			40, 				'Rich Añejo Tequila.', 				11, 			3),
-						(20, 'Tequila 1800 Silver', 				TRUE, 			'2024-07-07 10:30:00', 'SoftwareTestingProject/Tequila1800Silver',			'Mexico', 			750, 			40, 				'Popular Silver Tequila.', 			14, 			3),
+-- Wishkey products from Johnnie Walker
+(21, 'Johnnie Walker Red Label',       TRUE,    '2024-07-08 11:15:00',     'SoftwareTestingProject/johnnieWalkerRed',      'Scotland',     750,        40,     'Iconic Red Label Wishkey.',          15,         4,           90,      400000,          0),
+(22, 'Johnnie Walker Black Label',     TRUE,    '2024-07-08 11:15:00',     'SoftwareTestingProject/johnnieWalkerBlack',    'Scotland',     750,        40,     'Classic Black Label Wishkey.',       15,         4,           85,      500000,          0),
+(23, 'Johnnie Walker Double Black',    TRUE,    '2024-07-08 11:15:00',     'SoftwareTestingProject/johnnieWalkerDoubleBlack','Scotland',    750,        40,     'Smokier Double Black Wishkey.',      15,         4,           70,      550000,          0),
+(24, 'Johnnie Walker Gold Label Reserve',FALSE, '2024-07-08 11:15:00',     'SoftwareTestingProject/johnnieWalkerGold',     'Scotland',     750,        40,     'Luxurious Gold Label Wishkey.',      15,         4,           50,      700000,          0),
+(25, 'Johnnie Walker Green Label',     TRUE,    '2024-07-08 11:15:00',     'SoftwareTestingProject/johnnieWalkerGreen',    'Scotland',     750,        40,     'Smooth Green Label Wishkey.',        15,         4,          100,      600000,          0),
+(26, 'Johnnie Walker Platinum Label',  TRUE,    '2024-07-09 09:00:00',     'SoftwareTestingProject/johnnieWalkerPlatinum', 'Scotland',     750,        40,     'Exclusive Platinum Label Wishkey.',	15,         4,           45,    1200000,          0),
+(27, 'Johnnie Walker Blue Label',      TRUE,    '2024-07-09 09:00:00',     'SoftwareTestingProject/johnnieWalkerBlue',     'Scotland',     750,        40,     'Rare Blue Label Wishkey.',          15,         4,           40,    2500000,          0),
+(28, 'Johnnie Walker Gold Label 18',   FALSE,   '2024-07-09 09:00:00',     'SoftwareTestingProject/johnnieWalkerGold18',   'Scotland',     750,        40,     'Aged 18 Years Wishkey.',            15,         4,           30,     900000,          0),
+(29, 'Johnnie Walker Green Label 15',  TRUE,    '2024-07-09 09:00:00',     'SoftwareTestingProject/johnnieWalkerGreen15',  'Scotland',     750,        40,     '15-Year-Old Wishkey.',              15,         4,           70,     850000,          0),
+(30, 'Johnnie Walker King George V',   TRUE,    '2024-07-09 09:00:00',     'SoftwareTestingProject/kingGeorgeV',           'Scotland',     750,        40,     'Exclusive King George V Wishkey.',  15,         4,           90,    6000000,          0);				
 
-						-- Wishkey products from Johnnie Walker
-						(21, 'Johnnie Walker Red Label', 			TRUE, 			'2024-07-08 11:15:00', 'SoftwareTestingProject/johnnieWalkerRed', 		 	'Scotland', 		750, 			40, 				'Iconic Red Label Wishkey.', 		15, 			4),
-						(22, 'Johnnie Walker Black Label', 			TRUE, 			'2024-07-08 11:15:00', 'SoftwareTestingProject/johnnieWalkerBlack', 		'Scotland', 		750, 			40, 				'Classic Black Label Wishkey.', 	15, 			4),
-						(23, 'Johnnie Walker Double Black', 		TRUE, 			'2024-07-08 11:15:00', 'SoftwareTestingProject/johnnieWalkerDoubleBlack', 	'Scotland', 		750, 			40, 				'Smokier Double Black Wishkey.', 	15, 			4),
-						(24, 'Johnnie Walker Gold Label Reserve', 	FALSE, 			'2024-07-08 11:15:00', 'SoftwareTestingProject/johnnieWalkerGold', 			'Scotland', 		750, 			40, 				'Luxurious Gold Label Wishkey.', 	15, 			4),
-						(25, 'Johnnie Walker Green Label', 			TRUE, 			'2024-07-08 11:15:00', 'SoftwareTestingProject/johnnieWalkerGreen',			'Scotland', 		750, 			40, 				'Smooth Green Label Wishkey.', 		15, 			4),
-						(26, 'Johnnie Walker Platinum Label', 		TRUE, 			'2024-07-09 09:00:00', 'SoftwareTestingProject/johnnieWalkerPlatinum', 		'Scotland', 		750,			40, 				'Exclusive Platinum Label Wishkey.',15, 			4),
-						(27, 'Johnnie Walker Blue Label', 			TRUE, 			'2024-07-09 09:00:00', 'SoftwareTestingProject/johnnieWalkerBlue', 			'Scotland', 		750, 			40, 				'Rare Blue Label Wishkey.', 		15, 			4),
-						(28, 'Johnnie Walker Gold Label 18', 		FALSE,			'2024-07-09 09:00:00', 'SoftwareTestingProject/johnnieWalkerGold18', 		'Scotland', 		750, 			40, 				'Aged 18 Years Wishkey.', 			15, 			4),
-						(29, 'Johnnie Walker Green Label 15', 		TRUE, 			'2024-07-09 09:00:00', 'SoftwareTestingProject/johnnieWalkerGreen15', 		'Scotland', 		750,			40, 				'15-Year-Old Wishkey.', 			15, 			4),
-						(30, 'Johnnie Walker King George V',		TRUE, 			'2024-07-09 09:00:00', 'SoftwareTestingProject/kingGeorgeV', 	 			'Scotland', 		750,			40, 				'Exclusive King George V Wishkey.', 15, 			4);
-											
-                    
-			
--- Inserting 30 rows into the Batch table
-INSERT INTO `Batch` (`UnitPrice`,       `Quantity`,     `ReceivingTime`, `ProductId`) VALUES
-                    (180000,                95,        '2024-07-03 11:00:00', 1),
-
-					(210000,                97,        '2024-07-05 10:00:00', 2),
-					(360000,                27,         '2024-07-05 10:00:00', 3),
-					(450000,                6,         '2024-07-05 10:00:00', 4),
-					(520000,                9,         '2024-07-05 10:00:00', 5),
-
-					(144000,                50,         '2024-07-05 11:00:00', 1),
+INSERT INTO `Voucher` (`ExpirationTime`, `Code`, `Condition`, `SaleAmount`, `IsPublic`) VALUES
+	('2025-12-31 23:59:59', 'VOUCHER100K', 100000, 100000, TRUE),
+	('2025-12-31 23:59:59', 'VOUCHER200K', 200000, 200000, TRUE),
+	('2025-12-31 23:59:59', 'VOUCHER300K', 300000, 300000, TRUE),
+	('2025-12-31 23:59:59', 'VOUCHER500K', 500000, 500000, TRUE),
+	('2025-12-31 23:59:59', 'VOUCHER1M', 1000000, 1000000, TRUE);
 
 
-					(2310000,               22,         '2024-07-06 08:45:00', 6),
-					(1050000,               44,         '2024-07-06 08:45:00', 7),
-					(1500000,               37,         '2024-07-06 08:45:00', 8),
-					(1210000,               21,         '2024-07-06 08:45:00', 9),
-					(1210000,               29,         '2024-07-06 08:45:00', 10),
+INSERT INTO `Order` (`Id`, 			`OrderTime`, 			`TotalPrice`, 	`Note`, 								`AccountId`, `Payment`, 	`isPaid`, 	`VoucherId`) VALUES
+					('ORD00000001', '2024-07-01 08:30:00',  570000, 		'Urgent delivery', 						3, 			'COD', 		FALSE, 		1),
+					('ORD00000002', '2024-07-01 09:00:00',  1710000, 		'Gift wrap the items', 					3, 			'VNPAY', 	TRUE, 		2),					
+					('ORD00000003', '2024-07-01 10:30:00',  3350000, 		'Include a thank you note', 			3, 			'COD', 		FALSE, 		3),
+					('ORD00000004', '2024-07-01 11:00:00',  3600000, 		'Deliver before 6 PM', 					3, 			'VNPAY', 	TRUE, 		4),
+					('ORD00000005', '2024-07-02 08:00:00',  7260000, 		'Contact customer before delivery', 	3, 			'COD', 		FALSE, 		5),
 					
-					-- Tequila products
-					(880000,                18,         '2024-07-06 09:50:00', 11),
-					(1100000,               16,         '2024-07-06 09:50:00', 12),
-					(770000,                23,         '2024-07-06 09:50:00', 13),
-					(990000,                18,         '2024-07-06 09:50:00', 14),
-					(660000,                18,         '2024-07-06 09:50:00', 15),
+					('ORD00000006', '2024-07-02 09:30:00',  3080000, 		'Handle with care', 					3, 			'VNPAY', 	TRUE, 		2),
+					('ORD00000007', '2024-07-02 11:00:00',  1760000, 		'Leave at reception', 					3, 			'COD', 		FALSE, 		1),
+					('ORD00000008', '2024-07-03 08:15:00',  1760000, 		'Include gift note', 					3, 			'VNPAY', 	TRUE, 		3),
+					('ORD00000009', '2024-07-03 10:00:00',  1870000, 		'Call before delivery', 				3, 			'COD', 		FALSE, 		4),
+					('ORD00000010', '2024-07-03 11:30:00',  770000, 		'Pack items separately', 				3, 			'VNPAY', 	TRUE, 		5),
 
-					(1100000,               8,         '2024-07-07 10:30:00', 16),
-					(880000,                8,         '2024-07-07 10:30:00', 17),
-					(990000,                8,         '2024-07-07 10:30:00', 18),
-					(1100000,               8,         '2024-07-07 10:30:00', 19),
-					(660000,                8,         '2024-07-07 10:30:00', 20),
+					('ORD00000011', '2024-07-08 09:00:00',  1100000, 		'Delivery after 5 PM.', 				6, 			'COD', 		FALSE, 		1),
+					('ORD00000012', '2024-07-08 10:30:00',  1760000, 		'Include a thank you note.', 			6, 			'VNPAY', 	TRUE, 		2),
+					('ORD00000013', '2024-07-08 11:45:00',  1980000, 		'Deliver to the address on file.', 		7, 			'COD', 		FALSE, 		3),
+					('ORD00000014', '2024-07-09 08:30:00',  3300000, 		'No rush delivery.', 					7, 			'VNPAY', 	TRUE, 		4),
+					('ORD00000015', '2024-07-09 09:45:00',  4400000, 		'Contact customer before delivery.', 	7, 			'COD', 		FALSE, 		5),
 					
-					-- Whisky products from Johnnie Walker
-					(440000,                49,         '2024-07-08 11:15:00', 21),
-					(660000,                39,         '2024-07-08 11:15:00', 22),
-					(770000,                29,         '2024-07-08 11:15:00', 23),
-					(990000,                19,         '2024-07-08 11:15:00', 24),
-					(880000,                9,         '2024-07-08 11:15:00', 25),
+					('ORD00000016', '2024-07-09 11:00:00',  390000, 		'Gift wrap the items.', 				8, 			'VNPAY', 	TRUE, 		2),
+					('ORD00000017', '2024-07-10 08:00:00',  1710000,		'Deliver before noon.', 				8, 			'COD', 		FALSE, 		1),
+					('ORD00000018', '2024-07-10 09:30:00',  3350000, 		'Leave at the office reception.', 		9, 			'VNPAY', 	TRUE, 		3),
+					('ORD00000019', '2024-07-10 11:15:00',  3600000, 		'Include a personalized message.', 		10, 		'COD', 		FALSE, 		4),
+					('ORD00000020', '2024-07-11 09:00:00',  7260000, 		'Check if the customer is home.', 		3, 			'VNPAY', 	TRUE, 		5),
 
-					(1100000,               9,         '2024-07-09 09:00:00', 26),
-					(2200000,               9,         '2024-07-09 09:00:00', 27),
-					(1100000,               9,         '2024-07-09 09:00:00', 28),
-					(1100000,               9,         '2024-07-09 09:00:00', 29),
-					(3300000,               9,         '2024-07-09 09:00:00', 30),
-
-					(330000,               10,         '2024-08-10 10:20:00', 3),
-                    (440000,               10,         '2024-08-12 11:45:00', 4);
-
-
--- Insert additional sample data into the `Order` table without `Paid` and `PaymentOption`
-INSERT INTO `Order` (`Id`, 			`OrderTime`, 			`TotalPrice`, 	`Note`, 					`AccountId`) VALUES
-					('ORD00000001', '2024-07-01 08:30:00', 570000, 			'Urgent delivery', 						3),
-					('ORD00000002', '2024-07-01 09:00:00', 1710000, 		'Gift wrap the items', 					3),					
-					('ORD00000003', '2024-07-01 10:30:00', 3350000, 		'Include a thank you note', 			3),
-					('ORD00000004', '2024-07-01 11:00:00', 3600000, 		'Deliver before 6 PM', 					3),
-					('ORD00000005', '2024-07-02 08:00:00', 7260000, 		'Contact customer before delivery', 	3),
+					('ORD00000021', '2024-07-11 10:30:00',  570000, 		'Gift item should be packed separately.', 3, 		'COD', 		FALSE, 		2),
+					('ORD00000022', '2024-07-11 11:45:00',  1710000, 		'Deliver after 6 PM.', 					2, 			'VNPAY', 	TRUE, 		1),
+					('ORD00000023', '2024-07-12 08:30:00',  3350000, 		'Include a thank you note.', 			6, 			'COD', 		FALSE, 		3),
+					('ORD00000024', '2024-07-12 09:45:00',  3600000, 		'Call before delivery.',				9, 			'VNPAY', 	TRUE, 		4),
+					('ORD00000025', '2024-07-12 11:00:00',  7260000, 		'Deliver to the alternate address.', 	3, 			'COD', 		FALSE, 		5),
 					
-					('ORD00000006', '2024-07-02 09:30:00', 3080000, 		'Handle with care', 					3),
-					('ORD00000007', '2024-07-02 11:00:00', 1760000, 		'Leave at reception', 					3),
-					('ORD00000008', '2024-07-03 08:15:00', 1760000, 		'Include gift note', 					3),
-					('ORD00000009', '2024-07-03 10:00:00', 1870000, 		'Call before delivery', 				3),
-					('ORD00000010', '2024-07-03 11:30:00', 770000, 			'Pack items separately', 				3),
-
-					('ORD00000011', '2024-07-08 09:00:00', 1100000, 		'Delivery after 5 PM.', 				6),
-					('ORD00000012', '2024-07-08 10:30:00', 1760000, 		'Include a thank you note.', 			6),
-					('ORD00000013', '2024-07-08 11:45:00', 1980000, 		'Deliver to the address on file.', 		7),
-					('ORD00000014', '2024-07-09 08:30:00', 3300000, 		'No rush delivery.', 					7),
-					('ORD00000015', '2024-07-09 09:45:00', 4400000, 		'Contact customer before delivery.', 	7),
-					
-					('ORD00000016', '2024-07-09 11:00:00', 390000, 			'Gift wrap the items.', 				8),
-					('ORD00000017', '2024-07-10 08:00:00', 1710000,			'Deliver before noon.', 				8),
-					('ORD00000018', '2024-07-10 09:30:00', 3350000, 		'Leave at the office reception.', 		9),
-					('ORD00000019', '2024-07-10 11:15:00', 3600000, 		'Include a personalized message.', 		10),
-					('ORD00000020', '2024-07-11 09:00:00', 7260000, 		'Check if the customer is home.', 		3),
-
-					('ORD00000021', '2024-07-11 10:30:00', 570000, 		'Gift item should be packed separately.', 	3),
-					('ORD00000022', '2024-07-11 11:45:00', 1710000, 		'Deliver after 6 PM.', 						2),
-					('ORD00000023', '2024-07-12 08:30:00', 3350000, 			'Include a thank you note.', 				6),
-					('ORD00000024', '2024-07-12 09:45:00', 3600000, 		'Call before delivery.',					9),
-					('ORD00000025', '2024-07-12 11:00:00', 7260000, 		'Deliver to the alternate address.', 		3),
-					
-					('ORD00000026', '2024-07-13 08:00:00', 3080000, 		'Ensure timely delivery.', 					2),
-					('ORD00000027', '2024-07-13 09:30:00', 1760000, 		'No special instructions.', 				3),
-					('ORD00000028', '2024-07-13 11:15:00', 1760000, 		'Contact customer to confirm delivery.', 	1),
-					('ORD00000029', '2024-07-14 08:00:00', 1870000, 		'Deliver before noon.', 					2),
-					('ORD00000030', '2024-07-14 09:30:00', 770000, 		'Pack items carefully.', 					3);
-
+					('ORD00000026', '2024-07-13 08:00:00',  3080000, 		'Ensure timely delivery.', 				2, 			'VNPAY', 	TRUE, 		2),
+					('ORD00000027', '2024-07-13 09:30:00',  1760000, 		'No special instructions.', 			3, 			'COD', 		FALSE, 		1),
+					('ORD00000028', '2024-07-13 11:15:00',  1760000, 		'Contact customer to confirm delivery.', 1, 		'VNPAY', 	TRUE, 		3),
+					('ORD00000029', '2024-07-14 08:00:00',  1870000, 		'Deliver before noon.', 				2, 			'COD', 		FALSE, 		4),
+					('ORD00000030', '2024-07-14 09:30:00',  770000, 		'Pack items carefully.', 				3, 			'VNPAY', 	TRUE, 		5);
 
 -- Insert additional sample data into the `OrderStatus` table
 INSERT INTO `OrderStatus` 		(`OrderId`, 	`Status`, 			`UpdateTime`) VALUES
@@ -427,67 +382,6 @@ INSERT INTO `OrderDetail` 	(`OrderId`, 	         `ProductId`,    `Quantity`, `Un
 							('ORD00000030',                 20,             1,          660000, 660000);
 
 
-
-
--- Insert sample data into the InventoryReport table with specific CreateTime values
-INSERT INTO `InventoryReport`   (`CreateTime`,          `Supplier`,             `SupplierPhone`,    `TotalPrice`) VALUES
-								('2024-07-03 11:00:00', 'Supplier A',           '0912345678',         15000000),
-								('2024-07-05 10:00:00', 'Supplier B',           '0987654321',         38125000),
-								('2024-07-05 11:00:00', 'Supplier C',           '0923456789',          6000000),
-								('2024-07-06 08:45:00', 'Supplier D',           '0934567890',        197750000),
-								('2024-07-06 09:50:00', 'Supplier E',           '0945678901',         93500000),
-								('2024-07-07 10:30:00', 'Supplier F',           '0956789012',         43000000),
-								('2024-07-08 11:15:00', 'Supplier G',           '0967890123',         91000000),
-								('2024-07-09 09:00:00', 'Supplier H',           '0978901234',         80000000),
-								('2024-08-10 10:20:00', 'Supplier I',           '0989012345',         3000000),
-								('2024-08-12 11:45:00', 'Supplier J',           '0990123456',         4000000);
-
-                                    
-INSERT INTO `InventoryReportDetail` (`InventoryReportId`,   `ProductId`, `Quantity`, `UnitPrice`,   `Profit`,       `Total`) VALUES
-									(                   1,           1,        100,      150000,         20,         15000000),
-
-									(                   2,          2,         100,      175000,         20,         17500000),
-									(                   2,          3,          30,      300000,         20,         9000000),
-									(                   2,          4,          15,      375000,         20,         5625000),
-									(                   2,          5,          15,      400000,         30,         6000000),
-
-
-									(                   3,          1,          50,      120000,         20,         6000000),
-
-
-									(                   4,          6,          25,      1650000,        40,         41250000),
-									(                   4,          7,          50,      700000,         50,         35000000),
-									(                   4,          8,          40,      1250000,        20,         50000000),
-									(                   4,          9,          30,      1100000,        10,         33000000),
-									(                   4,         10,          35,      1100000,        10,         38500000),
-
-                                    (                   5,         11,          20,      800000,         10,         16000000),
-									(                   5,         12,          20,      1000000,        10,         20000000),
-									(                   5,         13,          25,      700000,         10,         17500000),
-									(                   5,         14,          20,      900000,         10,         18000000),
-									(                   5,         15,          20,      600000,         10,         12000000),
-
-                                    (                   6,         16,          10,      1000000,        10,         10000000),
-									(                   6,         17,          10,      800000,         10,         8000000),
-									(                   6,         18,          10,      900000,         10,         9000000),
-									(                   6,         19,          10,      1000000,        10,         10000000),
-									(                   6,         20,          10,      600000,         10,         6000000),
-
-                                    (                   7,         21,          50,      400000,         10,         20000000),
-									(                   7,         22,          40,      600000,         10,         24000000),
-									(                   7,         23,          30,      700000,         10,         21000000),
-									(                   7,         24,          20,      900000,         10,         18000000),
-									(                   7,         25,          10,      800000,         10,         8000000),
-
-                                    (                   8,         26,          10,      1000000,         10,         10000000),
-									(                   8,         27,          10,      2000000,         10,         20000000),
-									(                   8,         28,          10,      1000000,         10,         10000000),
-									(                   8,         29,          10,      1000000,         10,         10000000),
-									(                   8,         30,          10,      3000000,         10,         30000000),
-
-                                    (                   9,         3,          10,     300000,         10,          30000000),
-
-									(                  10,         4,          10,      400000,         10,         40000000);
 
 
 

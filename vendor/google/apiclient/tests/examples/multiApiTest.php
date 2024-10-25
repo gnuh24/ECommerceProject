@@ -19,16 +19,20 @@
  * under the License.
  */
 
-class examples_multiApiTest extends BaseTest
+namespace Google\Tests\Examples;
+
+use Google\Tests\BaseTest;
+
+class multiApiTest extends BaseTest
 {
-  public function testMultiApi()
-  {
-    $this->checkKey();
+    public function testMultiApi()
+    {
+        $this->checkKey();
 
-    $crawler = $this->loadExample('multi-api.php');
+        $crawler = $this->loadExample('multi-api.php');
 
-    $nodes = $crawler->filter('h1');
-    $this->assertEquals(1, count($nodes));
-    $this->assertEquals('User Query - Multiple APIs', $nodes->first()->text());
-  }
+        $nodes = $crawler->filter('h1');
+        $this->assertCount(1, $nodes);
+        $this->assertEquals('User Query - Multiple APIs', $nodes->first()->text());
+    }
 }

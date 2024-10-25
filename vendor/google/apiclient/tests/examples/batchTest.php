@@ -19,17 +19,21 @@
  * under the License.
  */
 
-class examples_batchTest extends BaseTest
+namespace Google\Tests\Examples;
+
+use Google\Tests\BaseTest;
+
+class batchTest extends BaseTest
 {
-  public function testBatch()
-  {
-    $this->checkKey();
+    public function testBatch()
+    {
+        $this->checkKey();
 
-    $crawler = $this->loadExample('batch.php');
+        $crawler = $this->loadExample('batch.php');
 
-    $nodes = $crawler->filter('br');
-    $this->assertEquals(20, count($nodes));
-    $this->assertContains('Life of Henry David Thoreau', $crawler->text());
-    $this->assertContains('George Bernard Shaw His Life and Works', $crawler->text());
-  }
+        $nodes = $crawler->filter('br');
+        $this->assertCount(20, $nodes);
+        $this->assertContains('Walden', $crawler->text());
+        $this->assertContains('George Bernard Shaw', $crawler->text());
+    }
 }

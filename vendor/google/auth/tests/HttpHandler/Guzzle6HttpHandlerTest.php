@@ -15,36 +15,54 @@
  * limitations under the License.
  */
 
-namespace Google\Auth\Tests;
+namespace Google\Auth\Tests\HttpHandler;
 
 use Google\Auth\HttpHandler\Guzzle6HttpHandler;
+use Google\Auth\Tests\BaseTest;
+use GuzzleHttp\Promise\FulfilledPromise;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
+/**
+ * @group http-handler
+ */
 class Guzzle6HttpHandlerTest extends BaseTest
 {
-    public function setUp()
+    protected $client;
+    protected $handler;
+
+    public function setUp(): void
     {
         $this->onlyGuzzle6();
 
-        $this->mockRequest =
-            $this
-                ->getMockBuilder('Psr\Http\Message\RequestInterface')
-                ->getMock();
-        $this->mockClient =
-            $this
-                ->getMockBuilder('GuzzleHttp\Client')
-                ->getMock();
+        $this->client = $this->prophesize('GuzzleHttp\ClientInterface');
+        $this->handler = new Guzzle6HttpHandler($this->client->reveal());
     }
 
     public function testSuccessfullySendsRequest()
     {
-        $this->mockClient
-            ->expects($this->any())
-            ->method('send')
-            ->will($this->returnValue(new Response(200)));
+        $request = new Request('GET', 'https://domain.tld');
+        $options = ['key' => 'value'];
+        $response = new Response(200);
 
-        $handler = new Guzzle6HttpHandler($this->mockClient);
-        $response = $handler($this->mockRequest);
-        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $response);
+        $this->client->send($request, $options)->willReturn($response);
+
+        $handler = $this->handler;
+
+        $this->assertSame($response, $handler($request, $options));
+    }
+
+    public function testSuccessfullySendsRequestAsync()
+    {
+        $request = new Request('GET', 'https://domain.tld');
+        $options = ['key' => 'value'];
+        $response = new Response(200);
+        $promise = new FulfilledPromise($response);
+
+        $this->client->sendAsync($request, $options)->willReturn($promise);
+
+        $handler = $this->handler;
+
+        $this->assertSame($response, $handler->async($request, $options)->wait());
     }
 }

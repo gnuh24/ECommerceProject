@@ -15,127 +15,128 @@
  * limitations under the License.
  */
 
+namespace Google\Tests\Http;
+
+use Google\Http\REST;
+use Google\Service\Exception as ServiceException;
+use Google\Tests\BaseTest;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
-class Google_HTTP_RESTTest extends BaseTest
+class RESTTest extends BaseTest
 {
-  /**
-   * @var Google_Http_REST $rest
-   */
-  private $rest;
+    /**
+     * @var REST $rest
+     */
+    private $rest;
 
-  public function setUp()
-  {
-    $this->rest = new Google_Http_REST();
-    $this->request = new Request('GET', '/');
-  }
-
-  public function testDecodeResponse()
-  {
-    $client = $this->getClient();
-    $response = new Response(204);
-    $decoded = $this->rest->decodeHttpResponse($response, $this->request);
-    $this->assertEquals($response, $decoded);
-
-    foreach (array(200, 201) as $code) {
-      $headers = array('foo', 'bar');
-      $stream = Psr7\stream_for('{"a": 1}');
-      $response = new Response($code, $headers, $stream);
-
-      $decoded = $this->rest->decodeHttpResponse($response, $this->request);
-      $this->assertEquals('{"a": 1}', (string) $decoded->getBody());
+    public function set_up()
+    {
+        $this->rest = new REST();
+        $this->request = new Request('GET', '/');
     }
-  }
 
-  public function testDecodeMediaResponse()
-  {
-    $client = $this->getClient();
+    public function testDecodeResponse()
+    {
+        $client = $this->getClient();
+        $response = new Response(204);
+        $decoded = $this->rest->decodeHttpResponse($response, $this->request);
+        $this->assertEquals($response, $decoded);
 
-    $request =  new Request('GET', 'http://www.example.com?alt=media');
-    $headers = array();
-    $stream = Psr7\stream_for('thisisnotvalidjson');
-    $response = new Response(200, $headers, $stream);
+        foreach ([200, 201] as $code) {
+            $headers = ['foo', 'bar'];
+            $stream = Psr7\Utils::streamFor('{"a": 1}');
+            $response = new Response($code, $headers, $stream);
 
-    $decoded = $this->rest->decodeHttpResponse($response, $request);
-    $this->assertEquals('thisisnotvalidjson', (string) $decoded->getBody());
-  }
+            $decoded = $this->rest->decodeHttpResponse($response, $this->request);
+            $this->assertEquals('{"a": 1}', (string) $decoded->getBody());
+        }
+    }
+
+    public function testDecodeMediaResponse()
+    {
+        $client = $this->getClient();
+
+        $request =  new Request('GET', 'http://www.example.com?alt=media');
+        $headers = [];
+        $stream = Psr7\Utils::streamFor('thisisnotvalidjson');
+        $response = new Response(200, $headers, $stream);
+
+        $decoded = $this->rest->decodeHttpResponse($response, $request);
+        $this->assertEquals('thisisnotvalidjson', (string) $decoded->getBody());
+    }
 
 
-  /** @expectedException Google_Service_Exception */
-  public function testDecode500ResponseThrowsException()
-  {
-    $response = new Response(500);
-    $this->rest->decodeHttpResponse($response, $this->request);
-  }
+    public function testDecode500ResponseThrowsException()
+    {
+        $this->expectException(ServiceException::class);
+        $response = new Response(500);
+        $this->rest->decodeHttpResponse($response, $this->request);
+    }
 
-  /** @expectedException Google_Service_Exception */
-  public function testExceptionResponse()
-  {
-    $http = new GuzzleHttp\Client();
+    public function testExceptionResponse()
+    {
+        $this->expectException(ServiceException::class);
+        $http = new GuzzleClient();
 
-    $request = new Request('GET', 'http://httpbin.org/status/500');
-    $response = $this->rest->doExecute($http, $request);
-  }
+        $request = new Request('GET', 'http://httpbin.org/status/500');
+        $response = $this->rest->doExecute($http, $request);
+    }
 
-  public function testDecodeEmptyResponse()
-  {
-    $stream = Psr7\stream_for('{}');
-    $response = new Response(200, array(), $stream);
-    $decoded = $this->rest->decodeHttpResponse($response, $this->request);
-    $this->assertEquals('{}', (string) $decoded->getBody());
-  }
+    public function testDecodeEmptyResponse()
+    {
+        $stream = Psr7\Utils::streamFor('{}');
+        $response = new Response(200, [], $stream);
+        $decoded = $this->rest->decodeHttpResponse($response, $this->request);
+        $this->assertEquals('{}', (string) $decoded->getBody());
+    }
 
-  /**
-   * @expectedException Google_Service_Exception
-   */
-  public function testBadErrorFormatting()
-  {
-    $stream = Psr7\stream_for(
-        '{
-         "error": {
-          "code": 500,
-          "message": null
-         }
-        }'
-    );
-    $response = new Response(500, array(), $stream);
-    $this->rest->decodeHttpResponse($response, $this->request);
-  }
+    public function testBadErrorFormatting()
+    {
+        $this->expectException(ServiceException::class);
+        $stream = Psr7\Utils::streamFor(
+            '{
+                "error": {
+                    "code": 500,
+                    "message": null
+                }
+            }'
+        );
+        $response = new Response(500, [], $stream);
+        $this->rest->decodeHttpResponse($response, $this->request);
+    }
 
-  /**
-   * @expectedException Google_Service_Exception
-   */
-  public function tesProperErrorFormatting()
-  {
-    $stream = Psr7\stream_for(
-        '{
-          error: {
-           errors: [
-            {
-             "domain": "global",
-             "reason": "authError",
-             "message": "Invalid Credentials",
-             "locationType": "header",
-             "location": "Authorization",
-            }
-           ],
-          "code": 401,
-          "message": "Invalid Credentials"
-        }'
-    );
-    $response = new Response(401, array(), $stream);
-    $this->rest->decodeHttpResponse($response, $this->request);
-  }
+    public function tesProperErrorFormatting()
+    {
+        $this->expectException(ServiceException::class);
+        $stream = Psr7\Utils::streamFor(
+            '{
+                error: {
+                    errors: [
+                        {
+                            "domain": "global",
+                            "reason": "authError",
+                            "message": "Invalid Credentials",
+                            "locationType": "header",
+                            "location": "Authorization",
+                        }
+                    ],
+                    "code": 401,
+                    "message": "Invalid Credentials"
+                }
+            }'
+        );
+        $response = new Response(401, [], $stream);
+        $this->rest->decodeHttpResponse($response, $this->request);
+    }
 
-  /**
-   * @expectedException Google_Service_Exception
-   */
-  public function testNotJson404Error()
-  {
-    $stream = Psr7\stream_for('Not Found');
-    $response = new Response(404, array(), $stream);
-    $this->rest->decodeHttpResponse($response, $this->request);
-  }
+    public function testNotJson404Error()
+    {
+        $this->expectException(ServiceException::class);
+        $stream = Psr7\Utils::streamFor('Not Found');
+        $response = new Response(404, [], $stream);
+        $this->rest->decodeHttpResponse($response, $this->request);
+    }
 }

@@ -1,40 +1,37 @@
 <?php
+
 namespace GuzzleHttp\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\NoSeekStream;
 
 /**
  * @covers GuzzleHttp\Psr7\NoSeekStream
  * @covers GuzzleHttp\Psr7\StreamDecoratorTrait
  */
-class NoSeekStreamTest extends \PHPUnit_Framework_TestCase
+class NoSeekStreamTest extends BaseTest
 {
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot seek a NoSeekStream
-     */
     public function testCannotSeek()
     {
         $s = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
             ->setMethods(['isSeekable', 'seek'])
             ->getMockForAbstractClass();
-        $s->expects($this->never())->method('seek');
-        $s->expects($this->never())->method('isSeekable');
+        $s->expects(self::never())->method('seek');
+        $s->expects(self::never())->method('isSeekable');
         $wrapped = new NoSeekStream($s);
-        $this->assertFalse($wrapped->isSeekable());
+        self::assertFalse($wrapped->isSeekable());
+
+        $this->expectExceptionGuzzle('RuntimeException', 'Cannot seek a NoSeekStream');
+
         $wrapped->seek(2);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot write to a non-writable stream
-     */
-    public function testHandlesClose()
+    public function testToStringDoesNotSeek()
     {
-        $s = Psr7\stream_for('foo');
+        $s = \GuzzleHttp\Psr7\Utils::streamFor('foo');
+        $s->seek(1);
         $wrapped = new NoSeekStream($s);
+        self::assertSame('oo', (string) $wrapped);
+
         $wrapped->close();
-        $wrapped->write('foo');
     }
 }

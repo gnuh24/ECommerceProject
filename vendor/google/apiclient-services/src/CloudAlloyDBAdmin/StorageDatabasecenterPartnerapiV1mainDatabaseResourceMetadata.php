@@ -36,6 +36,10 @@ class StorageDatabasecenterPartnerapiV1mainDatabaseResourceMetadata extends \Goo
   public $currentState;
   protected $customMetadataType = StorageDatabasecenterPartnerapiV1mainCustomMetadataData::class;
   protected $customMetadataDataType = '';
+  /**
+   * @var string
+   */
+  public $edition;
   protected $entitlementsType = StorageDatabasecenterPartnerapiV1mainEntitlement::class;
   protected $entitlementsDataType = 'array';
   /**
@@ -56,6 +60,10 @@ class StorageDatabasecenterPartnerapiV1mainDatabaseResourceMetadata extends \Goo
   protected $machineConfigurationDataType = '';
   protected $primaryResourceIdType = StorageDatabasecenterPartnerapiV1mainDatabaseResourceId::class;
   protected $primaryResourceIdDataType = '';
+  /**
+   * @var string
+   */
+  public $primaryResourceLocation;
   protected $productType = StorageDatabasecenterProtoCommonProduct::class;
   protected $productDataType = '';
   /**
@@ -160,6 +168,20 @@ class StorageDatabasecenterPartnerapiV1mainDatabaseResourceMetadata extends \Goo
     return $this->customMetadata;
   }
   /**
+   * @param string
+   */
+  public function setEdition($edition)
+  {
+    $this->edition = $edition;
+  }
+  /**
+   * @return string
+   */
+  public function getEdition()
+  {
+    return $this->edition;
+  }
+  /**
    * @param StorageDatabasecenterPartnerapiV1mainEntitlement[]
    */
   public function setEntitlements($entitlements)
@@ -256,6 +278,20 @@ class StorageDatabasecenterPartnerapiV1mainDatabaseResourceMetadata extends \Goo
   public function getPrimaryResourceId()
   {
     return $this->primaryResourceId;
+  }
+  /**
+   * @param string
+   */
+  public function setPrimaryResourceLocation($primaryResourceLocation)
+  {
+    $this->primaryResourceLocation = $primaryResourceLocation;
+  }
+  /**
+   * @return string
+   */
+  public function getPrimaryResourceLocation()
+  {
+    return $this->primaryResourceLocation;
   }
   /**
    * @param StorageDatabasecenterProtoCommonProduct

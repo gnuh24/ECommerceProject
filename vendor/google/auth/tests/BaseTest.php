@@ -1,25 +1,37 @@
 <?php
 
-namespace Google\Auth\tests;
+namespace Google\Auth\Tests;
 
 use GuzzleHttp\ClientInterface;
+use PHPUnit\Framework\TestCase;
 
-abstract class BaseTest extends \PHPUnit_Framework_TestCase
+abstract class BaseTest extends TestCase
 {
-    public function onlyGuzzle6()
+    protected function onlyGuzzle6()
     {
-        $version = ClientInterface::VERSION;
-        if ('6' !== $version[0]) {
+        if ($this->getGuzzleMajorVersion() !== 6) {
             $this->markTestSkipped('Guzzle 6 only');
         }
     }
 
-    public function onlyGuzzle5()
+    protected function onlyGuzzle7()
     {
-        $version = ClientInterface::VERSION;
-        if ('5' !== $version[0]) {
-            $this->markTestSkipped('Guzzle 5 only');
+        if ($this->getGuzzleMajorVersion() !== 7) {
+            $this->markTestSkipped('Guzzle 7 only');
         }
+    }
+
+    protected function getGuzzleMajorVersion()
+    {
+        if (defined('GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
+            return ClientInterface::MAJOR_VERSION;
+        }
+
+        if (defined('GuzzleHttp\ClientInterface::VERSION')) {
+            return (int) substr(ClientInterface::VERSION, 0, 1);
+        }
+
+        $this->fail('Unable to determine the currently used Guzzle Version');
     }
 
     /**
@@ -27,6 +39,15 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
      */
     public function getValidKeyName($key)
     {
-        return str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '-', $key);
+        return preg_replace('|[^a-zA-Z0-9_\.! ]|', '', $key);
+    }
+
+    protected function getCacheItemClass()
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            return 'Google\Auth\Cache\TypedItem';
+        }
+
+        return 'Google\Auth\Cache\Item';
     }
 }
