@@ -50,6 +50,19 @@
     z-index: 1000;
     animation: fadeIn 0.3s ease-in-out;
   }
+
+  .Table_data_quyen_1 {
+    text-align: center;
+    font-family: Arial;
+    background-color: rgb(255, 255, 255);
+    padding: 14px 0px;
+  }
+  .Table_data_quyen_2 {
+    text-align: center;
+    font-family: Arial;
+    background-color: rgb(225, 227, 229);
+    padding: 14px 0;
+  }
   
   .modal_content {
     background: #fff;
@@ -117,9 +130,8 @@
     display: none;
   } */
 
-  td{
-    height: 80px;
-  }
+ 
+  
   
   .pageButton {
     background-color: whitesmoke;
@@ -169,4 +181,8 @@
     cursor: pointer;
     font-weight: 700;
     border-radius: 10px;
+  }
+
+  #tableBody{
+    height: 200px;
   }

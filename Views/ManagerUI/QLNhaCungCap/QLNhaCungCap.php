@@ -114,33 +114,53 @@
         page: page,
         search: search
       },
-      success: function(response) {
+      success: function (response) {
         var data = response.data; // Lấy mảng dữ liệu từ API
         var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
         var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
         // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
-        $.each(data, function(index, record) {
-          var htmlContent = `
-                    <tr>
-                        <td style="text-align:center">${record.Id}</td>
-                        <td style="text-align:center">${record.BrandName}</td>
-                        
-                        <td style="text-align:center">`;
+        if (data.length > 0) {
+          data.forEach(function (record, index) {
+            var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
+            var trContent = `
+                        <form id="updateForm" method="post" action="FormUpdateNhaCungCap.php">
+                            <tr style="height: 20%"; max-height: 20%;>
+                            <td class="${trClass}">${record.Id}</td>
+                            <td class="${trClass}">${record.BrandName}</td>
+                            <td class="${trClass}">`;
 
-          // Kiểm tra nếu record.Id == 1 thì hiển thị nút "Mặc định" thay vì "Sửa" và "Xoá"
-          if (record.Id == 1) {
-            htmlContent += `<p>Mặc định</p>`;
-          } else {
-            htmlContent += `
-                        <button style="cursor:pointer" class="edit" onclick="updateNhaCungCap(${record.Id}, '${record.BrandName}')">Sửa</button>
-                        <button style="cursor:pointer" class="delete" onclick="deleteNhaCungCap(${record.Id}, '${record.BrandName}')">Xoá</button>`;
-          }
-
-          htmlContent += `</td></tr>`;
-
-          tableContent += htmlContent; // Thêm nội dung của hàng vào chuỗi tableContent
-        });
+            if (record.Id == 1) {
+              trContent += `Mặc định`;;
+            } else {
+              trContent += `
+                        <button class="edit" onclick="updateNhaCungCap(${record.Id}, '${record.BrandName}')">Sửa</button>
+                        <button class="delete" onclick="deleteNhaCungCap(${record.Id}, '${record.BrandName}')">Xoá</button>`;
+            }
+            trContent += `</tr></form>`;
+            // Nếu chỉ có ít hơn 10 phần tử và đã duyệt đến phần tử cuối cùng, thêm các hàng trống vào
+            if (data.length < 5 && index === data.length - 1) {
+              for (var i = data.length; i < 5; i++) {
+                var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng trống
+                trContent += `
+                                <form id="emptyForm" method="post" action="FormUpdateNhaCungCap.php">
+                                    <tr style="height: 20%"; max-height: 20%;>
+                                        <td class="${emptyTrClass}" style="width: 130px;"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                        <td class="${emptyTrClass}"></td>
+                                    </tr>
+                                </form>`;
+              }
+            }
+            tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
+          });
+        } else {
+          tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
+        }
 
         // Thiết lập lại nội dung của tbody bằng chuỗi tableContent
         tableBody.innerHTML = tableContent;
@@ -149,7 +169,7 @@
         createPagination(page, response.totalPages);
       },
 
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         if (xhr.status === 401) {
           alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -198,8 +218,8 @@
       paginationContainer.innerHTML = paginationHTML;
 
       // Thêm sự kiện click cho từng nút phân trang
-      paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
-        button.addEventListener('click', function() {
+      paginationContainer.querySelectorAll('.pageButton').forEach(function (button, index) {
+        button.addEventListener('click', function () {
           // Gọi hàm fetchDataAndUpdateTable khi người dùng click vào nút phân trang
           fetchDataAndUpdateTable(index + 1, searchValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
         });
@@ -213,7 +233,7 @@
 
 
   // Hàm xử lý sự kiện khi nút tìm kiếm được click
-  document.getElementById('searchButton').addEventListener('click', function() {
+  document.getElementById('searchButton').addEventListener('click', function () {
     var searchValue = document.querySelector('.Admin_input__LtEE-').value;
 
     // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
@@ -221,7 +241,7 @@
   });
 
   // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
-  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
+  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function (event) {
     // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
     if (event.key === 'Enter') {
       // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
@@ -254,16 +274,16 @@
           url: '../../../Controllers/BrandController.php?id=' + brandId,
           type: 'DELETE',
 
-          success: function(response) {
+          success: function (response) {
             Swal.fire({
               icon: 'success',
               title: 'Thành công!',
               text: 'Xóa thương hiệu thành công !!',
-            }).then(function() {
+            }).then(function () {
               fetchDataAndUpdateTable(currentPage, '');
             });
           },
-          error: function(xhr, status, error) {
+          error: function (xhr, status, error) {
             Swal.fire({
               icon: 'error',
               title: 'Lỗi!',
