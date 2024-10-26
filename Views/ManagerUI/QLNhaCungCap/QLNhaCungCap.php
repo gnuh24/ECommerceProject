@@ -62,11 +62,11 @@
                       <table class="Table_table__BWPy">
                         <thead class="Table_head__FTUog">
                           <tr>
-                            <th class="Table_th__hCkcg">Mã thương hiệu</th>
+                            <th style="width: 25%" class="Table_th__hCkcg">Mã thương hiệu</th>
                             <th class="Table_th__hCkcg">Thương hiệu</th>
                             <!-- <th class="Table_th__hCkcg">Email</th>
                             <th class="Table_th__hCkcg">Số điện thoại</th> -->
-                            <th class="Table_th__hCkcg">Xoá</th>
+                            <th style="width: 15%" class="Table_th__hCkcg">Action</th>
                           </tr>
                         </thead>
                         <tbody id="tableBody">

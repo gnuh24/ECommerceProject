@@ -59,9 +59,9 @@
                       <table class="Table_table__BWPy">
                         <thead class="Table_head__FTUog">
                           <tr>
-                            <th class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
+                            <th style="width: 25%" class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
                             <th class="Table_th__hCkcg" scope="col">Loại sản phẩm</th>
-                            <th class="Table_th__hCkcg" scope="col">Xoá</th>
+                            <th style="width: 15%" class="Table_th__hCkcg" scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody id="tableBody">
