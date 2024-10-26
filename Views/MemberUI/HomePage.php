@@ -8,6 +8,8 @@
     <!-- <link rel="stylesheet" href="./login.css" /> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../HelperUI/formatOutput.js"></script>
 
     <title>Kinh doanh rượu</title>
 </head>
@@ -94,17 +96,6 @@
 
 
 <script>
-    function formatCurrency(number) {
-        // Chuyển đổi số thành chuỗi và đảm bảo nó là số nguyên
-        number = parseInt(number);
-
-        // Sử dụng hàm toLocaleString() để định dạng số tiền
-        // và thêm đơn vị tiền tệ "đ" vào cuối chuỗi
-        return number.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    }
 
     // Lắng nghe sự kiện click vào Poster
     document

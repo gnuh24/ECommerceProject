@@ -10,6 +10,8 @@
     <title>Thông tin cá nhân</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../HelperUI/formatOutput.js"></script>
+
 </head>
 
 <body>
@@ -27,26 +29,7 @@
 <script>
     var email = '';
 
-    function formatDateToYYYYMMDD(dateString) {
-        // Kiểm tra nếu dữ liệu đầu vào rỗng hoặc không hợp lệ
-        if (!dateString || dateString.trim() === '') {
-            return ''; // Trả về rỗng nếu đầu vào không hợp lệ
-        }
 
-        var parts = dateString.split('/'); // Tách chuỗi theo dấu '/'
-
-        // Kiểm tra nếu định dạng ngày không đúng (không đủ 3 phần: ngày, tháng, năm)
-        if (parts.length !== 3) {
-            return ''; // Trả về rỗng nếu không đúng định dạng
-        }
-
-        var day = parts[0]; // Ngày
-        var month = parts[1]; // Tháng
-        var year = parts[2]; // Năm
-
-        // Trả về định dạng yyyy-MM-dd
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    }
 
     function loadUserInfoFromsessionStorage() {
         // Lấy dữ liệu từ sessionStorage
@@ -157,14 +140,7 @@
             document.getElementById('birthday').value = '';
         }
     }
-    // Hàm format ngày về dạng YYYY-MM-DD để sử dụng trong input type="date"
-    function formatDateToYYYYMMDD(dateString) {
-        var date = new Date(dateString);
-        var year = date.getFullYear();
-        var month = (date.getMonth() + 1).toString().padStart(2, '0');
-        var day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
+
 
 
     window.onload = loadUserInfoFromsessionStorage;
@@ -196,7 +172,7 @@
         formData.append('accountId', accountId);
         formData.append('fullname', fullname);
         formData.append('phone', phone);
-        formData.append('birthday', birthday); // Birthday should be in correct format (yyyy-mm-dd)
+        formData.append('birthday', birthday);
         formData.append('gender', gender);
         formData.append('address', address);
 
@@ -236,25 +212,6 @@
             });
 
         return false; // Ngăn chặn form gửi theo cách truyền thống
-    }
-
-
-    function formatDateToDDMMYYYY(dateString) {
-        // Tách chuỗi theo dấu gạch ngang "-"
-        var parts = dateString.split("-");
-
-        // Đảm bảo chuỗi có đủ các phần (năm, tháng, ngày)
-        if (parts.length === 3) {
-            var year = parts[0];
-            var month = parts[1];
-            var day = parts[2];
-
-            // Trả về định dạng dd/mm/yyyy
-            return `${day}/${month}/${year}`;
-        } else {
-            // Nếu chuỗi không hợp lệ, trả về giá trị ban đầu
-            return dateString;
-        }
     }
 </script>
 

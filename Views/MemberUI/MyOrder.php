@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../HelperUI/formatOutput.js"></script>
 
 </head>
 
@@ -104,9 +105,9 @@
                         <tr class='orderManagement_order_detail'>
                             <td class='anhMinhHoa'><img style='width: auto; height: 100px;' src='https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${chiTiet.Image}'></td>
                             <td class='tenSanPham'>${chiTiet.ProductName}</td>
-                            <td class='donGia'>${formatMoney(chiTiet.UnitPrice)}</td>
+                            <td class='donGia'>${formatCurrency(chiTiet.UnitPrice)}</td>
                             <td class='soLuong'>${chiTiet.Quantity}</td>
-                            <td class='thanhTien'>${formatMoney(chiTiet.Total)}</td>
+                            <td class='thanhTien'>${formatCurrency(chiTiet.Total)}</td>
                         </tr>`;
                     });
                 },
@@ -121,7 +122,7 @@
                     </table>
                     <div class='orderManagement_order_thanhTien'>
                         <p style="width: 50%;">Trạng thái: ${translateStatus(hoaDon.Status)}</p>
-                        <p>Tổng giá trị: ${formatMoney(hoaDon.TotalPrice)}</p>
+                        <p>Tổng giá trị: ${formatCurrency(hoaDon.TotalPrice)}</p>
                         <button class='order_detail_button' onclick="toOrderDetail('${hoaDon.OrderId}')"> Chi tiết</button>`;
 
             if (hoaDon.Status !== 'DangGiao' && hoaDon.Status !== 'GiaoThanhCong' && hoaDon.Status !== 'Huy' && hoaDon.Status !== 'DaDuyet') {
@@ -134,13 +135,6 @@
         });
     }
 
-    // Format tiền tệ (Giả định)
-    function formatMoney(value) {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(value);
-    }
 
     // Chuyển đổi trạng thái
     function translateStatus(status) {
