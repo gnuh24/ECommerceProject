@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="./HomePage.css" />
     <!-- <link rel="stylesheet" href="./login.css" /> -->
-    <!-- <link rel="stylesheet" href="./Product.css" /> -->
+    <link rel="stylesheet" href="./Product.css" />
     <link rel="stylesheet" href="./components/paginationjs.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -27,7 +27,7 @@
     <?php require_once "./Header.php"; ?>
 
     <!-- Thanh lọc menu -->
-    <div id="filter-menu" class="container-fluid bg-white p-3 rounded mb-4">
+    <div id="filter-menu" class="container-fluid bg-white p-3 rounded mb-4 d-flex align-items-end">
         <div class="row d-flex justify-content-around" style="width:80%">
 
             <div class="col-12 col-md-3 mb-2 mb-md-0">
@@ -59,6 +59,8 @@
         <button id="reset-button" class="btn btn-danger mt-2 mt-md-0">
             <i class="fa-solid fa-rotate-right"></i>
         </button>
+
+
 
     </div>
 
