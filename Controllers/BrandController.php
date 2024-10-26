@@ -108,7 +108,7 @@ class BrandController
     // Lấy tất cả Brand có phân trang và tìm kiếm
     public function getAllBrand($pageable, $search = null)
     {
-        $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 10;
+        $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 5;
         $result = $this->BrandModel->getAllBrand($pageable, $search, $pageSize);
         return $this->respond($result);
     }

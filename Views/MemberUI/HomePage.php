@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="HomePage.css" />
-    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="./HomePage.css" />
+    <!-- <link rel="stylesheet" href="./login.css" /> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -28,9 +28,6 @@
                 <h2 class="center-text-share">SẢN PHẨM NỔI BẬT</h2>
             </div>
         </div>
-        <div class="icon-bottom-title">
-            <img src="#" alt="" />
-        </div>
     </section>
 
 
@@ -45,14 +42,13 @@
         <button id="btn-load-more" class="btn btn-primary">Xem thêm các sản phẩm</button>
     </div>
 
-    <!-- Tin tức -->
+    <!-- Dịch vụ -->
     <section class="Home-titleSection">
         <div class="Home-lineSection-2"></div>
         <h2 class="Home-txtTitle">DỊCH VỤ</h2>
         <div class="Home-lineSection-2"></div>
     </section>
 
-    <!-- Dịch vụ -->
     <section class="Home-service container py-5" style="height: fit-content;">
         <div class="row" style="width:100%;height:fit-content;">
             <!-- Service 1 -->

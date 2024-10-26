@@ -5,7 +5,6 @@
         height: 80px;
     }
 
-
     .input__wrapper {
         display: flex;
         align-items: center;
@@ -16,7 +15,7 @@
 
     .search-input {
         padding-left: 25px;
-        background-image: url("../img/search.png");
+        /* background-image: url("../img/search.png");*/
         background-size: 20px;
         background-repeat: no-repeat;
         background-position: 5px center;
@@ -27,7 +26,7 @@
         height: 35px;
     }
 
-    #filter-button {
+    #search-button {
         background-color: white;
         color: rgb(146, 26, 26);
         padding: 10px 20px;
@@ -116,7 +115,7 @@
         <div class="col-12 col-md-6 mb-2 mb-md-0 d-flex justify-content-center">
             <form id="search" class="input__wrapper d-flex justify-content-center" method="post" action="SignedProduct.php" style="width:100%">
                 <input id="searchSanPham" name="searchFromAnotherPage" type="text" class="form-control me-2 search-input" placeholder="Tìm kiếm" style="width:90%" required="" />
-                <button id="filter-button" class="btn btn-primary" type="submit" style="width:10%">
+                <button id="search-button" class="btn btn-primary" type="submit" style="width:10%">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
@@ -171,7 +170,7 @@
     });
 
     // Sự kiện tìm kiếm search 
-    document.getElementById("filter-button").addEventListener("click", (event) => {
+    document.getElementById("search-button").addEventListener("click", (event) => {
         event.preventDefault();
         const form = document.getElementById("search");
         const searchValue = document.getElementById("searchSanPham").value;

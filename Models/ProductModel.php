@@ -11,19 +11,26 @@ class ProductModel
     }
 
     // Lấy tất cả sản phẩm của CommonUser
-    public function getAllProductsCommonUser($brandId = null, $categoryId = null, $search = null, $minPrice = null, $maxPrice = null, $limit = 16, $offset = 0)
-    {
+    public function getAllProductsCommonUser(
+        $brandId = null,
+        $categoryId = null,
+        $search = null,
+        $minPrice = null,
+        $maxPrice = null,
+        $limit = 12,
+        $pageNumber = 0
+    ) {
         // Lưu trữ điều kiện WHERE
         $conditions = [];
         $params = [];
 
         if ($brandId !== null) {
-            $conditions[] = "p.BrandId = :brandId";
+            $conditions[] = "p.brandId = :brandId";
             $params[':brandId'] = $brandId;
         }
 
         if ($categoryId !== null) {
-            $conditions[] = "p.CategoryId = :categoryId";
+            $conditions[] = "p.categoryId = :categoryId";
             $params[':categoryId'] = $categoryId;
         }
 
@@ -51,8 +58,7 @@ class ProductModel
 
         // Truy vấn lấy sản phẩm
         $query = "
-                SELECT p.*
-                FROM `product` p
+                SELECT p.* FROM `Product` p
                 $whereClause
                 LIMIT :limit OFFSET :offset
             ";
@@ -62,6 +68,8 @@ class ProductModel
 
             // Gán giá trị cho tham số LIMIT và OFFSET
             $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+            $offset = ($pageNumber - 1) * $limit;
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
 
             // Gán các tham số khác nếu có

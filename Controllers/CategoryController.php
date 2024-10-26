@@ -115,7 +115,7 @@ class CategoryController
     // Lấy tất cả danh mục có phân trang và tìm kiếm
     public function getAllCategories($page, $search)
     {
-        $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 10;
+        $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 5;
         $result = $this->categoryModel->getAllCategory($page, $search, $pageSize);
         return $this->respond($result);
     }

@@ -76,15 +76,15 @@ class ProductController
     public function getAllProductsCommonUser()
     {
         // Tham số truy vấn
-        $brandId = $_GET['brandId'] ?? null;
-        $categoryId = $_GET['categoryId'] ?? null;
+        $brandId = isset($_GET['brandId']) && !empty($_GET['brandId']) ? $_GET['brandId'] : null;
+        $categoryId = isset($_GET['categoryId']) && !empty($_GET['categoryId']) ? $_GET['categoryId'] : null;
         $search = $_GET['search'] ?? null;
         $minPrice = $_GET['minPrice'] ?? null;
         $maxPrice = $_GET['maxPrice'] ?? null;
-        $limit = $_GET['limit'] ?? 20;
-        $offset = $_GET['page'] ?? 0;
+        $pageSize = $_GET['pageSize'] ?? 12;
+        $pageNumber = $_GET['pageNumber'] ?? 1;
 
-        $result = $this->productModel->getAllProductsCommonUser($brandId, $categoryId, $search, $minPrice, $maxPrice, $limit, $offset);
+        $result = $this->productModel->getAllProductsCommonUser($brandId, $categoryId, $search, $minPrice, $maxPrice, $pageSize, $pageNumber);
         http_response_code(200);
         echo json_encode($result);
     }

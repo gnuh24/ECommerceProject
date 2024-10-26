@@ -1,4 +1,4 @@
-#filter-menu {
+/* #filter-menu {
     background-color: white;
     padding: 10px;
     border-radius: 5px;
@@ -22,11 +22,11 @@
 
 #filter-menu button:hover {
     background-color: #cccccc;
-}
+} */
 
-/* Responsive */
-@media (max-width: 768px) {
+
+/* @media (max-width: 768px) {
     #filter-menu {
         padding: 10px;
     }
-}
+} */
