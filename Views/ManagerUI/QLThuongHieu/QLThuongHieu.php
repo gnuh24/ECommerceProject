@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../AdminDemo.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="QLNhaCungCap.css" />
+  <link rel="stylesheet" href="QLThuongHieu.css" />
   <!-- <link rel="stylesheet" href="../bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -44,7 +44,7 @@
                             border-radius: 0.6rem;
                             cursor: pointer;
                           ">
-                        <a href="./FormCreateNhaCungCap.php"> Thêm Thương Hiệu</a>
+                        <a href="./FormCreateThuongHieu.php"> Thêm Thương Hiệu</a>
                       </button>
                     </div>
                     <br>
@@ -106,7 +106,7 @@
   var page = 1;
   var pageSizeGlobal = 5;
 
-  function getAllNhaCungCap(page, search) {
+  function getAllThuongHieu(page, search) {
     $('#loading-indicator').show();
 
     $.ajax({
@@ -128,7 +128,7 @@
           data.forEach(function (record, index) {
             var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
             var trContent = `
-                        <form id="updateForm" method="post" action="FormUpdateNhaCungCap.php">
+                        <form id="updateForm" method="post" action="FormUpdateThuongHieu.php">
                             <tr style="height: 20%"; max-height: 20%;>
                             <td class="${trClass}">${record.Id}</td>
                             <td class="${trClass}">${record.BrandName}</td>
@@ -138,8 +138,8 @@
               trContent += `Mặc định`;;
             } else {
               trContent += `
-                        <button class="edit" onclick="updateNhaCungCap(${record.Id}, '${record.BrandName}')">Sửa</button>
-                        <button class="delete" onclick="deleteNhaCungCap(${record.Id}, '${record.BrandName}')">Xoá</button>`;
+                        <button class="edit" onclick="updateThuongHieu(${record.Id}, '${record.BrandName}')">Sửa</button>
+                        <button class="delete" onclick="deleteThuongHieu(${record.Id}, '${record.BrandName}')">Xoá</button>`;
             }
             trContent += `</tr></form>`;
             // Nếu chỉ có ít hơn 10 phần tử và đã duyệt đến phần tử cuối cùng, thêm các hàng trống vào
@@ -147,7 +147,7 @@
               for (var i = data.length; i < 5; i++) {
                 var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng trống
                 trContent += `
-                                <form id="emptyForm" method="post" action="FormUpdateNhaCungCap.php">
+                                <form id="emptyForm" method="post" action="FormUpdateThuongHieu.php">
                                     <tr style="height: 20%"; max-height: 20%;>
                                         <td class="${emptyTrClass}" style="width: 130px;"></td>
                                         <td class="${emptyTrClass}"></td>
@@ -187,13 +187,13 @@
 
 
 
-  // Hàm để gọi getAllNhaCungCap và cập nhật dữ liệu và phân trang
+  // Hàm để gọi getAllThuongHieu và cập nhật dữ liệu và phân trang
   function fetchDataAndUpdateTable(page, search) {
     //Clear dữ liệu cũ
     clearTable();
 
     // Gọi hàm getAllTaiKhoan và truyền các giá trị tương ứng
-    getAllNhaCungCap(page, search);
+    getAllThuongHieu(page, search);
 
     // Tạo phân trang
     createPagination(page);
@@ -259,7 +259,7 @@
     }
   });
 
-  function deleteNhaCungCap(brandId, brandName) {
+  function deleteThuongHieu(brandId, brandName) {
     // Sử dụng Swal thay vì hộp thoại confirm
     Swal.fire({
       title: `Bạn có muốn xóa  ${brandName} không?`,
@@ -302,11 +302,11 @@
 
 
 
-  function updateNhaCungCap(brandId, brandName) {
+  function updateThuongHieu(brandId, brandName) {
     // Lấy ra form bằng id của nó
     var form = document.querySelector("#updateForm");
 
-    window.location.href = `FormUpdateNhaCungCap.php?brandId=${brandId}&brandName=${brandName}`
+    window.location.href = `FormUpdateThuongHieu.php?brandId=${brandId}&brandName=${brandName}`
 
     // Gửi form đi
     form.submit();

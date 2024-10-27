@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../AdminDemo.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../QLNhaCungCap/QLNhaCungCap.css" />
+    <link rel="stylesheet" href="../QLThuongHieu/QLThuongHieu.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <title>Thêm Nhà Cung Cấp</title>
@@ -44,7 +44,7 @@
                                                     padding: 1rem 2rem 1rem 2rem;
                                                     border-radius: 0.6rem;
                                                     cursor: pointer;
-                                                    " href="./QLNhaCungCap.php">
+                                                    " href="./QLThuongHieu.php">
                                                         Hủy
                                                     </a>
                                                     <button id="updateSupplier_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white;  background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">
@@ -114,7 +114,7 @@
             return;
         }
 
-        let isCreateNhaCungCapComplete = createNhaCungCap(
+        let isCreateThuongHieuComplete = createThuongHieu(
             brandName.value,
             // Email.value,
             // SoDienThoai.value
@@ -122,7 +122,7 @@
 
     });
 
-    function createNhaCungCap(brandName) {
+    function createThuongHieu(brandName) {
         $.ajax({
             url: '../../../Controllers/BrandController.php', // Đường dẫn đến controller
             type: 'POST',
@@ -139,7 +139,7 @@
                     title: 'Thành công!',
                     text: 'Tạo nhà cung cấp thành công!',
                 }).then(function() {
-                    window.location.href = 'QLNhaCungCap.php'; // Chuyển hướng đến trang quản lý nhà cung cấp
+                    window.location.href = 'QLThuongHieu.php'; // Chuyển hướng đến trang quản lý thương hiệu
                 });
 
             },
