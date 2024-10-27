@@ -1,76 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="oneForAll.css" />
-    <link rel="stylesheet" href="Admin.css" />
-    <title>Quản lý tài khoản</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-
-<body>
-    <div id="root">
-        <div>
-            <div class="App">
-                <div class="StaffLayout_wrapper__CegPk">
-                    <?php require_once "../ManagerHeader.php" ?>
-                    <div>
-                        <div>
-                            <div class="Manager_wrapper__vOYy">
-                                <?php require_once "../ManagerMenu.php" ?>
-
-                                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                                    <div class="wrapper">
-                                        <div style="
+<link rel="stylesheet" href="./QLTaiKhoan/Admin.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+    <div class="wrapper">
+        <div style="
                                             display: flex;
                                             padding-top: 1rem;
                                             padding-bottom: 1rem;
                                             ">
-                                            <h2>Quản lý tài khoản</h2>
-                                            <!-- <a href="FormCreateTaiKhoan.php" id="createAccountButton">Tạo Tài Khoản</a> -->
-                                        </div>
-                                        <div class="Admin_boxFeature__ECXnm">
-                                            <div style="position: relative;">
-                                                <input class="Admin_input__LtEE-" placeholder="Tìm kiếm tài khoản">
-                                            </div>
-                                            <select id="selectQuyen" style="height: 3rem; padding: 0.3rem;">
-                                                <option value="">Trạng thái: tất cả</option>
-                                                <option value="1">Hoạt động</option>
-                                                <option value="0">Khóa</option>
-                                            </select>
-                                            <button id="searchButton" style="">Tìm kiếm</button>
-                                        </div>
-                                        <div class="Admin_boxTable__hLXRJ">
-                                            <table class="Table_table__BWPy">
-                                                <thead class="Table_head__FTUog">
-                                                    <tr>
-                                                        <th class="Table_th__hCkcg">Mã Tài Khoản</th>
-                                                        <th class="Table_th__hCkcg">Email</th>
-                                                        <th class="Table_th__hCkcg">Ngày tạo</th>
-                                                        <th class="Table_th__hCkcg">Trạng thái</th>
-                                                        <th class="Table_th__hCkcg">Quyền</th>
-                                                        <th class="Table_th__hCkcg">Thao tác</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tableBody">
-
-                                                </tbody>
-                                            </table>
-                                            <div class="pagination"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h2>Quản lý tài khoản</h2>
+            <!-- <a href="FormCreateTaiKhoan.php" id="createAccountButton">Tạo Tài Khoản</a> -->
+        </div>
+        <div class="Admin_boxFeature__ECXnm">
+            <div style="position: relative;">
+                <input class="Admin_input__LtEE-" placeholder="Tìm kiếm tài khoản">
             </div>
+            <select id="selectQuyen" style="height: 3rem; padding: 0.3rem;">
+                <option value="">Trạng thái: tất cả</option>
+                <option value="1">Hoạt động</option>
+                <option value="0">Khóa</option>
+            </select>
+            <button id="searchButton" style="">Tìm kiếm</button>
+        </div>
+        <div class="Admin_boxTable__hLXRJ">
+            <table class="Table_table__BWPy">
+                <thead class="Table_head__FTUog">
+                    <tr>
+                        <th class="Table_th__hCkcg">Mã Tài Khoản</th>
+                        <th class="Table_th__hCkcg">Email</th>
+                        <th class="Table_th__hCkcg">Ngày tạo</th>
+                        <th class="Table_th__hCkcg">Trạng thái</th>
+                        <th class="Table_th__hCkcg">Quyền</th>
+                        <th class="Table_th__hCkcg">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+            </table>
+            <div class="pagination"></div>
         </div>
     </div>
-    </div>
-</body>
+</div>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -79,14 +51,6 @@
 
     // Lắng nghe sự kiện click trên nút logout
     document.addEventListener('DOMContentLoaded', function() {
-        var logoutButton = document.getElementById('logoutButton');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function() {
-                sessionStorage.removeItem('key');
-                window.location.href = '../../MemberUI/Login/AdminLoginUI.php';
-            });
-        }
-
 
         fetchDataAndUpdateTable(currentPage, '', '');
     });
@@ -99,7 +63,7 @@
 
     function getAllTaiKhoan(page, search, status) {
         $.ajax({
-            url: '../../../Controllers/AccountController.php',
+            url: '../../Controllers/AccountController.php',
             type: 'GET',
             dataType: "json",
 
@@ -269,7 +233,7 @@
                 formData.append('action', 'updateAccount'); // Gửi thêm action cho server biết
 
                 $.ajax({
-                    url: '../../../Controllers/AccountController.php',
+                    url: '../../Controllers/AccountController.php',
                     type: 'POST',
                     dataType: 'json',
 

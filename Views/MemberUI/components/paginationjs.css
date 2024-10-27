@@ -4,3 +4,8 @@
     justify-content: center;
     margin: 20px 0;
 }
+
+.paginationjs-pages {
+    background-color: rgb(146, 26, 26);
+    color: aliceblue;
+}
