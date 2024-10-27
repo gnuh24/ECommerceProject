@@ -97,7 +97,8 @@
     }
   }
 
-
+  var page = 1;
+  var pageSizeGlobal = 5;
   function getAllLoaiSanPham(page, search) {
     $.ajax({
       url: "../../../Controllers/CategoryController.php",
@@ -106,6 +107,7 @@
 
       data: {
         page: page,
+        pageSize: pageSizeGlobal,
         search: search
       },
       success: function (response) {

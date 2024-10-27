@@ -103,15 +103,19 @@
     tableBody.innerHTML = ''; // Xóa nội dung trong tbody
   }
 
+  var page = 1;
+  var pageSizeGlobal = 5;
 
   function getAllNhaCungCap(page, search) {
+    $('#loading-indicator').show();
+
     $.ajax({
       url: '../../../Controllers/BrandController.php',
       type: 'GET',
       dataType: "json",
-
       data: {
         page: page,
+        pageSize: pageSizeGlobal,
         search: search
       },
       success: function (response) {

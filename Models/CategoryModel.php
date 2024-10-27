@@ -53,9 +53,9 @@ class CategoryModel
     }
 
     // Lấy danh sách Category có phân trang và tìm kiếm
-    public function getAllCategory($page, $search, $pageSize)
+    public function getAllCategory($pageNumber = 1, $search = null, $pageSize = 12)
     {
-        $offset = ($page - 1) * $pageSize;
+        $offset = ($pageNumber - 1) * $pageSize;
         $query = "SELECT * FROM `category` WHERE `CategoryName` LIKE :search LIMIT :offset, :pageSize";
 
         try {
