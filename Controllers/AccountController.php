@@ -50,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'message' => 'Không tìm thấy tham số action!'
                 ]);
                 break;
+                // Cập nhật quyền cho tài khoản
+          
         }
     } else {
         echo json_encode([
@@ -222,6 +224,25 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode([
                         'status' => 400,
                         'message' => 'Vui lòng cung cấp ID và trạng thái!'
+                    ]);
+                }
+                break;
+          case 'updateRole':
+                $Id = $_POST['Id'] ?? null;
+                $newRole = $_POST['Role'] ?? null;
+
+                if ($Id && $newRole) {
+                    $accountController = new AccountController();
+                    $response = $accountController->updateRole($Id, $newRole);
+
+                    echo json_encode([
+                        'status' => $response->status,
+                        'message' => $response->message
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 400,
+                        'message' => 'Không tìm thấy tham số action!'
                     ]);
                 }
                 break;
@@ -508,7 +529,7 @@ class AccountController
         $email = $_GET['Email'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
         $status = $_GET['status'] ?? null;
-        $role = $_GET['Role'] ?? null;
+        $role = $_GET['role'] ?? null;
         // Kiểm tra filter có phải mảng hay không, nếu không thì gán thành mảng rỗng
         $filter = isset($_GET['filter']) && is_array($_GET['filter']) ? $_GET['filter'] : [];
 
@@ -582,4 +603,22 @@ class AccountController
 
         echo json_encode($response);
     }
+
+    // Phương thức cập nhật quyền cho tài khoản
+public function updateRole($Id, $newRole)
+{
+    // Kiểm tra xem tài khoản có tồn tại không
+    $accountExists = $this->accountModel->getAccountById($Id);
+    if ($accountExists->status !== 200) {
+        return (object)[
+            'status' => 400,
+            'message' => 'Tài khoản không tồn tại!'
+        ];
+    }
+
+    // Cập nhật quyền cho tài khoản
+    $updateResponse = $this->accountModel->updateRole($Id, $newRole);
+    return $updateResponse;
+}
+
 }

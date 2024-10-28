@@ -40,6 +40,14 @@
                                                 <option value="1">Hoạt động</option>
                                                 <option value="0">Khóa</option>
                                             </select>
+                                     
+                                            <select id="selectRole" style="height: 3rem; padding: 0.3rem;">
+                                                <option value="">Tất cả quyền</option>
+                                                <option value="Manager">Manager</option>
+                                                <option value="Admin">Admin</option>
+                                                <option value="User">User</option>
+                                                <option value="Employee">Employee</option>
+                                            </select>
                                             <button id="searchButton" style="">Tìm kiếm</button>
                                         </div>
                                         <div class="Admin_boxTable__hLXRJ">
@@ -97,99 +105,123 @@
     }
 
 
-    function getAllTaiKhoan(page, search, status) {
+    function getAllTaiKhoan(page, search, status, role) {
+    $.ajax({
+        url: '../../../Controllers/AccountController.php',
+        type: 'GET',
+        dataType: "json",
+        data: {
+            page: page,
+            search: search,
+            action: 'getAccountById',
+            status: status,
+            role: role  // Thêm role vào dữ liệu gửi lên server
+        },
+        success: function(response) {
+            var data = response.data;
+            var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
+            var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
+
+            if (data.length > 0) {
+                data.forEach(function(record, index) {
+                    var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
+
+                    // Xác định trạng thái và văn bản của nút dựa trên trạng thái của tài khoản
+                    var buttonText = (record.Status === 0) ? "Mở khóa" : "Khóa";
+                    var buttonClass = (record.Status === 0) ? "unlock" : "block";
+                    var buttonData = (record.Status === 0) ? "unlock" : "block";
+                    var trContent = `
+                    <form id="updateForm${record.Id}" method="post" action="FormUpdateTaiKhoan.php">
+                        <tr style="height: 20%"; max-height: 20%;>
+                            <td class="${trClass}" style="width: 130px;">${record.Id}</td>
+                            <td class="${trClass}">${record.Email}</td>
+                            <td class="${trClass}">${record.CreateTime}</td>
+                            <td class="${trClass}">${record.Status === 0 ? "Khóa" : "Hoạt động"}</td>`;
+                    
+                            if (record.Role === "Admin") {
+                                // Hiển thị quyền cho tài khoản là Admin
+                                trContent += `<td class="${trClass}">${record.Role}</td>`;
+                                trContent += `<td class="${trClass}">
+                                                <button class="${buttonClass}" data-action="${buttonData}" onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
+                                            </td>`;
+                            } else {
+                                // Hiển thị thẻ select cho tài khoản không phải User hoặc Admin
+                                trContent += `<td class="${trClass}">
+                                                <select class="role-select" id="roleSelect${record.Id}" 
+                                                     onchange="confirmRoleChange(${record.Id}, this.value, '${record.Role}')" 
+                                                        style="font-size: 14px; padding: 4px 8px; height: auto; min-height: 36px;">
+                                                        <option value="User" ${record.Role === "User" ? "selected" : ""}>User</option>
+                                                        <option value="Manager" ${record.Role === "Manager" ? "selected" : ""}>Manager</option>
+                                                        <option value="Employee" ${record.Role === "Employee" ? "selected" : ""}>Employee</option>
+                                                </select>
+                                            </td>`;
+
+                                trContent += `<td class="${trClass}">
+                                                <button class="${buttonClass}" data-action="${buttonData}" onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
+                                            </td>`;
+                            }
+
+
+                    trContent += `</tr></form>`;
+                    tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
+                });
+            } else {
+                tableContent = `<tr><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
+            }
+
+            // Thiết lập lại nội dung của tbody bằng chuỗi tableContent
+            tableBody.innerHTML = tableContent;
+
+            // Tạo phân trang
+            createPagination(page, response.totalPages);
+        },
+        error: function(xhr, status, error) {
+            if (xhr.status === 401) {
+                alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
+                window.location.href = '/login';
+            } else {
+                console.error('Lỗi khi gọi API: ', error);
+            }
+        }
+    });
+}
+
+
+
+function confirmRoleChange(accountId, newRole, oldRole) {
+    const confirmation = confirm("Bạn có chắc chắn muốn thay đổi quyền thành " + newRole + " không?");
+    const selectElement = document.getElementById("roleSelect" + accountId);
+
+    if (confirmation) {
+        // Gửi yêu cầu cập nhật quyền mới lên server
         $.ajax({
             url: '../../../Controllers/AccountController.php',
-            type: 'GET',
-            dataType: "json",
-
+            type: 'POST',
             data: {
-                page: page,
-                search: search,
-                action: 'getAccountById',
-                status: status,
+                action: 'updateRole',
+                Id: accountId,
+                Role: newRole
             },
             success: function(response) {
-                var data = response.data;
-                var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
-                var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
-
-                if (data.length > 0) {
-                    data.forEach(function(record, index) {
-                        var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
-
-                        // Xác định trạng thái và văn bản của nút dựa trên trạng thái của tài khoản
-                        var buttonText = (record.Status === 0) ? "Mở khóa" : "Khóa";
-                        var buttonClass = (record.Status === 0) ? "unlock" : "block";
-                        var buttonData = (record.Status === 0) ? "unlock" : "block";
-                        var trContent = `
-                        <form id="updateForm" method="post" action="FormUpdateTaiKhoan.php">
-                            <tr style="height: 20%"; max-height: 20%;>
-                                <td class="${trClass}" style="width: 130px;">${record.Id}</td>
-                                <td class="${trClass}">${record.Email}</td>
-                                <td class="${trClass}">${record.CreateTime}</td>
-                                <td class="${trClass}">${record.Status === 0 ? "Khóa" : "Hoạt động"}</td>
-                                <td class="${trClass}">${record.Role}</td>`;
-
-                        if (record.Role === "User") {
-                            trContent += `<td class="${trClass}">
-                                        <button class="${buttonClass}" data-action="${buttonData}" onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
-                                    </td>`;
-                        }
-
-
-
-                        trContent += `</tr></form>`;
-                        // Nếu chỉ có ít hơn 5 phần tử và đã duyệt đến phần tử cuối cùng, thêm các hàng trống vào
-                        if (data.length < 5 && index === data.length - 1) {
-                            for (var i = data.length; i < 5; i++) {
-                                var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng trống
-                                trContent += `
-                                <form id="emptyForm" method="post" action="FormUpdateTaiKhoan.php">
-                                    <tr style="height: 20%"; max-height: 20%;>
-                                        <td class="${emptyTrClass}" style="width: 130px;"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                    </tr>
-                                </form>`;
-                            }
-                        }
-                        tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
-                    });
-                } else {
-                    tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
-                }
-
-
-                // Thiết lập lại nội dung của tbody bằng chuỗi tableContent
-                tableBody.innerHTML = tableContent;
-
-
-                // Tạo phân trang
-                createPagination(page, response.totalPages);
+                alert("Cập nhật quyền thành công!");
             },
             error: function(xhr, status, error) {
-                if (xhr.status === 401) {
-                    alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
-                    window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
-                } else {
-                    console.error('Lỗi khi gọi API: ', error);
-                }
+                alert("Có lỗi xảy ra trong quá trình cập nhật quyền.");
+                console.error('Lỗi khi gọi API: ', error);
             }
         });
+    } else {
+        // Nếu người dùng không đồng ý, reset giá trị select về giá trị cũ
+        selectElement.value = oldRole;  // Khôi phục giá trị cũ
     }
+}
 
 
-    function fetchDataAndUpdateTable(page, search, status) {
-        //Clear dữ liệu cũ
+    function fetchDataAndUpdateTable(page, search, status, role) {
         clearTable();
-
-        getAllTaiKhoan(page, search, status);
+        getAllTaiKhoan(page, search, status, role);
     }
+
 
     // Hàm tạo nút phân trang
     function createPagination(currentPage, totalPages) {
@@ -225,30 +257,43 @@
     }
 
 
-    // Hàm xử lý sự kiện khi select Quyen thay đổi
-    document.querySelector('#selectQuyen').addEventListener('change', function() {
-        var searchValue = document.querySelector('.Admin_input__LtEE-').value;
-        var quyenValue = this.value;
-        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
-    });
-    // Hàm xử lý sự kiện khi nút tìm kiếm được click
-    document.getElementById('searchButton').addEventListener('click', function() {
-        var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+   // Hàm xử lý sự kiện khi select Quyen thay đổi
+document.querySelector('#selectQuyen').addEventListener('change', function() {
+    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+    var quyenValue = this.value;
+    var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
+    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+});
+
+// Hàm xử lý sự kiện khi nút tìm kiếm được click
+document.getElementById('searchButton').addEventListener('click', function() {
+    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+    var quyenValue = document.querySelector('#selectQuyen').value;
+    var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
+    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+});
+
+// Hàm xử lý sự kiện khi select Role thay đổi
+document.querySelector('#selectRole').addEventListener('change', function() {
+    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+    var quyenValue = document.querySelector('#selectQuyen').value;
+    var roleValue = this.value;
+    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+});
+
+// Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
+document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
+    // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
+    if (event.key === 'Enter') {
+        // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
+        event.preventDefault();
+        // Lấy giá trị của ô tìm kiếm và của select quyền
+        var searchValue = this.value;
         var quyenValue = document.querySelector('#selectQuyen').value;
-        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
-    });
-    // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
-    document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
-        // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
-        if (event.key === 'Enter') {
-            // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
-            event.preventDefault();
-            // Lấy giá trị của ô tìm kiếm và của select quyền
-            var searchValue = this.value;
-            var quyenValue = document.querySelector('#selectQuyen').value;
-            fetchDataAndUpdateTable(currentPage, searchValue, quyenValue);
-        }
-    });
+        var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
+        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+    }
+});
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maTaiKhoan, trangThai) {

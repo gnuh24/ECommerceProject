@@ -43,24 +43,26 @@ class AccountModel
 
     public function getAccountById($userInformationId = null, $filters = [], $page = 1, $search = '', $role = '', $status = null)
     {
-        // Đảm bảo rằng $page không phải là null và phải là số nguyên dương
+
+        // Xác định trang hiện tại, mặc định là 1 nếu không có giá trị hợp lệ
         $current_page = isset($page) && $page > 0 ? (int)$page : 1;
     
-        // Khởi tạo câu truy vấn cơ bản với JOIN bảng UserInformation
+        // Khởi tạo câu truy vấn cơ bản để lấy thông tin tài khoản và thông tin người dùng
         $query = "SELECT a.*, ui.Email, ui.Address, ui.Birthday, ui.Fullname, ui.Gender, ui.PhoneNumber 
                   FROM `account` a
                   JOIN `UserInformation` ui ON a.UserInformationId = ui.Id";
     
-        // Mảng chứa điều kiện
+        // Mảng chứa các điều kiện WHERE
         $where_conditions = [];
-    
-        // Nếu có $userInformationId, thêm điều kiện WHERE
+        
+        // Kiểm tra xem userInformationId có khác null không
         if ($userInformationId !== null) {
+            // Nếu có, thêm điều kiện WHERE để lọc theo UserInformationId
             $query .= " WHERE a.UserInformationId = :userInformationId";
-            $where_conditions[':userInformationId'] = $userInformationId;
+            $where_conditions[':userInformationId'] = $userInformationId; // Thêm tham số vào mảng điều kiện
         } else {
-            // Nếu không có $userInformationId, khởi tạo WHERE để thêm các điều kiện sau
-            $query .= " WHERE 1=1"; // Giúp đơn giản hóa việc thêm các điều kiện sau
+            // Nếu không có userInformationId, bắt đầu với điều kiện WHERE luôn đúng
+            $query .= " WHERE 1=1";
         }
     
         // Số phần tử mỗi trang
@@ -178,18 +180,6 @@ class AccountModel
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
 
     // Kiểm tra xem email đã tồn tại hay chưa
     function isEmailExists($email)
@@ -305,15 +295,43 @@ class AccountModel
         }
     }
 
+// Phương thức cập nhật quyền cho tài khoản
+public function updateRole($id, $newRole)
+{
+    $query = "UPDATE `account` SET `Role` = :role WHERE `Id` = :id"; 
 
+    try {
+        $statement = $this->connection->prepare($query);
+        if ($statement !== false) {
+            // Liên kết tham số
+            $statement->bindValue(':role', $newRole, PDO::PARAM_STR);
+            $statement->bindValue(':id', $id, PDO::PARAM_INT);
+            
+            // Thực thi câu lệnh
+            $statement->execute();
 
+            if ($statement->rowCount() > 0) {
+                return (object)[
+                    'status' => 200,
+                    'message' => 'Cập nhật quyền thành công!'
+                ];
+            } else {
+                return (object)[
+                    'status' => 404,
+                    'message' => 'Không tìm thấy tài khoản để cập nhật!'
+                ];
+            }
+        } else {
+            throw new PDOException();
+        }
+    } catch (PDOException $e) {
+        return (object)[
+            'status' => 400,
+            'message' => 'Cập nhật quyền thất bại: ' . $e->getMessage()
+        ];
+    }
+}
 
-
-
-
-
-
-   
     
     
 }
