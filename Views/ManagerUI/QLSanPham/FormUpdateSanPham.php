@@ -80,6 +80,9 @@
                                                         <input id="nongDoCon" type="text" class="input" name="nongDoCon" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
+                                                        <p class="text">Số lượng</p>
+                                                        <input id="soluong" type="text" class="input" name="nongDoCon" style="width: 40rem" />
+                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
                                                         <p class="text">Trạng thái</p>
                                                         <input disabled id="status" class="input" name="status" style="width: 40rem" readonly />
@@ -152,6 +155,7 @@
         let theTich = document.getElementById("theTich");
         let nongDoCon = document.getElementById("nongDoCon");
         let anhMinhHoa = document.getElementById("anhMinhHoa");
+        let soluong = document.getElementById("soluong");
 
         let moTa = document.getElementById("moTa");
 
@@ -162,6 +166,11 @@
             return;
         }
 
+        if (parseFloat(soluong.value) <= 0 || isNaN(parseFloat(soluong.value))) {
+            showErrorAlert('Lỗi!', 'Số lượng phải là số dương');
+            theTich.focus();
+            return;
+        }
 
         if (parseFloat(nongDoCon.value) < 0 || parseFloat(nongDoCon.value) > 100 || isNaN(parseFloat(nongDoCon.value))) {
             showErrorAlert('Lỗi!', 'Nồng độ cồn phải là số dương và có giá trị từ 0 đến 100');
@@ -179,7 +188,8 @@
             nongDoCon.value,
             thuongHieu.value,
             loaiSanPham.value,
-            moTa.value
+            moTa.value,
+            soluong.value
         );
 
         //Sau khi tạo xong chuyển về trang QLSanPham
@@ -206,33 +216,11 @@
                 $('#nongDoCon').val(data.data.abv);
                 $('#status').val(data.data.status ? 'Đang bán' : 'Ngừng bán'); // Trạng thái
                 $('#createTime').val(data.data.createTime); // Thời gian tạo
-                $('#quantity').val(data.data.quantity); // Số lượng
+                $('#soluong').val(data.data.quantity); // Số lượng
                 $('#moTa').val(data.data.description); // Mô tả
 
                 // Cập nhật hình ảnh
                 $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.data.image);
-
-                // Xử lý phần batches
-                const batchesContainer = $('#batch');
-                batchesContainer.empty(); // Clear the current content in the #batch div
-
-                if (data.data.batches && data.data.batches.length > 0) {
-                    // Loop through each batch and add it to the #batch div
-                    data.data.batches.forEach((batch, index) => {
-                        const batchHTML = `
-                                <div class="batch-item">
-                                    <h4>Lô số ${index + 1}</h4>
-                                    <p>Đơn giá: ${batch.price} VND</p>
-                                    <p>Số lượng: ${batch.quantity}</p>
-                                    <p>Ngày nhập: ${batch.receivingTime}</p>
-                                </div>
-                            `;
-                        batchesContainer.append(batchHTML); // Append each batch to the #batch div
-                    });
-                } else {
-                    // If no batches are available, show a message
-                    batchesContainer.append('<p>No batches available</p>');
-                }
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
@@ -303,7 +291,7 @@
         });
     }
 
-    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa) {
+    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong) {
         // Tạo đối tượng dữ liệu
         var dataToSend = {
             id: id,
@@ -311,6 +299,7 @@
             origin: xuatXu,
             brandId: Number(thuongHieu),
             capacity: theTich,
+            quanity: soluong,
             abv: nongDoCon,
             description: moTa
         };

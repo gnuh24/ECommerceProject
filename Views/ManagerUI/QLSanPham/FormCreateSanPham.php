@@ -69,6 +69,10 @@
                                                         <input id="nongDoCon" type="text" class="input" name="nongDoCon" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
+                                                        <p class="text">Số lượng</p>
+                                                        <input id="soluong" type="text" class="input" name="nongDoCon" style="width: 40rem" />
+                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
+
 
                                                         <p class="text">Giá</p>
                                                         <input id="gia" class="input" name="gia" style="width: 40rem" />
@@ -144,6 +148,7 @@
         let gia = document.getElementById("gia");
         let anhMinhHoa = document.getElementById("anhMinhHoa");
         let moTa = document.getElementById("moTa");
+        let soluong = document.getElementById("soluong");
 
         if (!tenSanPham.value.trim()) {
             showErrorAlert('Lỗi!', 'Tên sản phẩm không được để trống');
@@ -225,71 +230,53 @@
             loaiSanPham.value,
             xuatXu.value,
             thuongHieu.value,
-
             theTich.value,
             nongDoCon.value,
             gia.value,
+            soluong.value,
             anhMinhHoa.files[0],
             moTa.value);
-
-
-
-
-
         //Sau khi tạo xong chuyển về trang QLSanPham
         showSuccessAlert('Thành công!', 'Tạo sản phẩm mới thành công !!', 'QLSanPham.php');
     });
 
 
-
     function getCategories() {
         $.ajax({
-            url: "http://localhost:8080/Category/noPaging",
-            method: "GET",
-            dataType: "json",
-            success: function(response) {
-                console.log(response)
-                if (response && response.length > 0) {
-                    // Xóa tất cả các option hiện có trong dropdown
-                    $('#loaiSanPham').empty();
-                    // Thêm option "Tất cả"
-                    $('#loaiSanPham').append('<option value="">Chọn loại sản phẩm</option>');
-                    // Duyệt qua danh sách loại sản phẩm và thêm từng option vào dropdown
-                    $.each(response, function(index, category) {
-                        $('#loaiSanPham').append(`<option value="${category.id}">${category.categoryName}</option>`);
-                    });
-                } else {
-                    console.log("Không có loại sản phẩm nào được trả về từ API.");
-                }
+            url: "../../../Controllers/CategoryController.php",
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let categorySelect = $('#loaiSanPham');
+                categorySelect.empty(); // Xóa các options cũ
+                data.data.forEach(function(category) {
+                    categorySelect.append(new Option(category.CategoryName, category.Id));
+                });
             },
             error: function(xhr, status, error) {
-                console.error("Error:", error);
+                console.error('Error loading categories:', error);
             }
         });
     }
 
     function getBrand() {
         $.ajax({
-            url: "http://localhost:8080/Brand/noPaging",
-            method: "GET",
-            dataType: "json",
-            success: function(response) {
-                console.log(response)
-                if (response && response.length > 0) {
-                    $('#thuongHieu').empty();
-                    $('#thuongHieu').append('<option value="">Chọn thương hiệu sản phẩm</option>');
-                    $.each(response, function(index, brand) {
-                        $('#thuongHieu').append(`<option value="${brand.brandId}">${brand.brandName}</option>`);
-                    });
-                } else {
-                    console.log("Không có thương hiệu sản phẩm nào được trả về từ API.");
-                }
+            url: "../../../Controllers/BrandController.php",
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let brandSelect = $('#thuongHieu');
+                brandSelect.empty(); // Xóa các options cũ
+                data.data.forEach(function(brand) {
+                    brandSelect.append(new Option(brand.BrandName, brand.Id));
+                });
             },
             error: function(xhr, status, error) {
-                console.error("Error:", error);
+                console.error('Error loading brands:', error);
             }
         });
     }
+
 
 
     function showErrorAlert(title, message) {
@@ -318,27 +305,24 @@
 
 
 
-    function createSanPham(tenSanPham, maLoaiSanPham, xuatXu, thuongHieu, theTich, nongDoCon, gia, anhMinhHoa, moTa) {
-        var formData = new FormData();
-        formData.append("productName", tenSanPham);
-        formData.append("categoryId", maLoaiSanPham);
-        formData.append("origin", xuatXu);
-        formData.append("brandId", thuongHieu);
-        formData.append("capacity", theTich);
-        formData.append("abv", nongDoCon);
-        formData.append("price", gia);
-        formData.append("image", anhMinhHoa);
-        formData.append("description", moTa);
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
+    function createSanPham(tenSanPham, maLoaiSanPham, xuatXu, thuongHieu, theTich, nongDoCon, gia, soluong, anhMinhHoa, moTa) {
+        var dataToSend = {
+            productName: tenSanPham,
+            categoryId: (maLoaiSanPham),
+            origin: xuatXu,
+            brandId: Number(thuongHieu),
+            capacity: theTich,
+            quanity: soluong,
+            abv: nongDoCon,
+            description: moTa,
+            price: gia,
+            image: anhMinhHoa
+        };
         $.ajax({
-            url: 'http://localhost:8080/Product', // Kiểm tra URL chính xác
+            url: '../../../Controllers/ProductController.php', // Kiểm tra URL chính xác
             type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
+            contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
+            data: JSON.stringify(dataToSend), // Chuyển đổi đối tượng thành chuỗi JSON
 
             success: function(data) {
                 console.log(data); // Log dữ liệu trả về để kiểm tra

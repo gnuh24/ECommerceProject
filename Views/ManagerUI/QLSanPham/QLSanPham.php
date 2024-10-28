@@ -2,17 +2,37 @@
 <html lang="en">
 
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Chỉ tải một lần jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+    <!-- Cấu hình meta -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Các tệp CSS -->
     <link rel="stylesheet" href="../AdminDemo.css" />
     <link rel="stylesheet" href="QLSanPham.css" />
+
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Pagination.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
 
     <title>Quản lý sản phẩm</title>
 </head>
+
+<style>
+    .paginationjs {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+</style>
 
 <body>
     <div id="root">
@@ -39,7 +59,7 @@
                                 <div class="wrapper">
                                     <div style="">
                                         <h2>Quản lý sản Phẩm</h2>
-                                        <!-- <button id="createProductBtn" onclick="toCreateForm()">Tạo Sản Phẩm</button> -->
+                                        <button id="createProductBtn" onclick="toCreateForm()">Tạo Sản Phẩm</button>
                                     </div>
                                     <!-- Thanh lọc menu -->
                                     <div id="filter-menu">
@@ -94,7 +114,7 @@
                                                 </thead>
                                                 <tbody id="tableBody"></tbody>
                                             </table>
-                                            <div id="pagination">
+                                            <div id="pagination-container">
 
                                             </div>
                                         </div>
@@ -110,6 +130,9 @@
 </body>
 
 <script>
+    var currentPage = 1; // Track the current page
+    var pageSizeGlobal = 5;
+
     function toCreateForm() {
         window.location.href = "FormCreateSanPham.php";
     }
@@ -176,8 +199,7 @@
                 }
 
                 tableBody.innerHTML = tableContent;
-
-                createPagination(page, response.totalPages);
+                setupPagination(response.totalElements, page);
             },
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);
@@ -338,38 +360,31 @@
 
     });
 
+    function setupPagination(totalElements, currentPage) {
 
+        //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+        const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+        totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
 
-    // Hàm tạo nút phân trang
-    function createPagination(currentPage, totalPages) {
-        var paginationContainer = document.getElementById("pagination");
+        $('#pagination-container').pagination({
+            dataSource: Array.from({
+                length: totalElements
+            }, (_, i) => i + 1),
 
-        // Xóa nút phân trang cũ (nếu có)
-        paginationContainer.innerHTML = '';
+            pageSize: pageSizeGlobal,
+            showPrevious: true,
+            showNext: true,
+            pageNumber: currentPage,
 
-        // Chỉ tạo phân trang khi totalPages > 1
-        if (totalPages > 1) {
-            // Tạo nút cho từng trang và thêm vào chuỗi HTML
-            var paginationHTML = '';
-            for (var i = 1; i <= totalPages; i++) {
-                paginationHTML += '<button class="pageButton">' + i + '</button>';
+            callback: function(data, pagination) {
+                if (pagination.pageNumber !== currentPage) {
+                    currentPage = pagination.pageNumber; // Update current page
+                    filterProducts(currentPage); // Fetch new data for the selected page
+                }
             }
-
-            // Thiết lập nút phân trang vào paginationContainer
-            paginationContainer.innerHTML = paginationHTML;
-
-            // Thêm sự kiện click cho từng nút phân trang
-            paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
-                button.addEventListener('click', function() {
-                    // Gọi hàm filterProducts khi người dùng click vào nút phân trang
-                    filterProducts(index + 1); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
-                });
-            });
-
-            // Đánh dấu trang hiện tại
-            paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active');
-        }
+        });
     }
+
 
     function toUpdate(maSanPham) {
         window.location.href = `FormUpdateSanPham.php?maSanPham=${maSanPham}`;
