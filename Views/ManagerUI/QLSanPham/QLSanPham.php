@@ -33,38 +33,37 @@
 </style>
 
 <body>
-    <div id="root">
-        <div>
-            <!-- Modal chỉnh sửa sản phẩm -->
-            <div id="editProductModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Chỉnh sửa sản phẩm</h2>
+
+    <!-- Modal chỉnh sửa sản phẩm -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Chỉnh sửa sản phẩm</h2>
 
 
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <div class="App">
-                <div class="StaffLayout_wrapper__CegPk">
-                    <?php require_once "../ManagerHeader.php" ?>
+    <div class="App">
+        <div class="StaffLayout_wrapper__CegPk">
+            <?php require_once "../ManagerHeader.php" ?>
 
-                    <div>
-                        <div>
-                            <div class="Manager_wrapper__vOYy">
-                                <?php require_once "../ManagerMenu.php" ?>
+            <div>
+                <div>
+                    <div class="Manager_wrapper__vOYy">
+                        <?php require_once "../ManagerMenu.php" ?>
 
-                                <div class="wrapper">
-                                    <div style="">
-                                        <h2>Quản lý sản Phẩm</h2>
-                                        <button id="createProductBtn" onclick="toCreateForm()">Tạo Sản Phẩm</button>
-                                    </div>
-                                    <!-- Thanh lọc menu -->
-                                    <div id="filter-menu">
-                                        <input type="text" placeholder="Tìm kiếm theo tên sản phẩm" id="searchSanPham" name="searchSanPham">
-                                        <button id="filter-button"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <div class="wrapper">
+                            <div style="">
+                                <h2>Quản lý sản Phẩm</h2>
+                                <button id="createProductBtn" onclick="toCreateForm()">Tạo Sản Phẩm</button>
+                            </div>
+                            <!-- Thanh lọc menu -->
+                            <div id="filter-menu">
+                                <input type="text" placeholder="Tìm kiếm theo tên sản phẩm" id="searchSanPham" name="searchSanPham">
+                                <button id="filter-button"><i class="fa-solid fa-magnifying-glass"></i></button>
 
-                                        <!-- <label for="price-filter">Giá:</label>
+                                <!-- <label for="price-filter">Giá:</label>
                                         <select id="price-filter">
                                             <option value="">Tất cả</option>
                                             <option value="low">Dưới 1 triệu</option>
@@ -72,50 +71,48 @@
                                             <option value="high">Trên 3 triệu</option>
                                         </select> -->
 
-                                        <label for="state-filter">Trạng thái:</label>
-                                        <select id="state-filter">
-                                            <option value="all">Tất cả</option>
-                                            <option value="true">Kinh doanh</option>
-                                            <option value="false">Ngừng kinh doanh</option>
+                                <label for="state-filter">Trạng thái:</label>
+                                <select id="state-filter">
+                                    <option value="all">Tất cả</option>
+                                    <option value="true">Kinh doanh</option>
+                                    <option value="false">Ngừng kinh doanh</option>
 
-                                        </select>
+                                </select>
 
-                                        <label for="category-filter">Loại sản phẩm:</label>
-                                        <select id="category-filter">
-                                            <!-- Hiển thị menu LoaiSanPham -->
-                                        </select>
+                                <label for="category-filter">Loại sản phẩm:</label>
+                                <select id="category-filter">
+                                    <!-- Hiển thị menu LoaiSanPham -->
+                                </select>
 
 
-                                        <label for="brand-filter">Thương hiệu:</label>
-                                        <select id="brand-filter">
-                                        </select>
+                                <label for="brand-filter">Thương hiệu:</label>
+                                <select id="brand-filter">
+                                </select>
 
-                                        <button id="reset-button"><i class="fa-solid fa-rotate-right"></i></button>
-                                    </div>
+                                <button id="reset-button"><i class="fa-solid fa-rotate-right"></i></button>
+                            </div>
 
-                                    <div>
-                                        <div class="boxTable" style="width: 100%;">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 5%; text-align: center;">ID</th>
-                                                        <th style="width: 10%; text-align: center;">Minh họa</th>
-                                                        <th style="width: 25%;">Tên Sản Phẩm</th>
-                                                        <th style="width: 10%; text-align: center;">Giá Tiền</th>
-                                                        <th style="width: 10%; text-align: center;">Trạng thái</th>
-                                                        <th style="width: 10%;text-align: center;">Loại sản phẩm</th>
-                                                        <th style="width: 10%;text-align: center;">Thương hiệu</th>
+                            <div>
+                                <div class="boxTable" style="width: 100%;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%; text-align: center;">ID</th>
+                                                <th style="width: 10%; text-align: center;">Minh họa</th>
+                                                <th style="width: 25%;">Tên Sản Phẩm</th>
+                                                <th style="width: 10%; text-align: center;">Giá Tiền</th>
+                                                <th style="width: 10%; text-align: center;">Trạng thái</th>
+                                                <th style="width: 10%;text-align: center;">Loại sản phẩm</th>
+                                                <th style="width: 10%;text-align: center;">Thương hiệu</th>
 
-                                                        <th style="width: 5%; text-align: center;">Số Lượng</th>
-                                                        <th style="width: 10%; text-align: center;">Thao Tác</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tableBody"></tbody>
-                                            </table>
-                                            <div id="pagination-container">
+                                                <th style="width: 5%; text-align: center;">Số Lượng</th>
+                                                <th style="width: 10%; text-align: center;">Thao Tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody"></tbody>
+                                    </table>
+                                    <div id="pagination-container">
 
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

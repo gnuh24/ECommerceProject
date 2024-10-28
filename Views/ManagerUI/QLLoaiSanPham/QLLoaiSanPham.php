@@ -66,20 +66,19 @@
               <div style="margin-left: auto"></div>
             </div>
             <br>
-            <div class="boxTable">
-              <table class="Table_table__BWPy">
-                <thead class="Table_head__FTUog">
-                  <tr>
-                    <th style="width: 25%" class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
-                    <th class="Table_th__hCkcg" scope="col">Loại sản phẩm</th>
-                    <th style="width: 15%" class="Table_th__hCkcg" scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="tableBody">
+            <table class="Table_table__BWPy">
+              <thead class="Table_head__FTUog">
+                <tr>
+                  <th style="width: 25%" class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
+                  <th class="Table_th__hCkcg" scope="col">Loại sản phẩm</th>
+                  <th style="width: 15%" class="Table_th__hCkcg" scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
 
-                </tbody>
-              </table>
-            </div>
+              </tbody>
+            </table>
+            <!-- </div> -->
             <div id="pagination-container"></div>
 
           </div>
@@ -159,7 +158,7 @@
             tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
           });
         } else {
-          tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
+          tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có loại sản phẩm nào thỏa yêu cầu</td></tr>`;
         }
 
         // Thiết lập lại nội dung của tbody bằng chuỗi tableContent

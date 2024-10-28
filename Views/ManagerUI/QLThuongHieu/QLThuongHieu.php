@@ -27,26 +27,23 @@
 </style>
 
 <body>
-  <div id="root">
-    <div>
-      <div class="App">
-        <div class="StaffLayout_wrapper__CegPk">
-          <?php require_once "../ManagerHeader.php" ?>
+  <div class="App">
+    <div class="StaffLayout_wrapper__CegPk">
+      <?php require_once "../ManagerHeader.php" ?>
 
-          <div>
-            <div>
-              <div class="Manager_wrapper__vOYy">
-                <?php require_once "../ManagerMenu.php" ?>
 
-                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                  <div class="wrapper">
-                    <div style="
+      <div class="Manager_wrapper__vOYy">
+        <?php require_once "../ManagerMenu.php" ?>
+
+        <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+          <div class="wrapper">
+            <div style="
                           display: flex;
                           padding-top: 1rem;
                           padding-bottom: 1rem;
                         ">
-                      <h2>Thương Hiệu</h2>
-                      <button style="
+              <h2>Thương Hiệu</h2>
+              <button style="
                             margin-left: auto;
                             font-family: Arial;
                             font-size: 1.5rem;
@@ -57,48 +54,44 @@
                             border-radius: 0.6rem;
                             cursor: pointer;
                           ">
-                        <a href="./FormCreateThuongHieu.php"> Thêm Thương Hiệu</a>
-                      </button>
-                    </div>
-                    <br>
+                <a href="./FormCreateThuongHieu.php"> Thêm Thương Hiệu</a>
+              </button>
+            </div>
+            <br>
 
-                    <div class="boxFeature">
-                      <div style="position: relative">
-                        <input class="Admin_input__LtEE-" placeholder="Tìm kiếm thương hiệu" />
-                        <button id="searchButton" style="cursor: pointer;"><i class="fa fa-search"></i></button>
-                      </div>
-                      <div style="margin-left: auto"></div>
-                    </div>
-
-                    <br>
-                    <div class="boxTable">
-                      <table class="Table_table__BWPy">
-                        <thead class="Table_head__FTUog">
-                          <tr>
-                            <th style="width: 25%" class="Table_th__hCkcg">Mã thương hiệu</th>
-                            <th class="Table_th__hCkcg">Thương hiệu</th>
-                            <!-- <th class="Table_th__hCkcg">Email</th>
-                            <th class="Table_th__hCkcg">Số điện thoại</th> -->
-                            <th style="width: 15%" class="Table_th__hCkcg">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody id="tableBody">
-
-                        </tbody>
-                      </table>
-                    </div>
-                    <div id="pagination-container">
-                    </div>
-                  </div>
-                </div>
+            <div class="boxFeature">
+              <div style="position: relative">
+                <input class="Admin_input__LtEE-" placeholder="Tìm kiếm thương hiệu" />
+                <button id="searchButton" style="cursor: pointer;"><i class="fa fa-search"></i></button>
               </div>
+              <div style="margin-left: auto"></div>
+            </div>
+
+            <br>
+            <div class="boxTable">
+              <table class="Table_table__BWPy">
+                <thead class="Table_head__FTUog">
+                  <tr>
+                    <th style="width: 25%" class="Table_th__hCkcg">Mã thương hiệu</th>
+                    <th class="Table_th__hCkcg">Thương hiệu</th>
+                    <!-- <th class="Table_th__hCkcg">Email</th>
+                            <th class="Table_th__hCkcg">Số điện thoại</th> -->
+                    <th style="width: 15%" class="Table_th__hCkcg">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+              </table>
+            </div>
+            <div id="pagination-container">
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
+
 </body>
 
 
@@ -177,7 +170,7 @@
             tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
           });
         } else {
-          tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
+          tableContent = `<tr ><td style="text-align: center;" colspan="7">Không có thương hiệu nào thỏa yêu cầu</td></tr>`;
         }
 
         // Thiết lập lại nội dung của tbody bằng chuỗi tableContent

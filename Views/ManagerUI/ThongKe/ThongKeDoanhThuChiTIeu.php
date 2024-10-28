@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="ThongKeDonHang.css" />
     <link rel="stylesheet" href="ThongKeTaiChinh.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script src="../../HelperUI/formatOutput.js"></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <title>Thống kê sản phẩm bán chạy</title>
@@ -141,13 +143,6 @@
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);
             }
-        });
-    }
-
-    function formatCurrency(value) {
-        return value.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
         });
     }
 </script>
