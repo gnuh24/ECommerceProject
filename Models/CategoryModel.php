@@ -53,7 +53,7 @@ class CategoryModel
     }
 
     // Lấy danh sách Category có phân trang và tìm kiếm
-    public function getAllCategory($pageNumber = 1, $search = null, $pageSize = 12)
+    public function getAllCategory($pageNumber = 1, $search = null, $pageSize = 5)
     {
         $offset = ($pageNumber - 1) * $pageSize;
         $query = "SELECT * FROM `category` WHERE `CategoryName` LIKE :search LIMIT :offset, :pageSize";
@@ -71,13 +71,16 @@ class CategoryModel
             $totalStmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
             $totalStmt->execute();
             $totalResult = $totalStmt->fetch(PDO::FETCH_ASSOC);
+            $totalElements = $totalResult['total'];
             $totalPages = ceil($totalResult['total'] / $pageSize);
 
             return (object) [
                 "status" => 200,
                 "message" => "Categories fetched successfully",
                 "data" => $result,
-                "totalPages" => $totalPages
+                "totalPages" => $totalPages,
+                "totalElements" => $totalElements,
+                "size" => $pageSize
             ];
         } catch (PDOException $e) {
             return (object) [

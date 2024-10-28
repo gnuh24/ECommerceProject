@@ -6,10 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="QLNhaCungCap.css" />
+  <link rel="stylesheet" href="QLThuongHieu.css" />
   <!-- <link rel="stylesheet" href="../bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+  <!-- Include Pagination.js -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
   <title>Quản lý thương hiệu</title>
 </head>
 
@@ -44,7 +48,7 @@
                             border-radius: 0.6rem;
                             cursor: pointer;
                           ">
-                        <a href="./FormCreateNhaCungCap.php"> Thêm Thương Hiệu</a>
+                        <a href="./FormCreateThuongHieu.php"> Thêm Thương Hiệu</a>
                       </button>
                     </div>
                     <br>
@@ -74,12 +78,7 @@
                         </tbody>
                       </table>
                     </div>
-                    <div class="pagination">
-                      <?php
-                      for ($i = 1; $i <= $totalPage; $i++) {
-                        echo '<button class="pageButton" onclick="fetchDataAndUpdateTable(' . $i . ')">' . $i . '</button>';
-                      }
-                      ?>
+                    <div id="pagination-container">
                     </div>
                   </div>
                 </div>
@@ -89,6 +88,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </body>
 
@@ -105,8 +105,9 @@
 
   var page = 1;
   var pageSizeGlobal = 5;
+  var search = "";
 
-  function getAllNhaCungCap(page, search) {
+  function getAllThuongHieu(page, search) {
     $('#loading-indicator').show();
 
     $.ajax({
@@ -128,7 +129,7 @@
           data.forEach(function(record, index) {
             var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
             var trContent = `
-                        <form id="updateForm" method="post" action="FormUpdateNhaCungCap.php">
+                        <form id="updateForm" method="post" action="FormUpdateThuongHieu.php">
                             <tr style="height: 20%"; max-height: 20%;>
                             <td class="${trClass}">${record.Id}</td>
                             <td class="${trClass}">${record.BrandName}</td>
@@ -138,8 +139,8 @@
               trContent += `Mặc định`;;
             } else {
               trContent += `
-                        <button class="edit" onclick="updateNhaCungCap(${record.Id}, '${record.BrandName}')">Sửa</button>
-                        <button class="delete" onclick="deleteNhaCungCap(${record.Id}, '${record.BrandName}')">Xoá</button>`;
+                        <button class="edit" onclick="updateThuongHieu(${record.Id}, '${record.BrandName}')">Sửa</button>
+                        <button class="delete" onclick="deleteThuongHieu(${record.Id}, '${record.BrandName}')">Xoá</button>`;
             }
             trContent += `</tr></form>`;
             // Nếu chỉ có ít hơn 10 phần tử và đã duyệt đến phần tử cuối cùng, thêm các hàng trống vào
@@ -147,7 +148,7 @@
               for (var i = data.length; i < 5; i++) {
                 var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng trống
                 trContent += `
-                                <form id="emptyForm" method="post" action="FormUpdateNhaCungCap.php">
+                                <form id="emptyForm" method="post" action="FormUpdateThuongHieu.php">
                                     <tr style="height: 20%"; max-height: 20%;>
                                         <td class="${emptyTrClass}" style="width: 130px;"></td>
                                         <td class="${emptyTrClass}"></td>
@@ -170,7 +171,7 @@
         tableBody.innerHTML = tableContent;
 
         // Tạo phân trang (giả sử `createPagination` là hàm bạn đã định nghĩa để tạo phân trang)
-        createPagination(page, response.totalPages);
+        setupPagination(response.totalElements, page);
       },
 
       error: function(xhr, status, error) {
@@ -187,16 +188,13 @@
 
 
 
-  // Hàm để gọi getAllNhaCungCap và cập nhật dữ liệu và phân trang
+  // Hàm để gọi getAllThuongHieu và cập nhật dữ liệu và phân trang
   function fetchDataAndUpdateTable(page, search) {
     //Clear dữ liệu cũ
     clearTable();
 
     // Gọi hàm getAllTaiKhoan và truyền các giá trị tương ứng
-    getAllNhaCungCap(page, search);
-
-    // Tạo phân trang
-    createPagination(page);
+    getAllThuongHieu(page, search);
   }
 
   // Khởi tạo trang hiện tại
@@ -204,36 +202,24 @@
   fetchDataAndUpdateTable(currentPage, '');
 
   // Hàm tạo nút phân trang
-  function createPagination(currentPage, totalPages) {
-    var paginationContainer = document.querySelector('.pagination');
-    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+  function setupPagination(totalElements, currentPage) {
+    $('#pagination-container').pagination({
+      dataSource: Array.from({
+        length: totalElements
+      }, (_, i) => i + 1),
+      pageSize: pageSizeGlobal,
+      showPrevious: true,
+      showNext: true,
+      pageNumber: currentPage,
 
-    // Xóa nút phân trang cũ (nếu có)
-    paginationContainer.innerHTML = '';
-
-    if (totalPages > 1) {
-      // Tạo nút cho từng trang và thêm vào chuỗi HTML
-      var paginationHTML = '';
-      for (var i = 1; i <= totalPages; i++) {
-        paginationHTML += '<button class="pageButton">' + i + '</button>';
+      callback: function(data, pagination) {
+        if (pagination.pageNumber !== currentPage) {
+          currentPage = pagination.pageNumber; // Cập nhật trang hiện tại
+          fetchDataAndUpdateTable(currentPage, search); // Tải dữ liệu mới cho trang
+        }
       }
-
-      // Thiết lập nút phân trang vào paginationContainer
-      paginationContainer.innerHTML = paginationHTML;
-
-      // Thêm sự kiện click cho từng nút phân trang
-      paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
-        button.addEventListener('click', function() {
-          // Gọi hàm fetchDataAndUpdateTable khi người dùng click vào nút phân trang
-          fetchDataAndUpdateTable(index + 1, searchValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
-        });
-      });
-
-      // Đánh dấu trang hiện tại
-      paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active'); // Sửa lại để chỉ chọn trang hiện tại
-    }
+    });
   }
-
 
 
   // Hàm xử lý sự kiện khi nút tìm kiếm được click
@@ -259,7 +245,7 @@
     }
   });
 
-  function deleteNhaCungCap(brandId, brandName) {
+  function deleteThuongHieu(brandId, brandName) {
     // Sử dụng Swal thay vì hộp thoại confirm
     Swal.fire({
       title: `Bạn có muốn xóa  ${brandName} không?`,
@@ -302,11 +288,11 @@
 
 
 
-  function updateNhaCungCap(brandId, brandName) {
+  function updateThuongHieu(brandId, brandName) {
     // Lấy ra form bằng id của nó
     var form = document.querySelector("#updateForm");
 
-    window.location.href = `FormUpdateNhaCungCap.php?brandId=${brandId}&brandName=${brandName}`
+    window.location.href = `FormUpdateThuongHieu.php?brandId=${brandId}&brandName=${brandName}`
 
     // Gửi form đi
     form.submit();
