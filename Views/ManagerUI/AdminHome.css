@@ -15,7 +15,6 @@ body {
     text-rendering: optimizeSpeed;
     color: var(--text-color);
     overflow-y: overlay;
-    background-color: #ffeecc;
 }
 
 html *::-webkit-scrollbar {

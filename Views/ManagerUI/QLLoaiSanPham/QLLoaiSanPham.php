@@ -7,14 +7,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="../QLLoaiSanPham/QLLoaiSanPham.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" /> <!-- PaginationJS CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+  <!-- PaginationJS CSS -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script> <!-- PaginationJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+  <!-- PaginationJS -->
 
   <title>Quản lý loại sản phẩm</title>
 </head>
+<style>
+  .paginationjs {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+</style>
 
 <body>
   <div id="root">

@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="QLThuongHieu.css" />
-  <!-- <link rel="stylesheet" href="../bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
   <!-- Include Pagination.js -->
@@ -16,6 +15,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
   <title>Quản lý thương hiệu</title>
 </head>
+<style>
+  .paginationjs {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+</style>
 
 <body>
   <div id="root">
@@ -97,13 +103,16 @@
 
 
 <script>
+  // Khởi tạo trang hiện tại
+  fetchDataAndUpdateTable(currentPage, '');
+
   // Hàm để xóa hết các dòng trong bảng
   function clearTable() {
     var tableBody = document.querySelector('.Table_table__BWPy tbody');
     tableBody.innerHTML = ''; // Xóa nội dung trong tbody
   }
 
-  var page = 1;
+  var currentPage = 1;
   var pageSizeGlobal = 5;
   var search = "";
 
@@ -196,10 +205,6 @@
     // Gọi hàm getAllTaiKhoan và truyền các giá trị tương ứng
     getAllThuongHieu(page, search);
   }
-
-  // Khởi tạo trang hiện tại
-  var currentPage = 1;
-  fetchDataAndUpdateTable(currentPage, '');
 
   // Hàm tạo nút phân trang
   function setupPagination(totalElements, currentPage) {

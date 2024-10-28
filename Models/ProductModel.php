@@ -197,7 +197,7 @@ class ProductModel
                     "id" => $item['Id'],
                     "productName" => $item['ProductName'],
                     "status" => $item['Status'],
-                    "quantity" => $item['AvailableQuantity'],
+                    "quantity" => $item['Quantity'],
                     "price" => $item['UnitPrice'],
                     "image" => $item['Image'],
                     "sale" => $item['Sale'],
@@ -364,55 +364,115 @@ class ProductModel
         }
     }
 
-    public function createProduct($productName)
+    public function createProduct($productName, $unitPrice, $image, $origin = null, $capacity = null, $quantity, $abv = null, $description = null, $brandId = null, $categoryId = null)
     {
-        // Lấy thời gian hiện tại ở định dạng 'Y-m-d H:i:s'
-        $currentDateTime = date('Y-m-d H:i:s');
+        $status = 1; // Default status
+        $createTime = date('Y-m-d H:i:s'); // Current date and time
 
-        // Status mặc định là true (hoặc 1)
-        $status = true;
+        $fields = ["`ProductName`", "`Status`", "`CreateTime`", "`Quantity`", "`UnitPrice`"];
+        $placeholders = [":productName", ":status", ":createTime", ":quantity", ":unitPrice"];
+        $params = [
+            ':productName' => $productName,
+            ':status' => $status,
+            ':createTime' => $createTime,
+            ':quantity' => $quantity,
+            ':unitPrice' => $unitPrice
+        ];
 
-        $query = "
-        INSERT INTO `Product` 
-        (`ProductName`, `Status`, `CreateTime`, `BrandId`, `CategoryId`) 
-        VALUES (:productName, :status, :createTime, 1, 1)
-        ";
+        // Check and add optional fields
+        if (!empty($image)) {
+            $fields[] = "`Image`";
+            $placeholders[] = ":image";
+            $params[':image'] = $image;
+        }
+
+        if (!empty($sale)) {
+            $fields[] = "`Sale`";
+            $placeholders[] = ":sale";
+            $params[':sale'] = $sale;
+        }
+
+        if (!empty($origin)) {
+            $fields[] = "`Origin`";
+            $placeholders[] = ":origin";
+            $params[':origin'] = $origin;
+        }
+
+        if ($capacity !== null) {
+            $fields[] = "`Capacity`";
+            $placeholders[] = ":capacity";
+            $params[':capacity'] = $capacity;
+        }
+
+        if ($abv !== null) {
+            $fields[] = "`ABV`";
+            $placeholders[] = ":abv";
+            $params[':abv'] = $abv;
+        }
+
+        if (!empty($description)) {
+            $fields[] = "`Description`";
+            $placeholders[] = ":description";
+            $params[':description'] = $description;
+        }
+
+        if ($brandId !== null) {
+            $fields[] = "`BrandId`";
+            $placeholders[] = ":brandId";
+            $params[':brandId'] = $brandId;
+        }
+
+        if ($categoryId !== null) {
+            $fields[] = "`CategoryId`";
+            $placeholders[] = ":categoryId";
+            $params[':categoryId'] = $categoryId;
+        }
+
+        // Create SQL query
+        $query = "INSERT INTO `Product` (" . implode(", ", $fields) . ") VALUES (" . implode(", ", $placeholders) . ")";
+        $queryWithParams = $this->getSQLWithParams($query, $params);
 
         try {
+            // Prepare and execute statement
             $statement = $this->connection->prepare($query);
 
-            // Gán giá trị cho các tham số
-            $statement->bindValue(':productName', $productName, PDO::PARAM_STR);
-            $statement->bindValue(':status', $status, PDO::PARAM_BOOL);
-            $statement->bindValue(':createTime', $currentDateTime, PDO::PARAM_STR);
+            // Bind values to parameters
+            foreach ($params as $param => $value) {
+                $statement->bindValue($param, $value);
+            }
 
+            // Execute statement
             $statement->execute();
+            $lastInsertId = $this->connection->lastInsertId();
 
+            // Return success status
             return (object)[
                 "status" => 201,
                 "message" => "Product created successfully",
-                "productId" => $this->connection->lastInsertId() // Lấy ID của sản phẩm vừa được tạo
             ];
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return (object)[
-                "status" => 400,
-                "message" => $e->getMessage()
+                "status" => 500,
+                "message" => "Insert failed: " . $e->getMessage(),
+                "query" => $queryWithParams
             ];
         }
     }
 
-    public function updateProduct($id, $image, $origin, $capacity, $abv, $description, $brandId, $categoryId, $status)
+
+    public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status)
     {
         $fieldsToUpdate = [];
         $params = [];
 
-        // Xây dựng các trường cần cập nhật
-        if ($image !== null && $image !== '') {
+        // Add fields and parameters dynamically if they are not null or empty
+        if (!empty($image)) {
             $fieldsToUpdate[] = "`Image` = :image";
             $params[':image'] = $image;
         }
 
-        if ($origin !== null && $origin !== '') {
+        if (!empty($origin)) {
             $fieldsToUpdate[] = "`Origin` = :origin";
             $params[':origin'] = $origin;
         }
@@ -427,7 +487,12 @@ class ProductModel
             $params[':abv'] = $abv;
         }
 
-        if ($description !== null && $description !== '') {
+        if ($quantity !== null) {
+            $fieldsToUpdate[] = "`Quantity` = :quantity";
+            $params[':quantity'] = $quantity;
+        }
+
+        if (!empty($description)) {
             $fieldsToUpdate[] = "`Description` = :description";
             $params[':description'] = $description;
         }
@@ -442,13 +507,12 @@ class ProductModel
             $params[':categoryId'] = $categoryId;
         }
 
-        // Thêm logic cập nhật cho status
         if ($status !== null) {
             $fieldsToUpdate[] = "`Status` = :status";
             $params[':status'] = $status;
         }
 
-        // Kiểm tra nếu không có trường nào hợp lệ để cập nhật
+        // Ensure there are fields to update
         if (empty($fieldsToUpdate)) {
             return (object)[
                 "status" => 400,
@@ -456,35 +520,31 @@ class ProductModel
             ];
         }
 
-        // Tạo câu lệnh SQL
+        // Build the SQL query
         $query = "UPDATE `product` SET " . implode(", ", $fieldsToUpdate) . " WHERE `Id` = :id";
         $params[':id'] = intval($id);
 
-        // Tạo câu SQL có chứa các giá trị đã được thay thế
+        // Replace parameters in SQL for logging
         $queryWithParams = $this->getSQLWithParams($query, $params);
 
         try {
-            // Thực thi câu lệnh
+            // Prepare and bind parameters for execution
             $statement = $this->connection->prepare($query);
-
-            // Gán giá trị cho các tham số
             foreach ($params as $param => $value) {
                 $statement->bindValue($param, $value);
             }
 
-            // Thực thi câu lệnh và kiểm tra số dòng bị ảnh hưởng
+            // Execute statement and check affected rows
             $statement->execute();
             $rowCount = $statement->rowCount();
 
-            // Trả về câu lệnh SQL và trạng thái cập nhật
             return (object)[
                 "status" => 200,
                 "message" => $rowCount > 0 ? "Product updated successfully" : "No record was updated",
-                "query" => $queryWithParams, // Trả về câu lệnh SQL đã thay thế
+                "query" => $queryWithParams,
                 "rowCount" => $rowCount
             ];
         } catch (PDOException $e) {
-            // Ghi log lỗi và trả về lỗi
             error_log($e->getMessage());
             return (object)[
                 "status" => 500,
@@ -493,6 +553,7 @@ class ProductModel
             ];
         }
     }
+
 
     private function getSQLWithParams($query, $params)
     {

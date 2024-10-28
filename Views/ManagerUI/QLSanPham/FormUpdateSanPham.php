@@ -6,14 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../QLTaiKhoan/UserUpdate.css" />
     <link rel="stylesheet" href="../QLTaiKhoan/oneForAll.css" />
-    <style>
-        .batch-item {
-            background-color: white;
-            border: 2px solid black;
-            margin-top: 25px;
-            padding: 5px;
-        }
-    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -25,12 +17,8 @@
         <div>
             <div class="App">
                 <div class="StaffLayout_wrapper__CegPk">
-                    <div class="StaffHeader_wrapper__IQw-U">
-                        <p class="StaffHeader_title__QxjW4">Dekanta</p>
-                        <button class="StaffHeader_signOut__i2pcu">
-                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right-from-bracket" class="svg-inline--fa fa-arrow-right-from-bracket" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 2rem; height: 2rem; color: white"></svg>
-                        </button>
-                    </div>
+                    <?php require_once "../ManagerHeader.php" ?>
+
                     <div>
                         <div>
                             <div class="Manager_wrapper__vOYy">
@@ -80,6 +68,9 @@
                                                         <input id="nongDoCon" type="text" class="input" name="nongDoCon" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
+                                                        <p class="text">Số lượng</p>
+                                                        <input id="soluong" type="text" class="input" name="nongDoCon" style="width: 40rem" />
+                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
                                                         <p class="text">Trạng thái</p>
                                                         <input disabled id="status" class="input" name="status" style="width: 40rem" readonly />
@@ -152,6 +143,7 @@
         let theTich = document.getElementById("theTich");
         let nongDoCon = document.getElementById("nongDoCon");
         let anhMinhHoa = document.getElementById("anhMinhHoa");
+        let soluong = document.getElementById("soluong");
 
         let moTa = document.getElementById("moTa");
 
@@ -162,6 +154,11 @@
             return;
         }
 
+        if (parseFloat(soluong.value) <= 0 || isNaN(parseFloat(soluong.value))) {
+            showErrorAlert('Lỗi!', 'Số lượng phải là số dương');
+            theTich.focus();
+            return;
+        }
 
         if (parseFloat(nongDoCon.value) < 0 || parseFloat(nongDoCon.value) > 100 || isNaN(parseFloat(nongDoCon.value))) {
             showErrorAlert('Lỗi!', 'Nồng độ cồn phải là số dương và có giá trị từ 0 đến 100');
@@ -179,7 +176,8 @@
             nongDoCon.value,
             thuongHieu.value,
             loaiSanPham.value,
-            moTa.value
+            moTa.value,
+            soluong.value
         );
 
         //Sau khi tạo xong chuyển về trang QLSanPham
@@ -206,33 +204,11 @@
                 $('#nongDoCon').val(data.data.abv);
                 $('#status').val(data.data.status ? 'Đang bán' : 'Ngừng bán'); // Trạng thái
                 $('#createTime').val(data.data.createTime); // Thời gian tạo
-                $('#quantity').val(data.data.quantity); // Số lượng
+                $('#soluong').val(data.data.quantity); // Số lượng
                 $('#moTa').val(data.data.description); // Mô tả
 
                 // Cập nhật hình ảnh
                 $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.data.image);
-
-                // Xử lý phần batches
-                const batchesContainer = $('#batch');
-                batchesContainer.empty(); // Clear the current content in the #batch div
-
-                if (data.data.batches && data.data.batches.length > 0) {
-                    // Loop through each batch and add it to the #batch div
-                    data.data.batches.forEach((batch, index) => {
-                        const batchHTML = `
-                                <div class="batch-item">
-                                    <h4>Lô số ${index + 1}</h4>
-                                    <p>Đơn giá: ${batch.price} VND</p>
-                                    <p>Số lượng: ${batch.quantity}</p>
-                                    <p>Ngày nhập: ${batch.receivingTime}</p>
-                                </div>
-                            `;
-                        batchesContainer.append(batchHTML); // Append each batch to the #batch div
-                    });
-                } else {
-                    // If no batches are available, show a message
-                    batchesContainer.append('<p>No batches available</p>');
-                }
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
@@ -303,7 +279,7 @@
         });
     }
 
-    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa) {
+    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong) {
         // Tạo đối tượng dữ liệu
         var dataToSend = {
             id: id,
@@ -311,6 +287,7 @@
             origin: xuatXu,
             brandId: Number(thuongHieu),
             capacity: theTich,
+            quanity: soluong,
             abv: nongDoCon,
             description: moTa
         };
