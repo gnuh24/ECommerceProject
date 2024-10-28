@@ -1,3 +1,30 @@
+<style>
+    .StaffHeader_wrapper__IQw-U {
+        z-index: 9;
+        background-color: rgb(50, 49, 49);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .StaffHeader_title__QxjW4 {
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .StaffHeader_signOut__i2pcu {
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+    }
+</style>
+
 <div class="StaffHeader_wrapper__IQw-U">
     <p class="StaffHeader_title__QxjW4">Dekanta</p>
     <button id="logoutButton" class="StaffHeader_signOut__i2pcu">
@@ -6,8 +33,8 @@
         </svg>
     </button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.getElementById("logoutButton").addEventListener("click", () => {
         Swal.fire({
@@ -23,6 +50,9 @@
             if (result.isConfirmed) {
 
                 sessionStorage.removeItem('id');
+                sessionStorage.removeItem('email');
+                sessionStorage.removeItem('role');
+
 
                 // Chuyển hướng về trang đăng nhập
                 window.location.href = "../../MemberUI/Login/LoginUI.php";

@@ -1,0 +1,109 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+    line-height: 1.5;
+    text-rendering: optimizeSpeed;
+    color: var(--text-color);
+    overflow-y: overlay;
+    background-color: #ffeecc;
+}
+
+html *::-webkit-scrollbar {
+    display: none;
+    width: 8px;
+}
+
+button,
+input,
+[tabindex] {
+    outline: none;
+    border: none;
+}
+
+a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+.StaffLayout_wrapper__CegPk {
+    background-color: #fff;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+.Manager_wrapper__vOYy {
+    padding-top: 8.2rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.Products_boxFeature__0FLEt {
+    background-color: #ece9e9;
+    height: 5rem;
+    border-radius: 0.3rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+}
+
+svg:not(:root).svg-inline--fa,
+svg:not(:host).svg-inline--fa {
+    overflow: visible;
+    box-sizing: content-box;
+}
+
+.Products_input__Skvqe {
+    height: 3rem;
+    border: 1px solid #9c9b9b;
+    width: 50rem;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border-radius: 2px;
+}
+
+.Products_boxTable__ufdxZ {
+    margin-top: 1rem;
+    overflow-y: auto;
+    background-color: #ece9e9;
+    height: 48rem;
+    border-radius: 0.3rem;
+}
+
+.Table_table__fUoNr {
+    width: 100%;
+    border-spacing: 0;
+    position: relative;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.Table_head__CEe3S {
+    position: sticky;
+    top: 0;
+    background-color: #343333;
+    color: white;
+}
+
+.Table_th__RG2t4 {
+    font-family: "Lucida Sans", Geneva, Verdana, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    padding: 1rem;
+    text-align: center;
+    color: white;
+}

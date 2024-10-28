@@ -45,55 +45,13 @@
     height: 100dvh;
     position: relative;
   }
-  .StaffHeader_title__QxjW4 {
-    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #ffffff;
-  }
-  .StaffHeader_signOut__i2pcu {
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-  }
-  .StaffHeader_wrapper__IQw-U {
-    z-index: 9;
-    background-color: rgb(50, 49, 49);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 2rem;
-    display: flex;
-    justify-content: space-between;
-  }
+
   .Manager_wrapper__vOYy {
-    /* nayf của manager */
-    /* padding-top: 6rem; */
-    /* này của admin */
     padding-top: 8.2rem;
     display: flex;
     gap: 2rem;
   }
-  .Sidebar_sideBar__CC4MK {
-    position: fixed;
-    height: 100dvh;
-    width: 15%;
-    background-color: rgba(50, 49, 49, 0.918);
-  }
-  .MenuItemSidebar_menuItem__56b1m.MenuItemSidebar_active__RPq {
-    background-color: #333;
-    color: #fff;
-  }
-  .MenuItemSidebar_menuItem__56b1m {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #fff;
-    cursor: pointer;
-  }
+  
   .Products_boxFeature__0FLEt {
     background-color: rgb(236, 233, 233);
     height: 5rem;

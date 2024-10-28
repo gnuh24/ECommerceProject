@@ -1,5 +1,0 @@
-name:   apiclient-services
-parent: default
-
-namespace:
-    'namespace.twig': '%s.ns.html'

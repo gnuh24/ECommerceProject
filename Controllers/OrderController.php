@@ -17,41 +17,32 @@ switch ($_SERVER['REQUEST_METHOD']) {
             echo $response;
         } else {
             $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $size = isset($_GET['size']) ? (int)$_GET['size'] : 10;
+            $pageSize = isset($_GET['pageSize']) ? (int)$_GET['pageSize'] : 5;
             $minNgayTao = isset($_GET['from']) ? urldecode($_GET['from']) : null;
             $maxNgayTao = isset($_GET['to']) ? urldecode($_GET['to']) : null;
-
             $status = $_GET['status'] ?? null;
 
-            $response = $controller->getAllOrders($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);
+            $response = $controller->getAllOrders($pageNumber, $pageSize, $minNgayTao, $maxNgayTao, $status);
+
             echo $response;
         }
         break;
 
     case 'POST':
-        $response = $controller->createOrder();
-        echo $response;
-        break;
+        // $response = $controller->createOrder();
+        // echo $response;
+        // break;
 
     case 'PUT':
         if (isset($_GET['orderId'])) {
-            $response = $controller->updateOrder($_GET['orderId']);
-            echo $response;
+            // $response = $controller->updateOrder($_GET['orderId']);
+            // echo $response;
         } else {
             http_response_code(400);
             echo json_encode(["status" => 400, "message" => "Order ID is required for update."]);
         }
         break;
 
-    case 'DELETE':
-        if (isset($_GET['orderId'])) {
-            $response = $controller->deleteOrder($_GET['orderId']);
-            echo $response;
-        } else {
-            http_response_code(400);
-            echo json_encode(["status" => 400, "message" => "Order ID is required for deletion."]);
-        }
-        break;
 
     default:
         http_response_code(405);
@@ -108,13 +99,6 @@ class OrderController
     //     $this->response($response);
     // }
 
-    // Xóa đơn hàng theo Id
-    public function deleteOrder($orderId)
-    {
-        $response = $this->orderModel->deleteOrder($orderId);
-        $this->response($response);
-    }
-
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId
     public function getOrdersByAccountId($accountId)
     {
@@ -132,6 +116,10 @@ class OrderController
 
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
+        }
+
+        if (isset($result->totalElements)) {
+            $response['totalElements'] = $result->totalElements;
         }
 
         echo json_encode($response);
