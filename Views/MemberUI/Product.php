@@ -155,18 +155,6 @@
 
     });
 
-    // Lắng nghe sự kiện click vào nút search
-    document.getElementById("filter-button").addEventListener("click", function(event) {
-        currentPage = 1;
-        event.preventDefault(); // Ngăn chặn hành vi mặc định của form
-
-        // Update search filter based on search input
-        currentFilters.search = document.getElementById("searchSanPham").value;
-
-        // Gọi lại hàm filterProducts khi click search
-        getAllSanPham(currentPage);
-    });
-
     function setPriceRange(priceFilter) {
         switch (priceFilter) {
             case "low":

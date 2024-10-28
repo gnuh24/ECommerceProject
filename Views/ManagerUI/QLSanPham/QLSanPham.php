@@ -7,7 +7,7 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../AdminDemo.css" />
+    <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="QLSanPham.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -135,7 +135,7 @@
 
         // Gọi API để lấy dữ liệu sản phẩm
         $.ajax({
-            url: "../../../Controllers/ProductController.php",
+            url: "../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
 
@@ -203,7 +203,7 @@
                 };
                 // Gọi hàm updateTaiKhoan bằng Ajax
                 $.ajax({
-                    url: "../../../Controllers/ProductController.php",
+                    url: "../../Controllers/ProductController.php",
                     type: 'PATCH',
                     contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
                     data: JSON.stringify(dataToSend),

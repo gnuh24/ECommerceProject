@@ -1,4 +1,6 @@
 <link rel="stylesheet" href="./QLTaiKhoan/Admin.css" />
+<link rel="stylesheet" href="./QLTaiKhoan/Admin.css" />
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
     <div class="wrapper">
