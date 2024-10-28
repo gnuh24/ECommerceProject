@@ -94,7 +94,7 @@
   // Khởi tạo trang hiện tại
   fetchDataAndUpdateTable(currentPage, '');
   var currentPage = 1;
-  var pageSizeGlobal = 1;
+  var pageSizeGlobal = 5;
   var search = "";
 
   function clearTable() {
@@ -120,7 +120,6 @@
         search: search
       },
       success: function(response) {
-        console.log(response);
         var data = response.data;
         var tableBody = document.getElementById("tableBody");
         var tableContent = "";

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="./HomePage.css" />
-    <!-- <link rel="stylesheet" href="./login.css" /> -->
     <link rel="stylesheet" href="./Product.css" />
     <link rel="stylesheet" href="./components/paginationjs.css" />
 
@@ -246,6 +245,12 @@
     }
 
     function setupPagination(totalElements, currentPage) {
+
+        //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+        const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+        totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
+
+        // Config paging
         $('#pagination-container').pagination({
             dataSource: Array.from({
                 length: totalElements
@@ -263,6 +268,7 @@
                 }
             }
         });
+
     }
 
     function getCategories() {

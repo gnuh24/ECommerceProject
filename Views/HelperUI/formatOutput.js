@@ -9,8 +9,7 @@ function formatCurrency(number) {
     // Chuyển đổi số thành chuỗi và đảm bảo nó là số nguyên
     number = parseInt(number);
 
-    // Sử dụng hàm toLocaleString() để định dạng số tiền
-    // và thêm đơn vị tiền tệ "đ" vào cuối chuỗi
+    // Sử dụng hàm toLocaleString() để định dạng số tiền và thêm đơn vị tiền tệ "đ" vào cuối chuỗi
     return number.toLocaleString('vi-VN', {
         style: 'currency',
         currency: 'VND'
@@ -47,7 +46,7 @@ function formatDateToYYYYMMDD(dateString) {
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
-// Hàm format ngày về dạng dd/MM/yyyy để sử dụng trong input type="date"
+// Hàm format ngày từ yyyy-MM-dd về dạng dd/MM/yyyy để sử dụng trong input type="date"
 function formatDateToDDMMYYYY(dateString) {
     // Tách chuỗi theo dấu gạch ngang "-"
     var parts = dateString.split("-");
@@ -63,5 +62,48 @@ function formatDateToDDMMYYYY(dateString) {
     } else {
         // Nếu chuỗi không hợp lệ, trả về giá trị ban đầu
         return dateString;
+    }
+}
+
+
+// Chuyển từ Enum -> Text (Có dấu tiếng Việt)
+function fromEnumStatusToText(status) {
+    switch (status) {
+        case 'ChoDuyet':
+            return 'Chờ Duyệt';
+        case 'DaDuyet':
+            return 'Đã duyệt';
+        case 'Huy':
+            return 'Đã Hủy';
+        case 'DangGiao':
+            return 'Đang Giao';
+        case 'GiaoThanhCong':
+            return 'Giao thành công';
+        default:
+            return status;
+    }
+}
+
+// Lấy thao tác cho trạng thái tiếp theo trong nút
+function fromCurrentStatusToNextStatusText(status) {
+    switch (status) {
+        case 'ChoDuyet':
+            return 'Duyệt đơn';
+        case 'DaDuyet':
+            return 'Giao cho shipper';
+        case 'DangGiao':
+            return 'Hoàn tất đơn hàng';
+    }
+}
+
+// Lấy trạng thái tiếp theo trong quy trình mua hàng
+function fromCurrentStatusToNextStatus(status) {
+    switch (status) {
+        case 'ChoDuyet':
+            return 'DaDuyet';
+        case 'DaDuyet':
+            return 'DangGiao';
+        case 'DangGiao':
+            return 'GiaoThanhCong';
     }
 }
