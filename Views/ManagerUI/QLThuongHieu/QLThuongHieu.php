@@ -212,6 +212,9 @@
 
   // Hàm tạo nút phân trang
   function setupPagination(totalElements, currentPage) {
+    //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+    const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+    totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
     $('#pagination-container').pagination({
       dataSource: Array.from({
         length: totalElements

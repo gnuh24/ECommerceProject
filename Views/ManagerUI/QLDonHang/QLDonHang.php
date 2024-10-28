@@ -20,66 +20,60 @@
 </head>
 
 <body>
-    <div>
-        <div class="App">
-            <div class="StaffLayout_wrapper__CegPk">
-                <?php require_once "../ManagerHeader.php" ?>
 
-                <div>
-                    <div>
-                        <div class="Manager_wrapper__vOYy">
-                            <?php require_once "../ManagerMenu.php" ?>
-                            <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                                <div class="wrapper">
-                                    <div class="Admin_rightBar__RXnS9">
-                                        <div style="
+    <div class="App">
+        <div class="StaffLayout_wrapper__CegPk">
+            <?php require_once "../ManagerHeader.php" ?>
+            <div class="Manager_wrapper__vOYy">
+                <?php require_once "../ManagerMenu.php" ?>
+                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+                    <div class="wrapper">
+                        <div class="Admin_rightBar__RXnS9">
+                            <div style="
                                                 display: flex;
                                                 margin-bottom: 1rem;
                                                 align-items: center;
                                             ">
-                                            <p class="Admin_title__1Tk48">Quản lí đơn hàng</p>
-                                        </div>
-                                        <div class="Admin_boxFeature__ECXnm">
-                                            <label for=""> Lọc đơn hàng:</label>
-                                            <div style="position: relative">
-                                                <input class="Admin_input__LtEE-" type="date" id="dateStart" />
-                                            </div>
-                                            <label for=""> đến </label>
-                                            <div style="position: relative">
-                                                <input class="Admin_input__LtEE-" type="date" id="dateEnd" />
-                                            </div>
-                                            <div style="position: relative">
-                                                <select style="height: 3rem; padding: 0.3rem;" class="Admin_input__LtEE-" id="TrangThai">
-                                                    <option value="">Trạng thái : Tất Cả</option>
-                                                    <option value="ChoDuyet">Chờ duyệt</option>
-                                                    <option value="DaDuyet">Đã duyệt</option>
-                                                    <option value="Huy">Hủy</option>
-                                                    <option value="DangGiao">Đang giao</option>
-                                                    <option value="GiaoThanhCong">Giao thành công</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="Admin_boxTable__hLXRJ">
-                                            <table class="Table_table__BWPy">
-                                                <thead class="Table_head__FTUog">
-                                                    <tr>
-                                                        <th class="Table_th__hCkcg">Mã đơn</th>
-                                                        <th class="Table_th__hCkcg">Ngày đặt</th>
-                                                        <th class="Table_th__hCkcg">Tổng đơn</th>
-                                                        <th class="Table_th__hCkcg">Khách hàng</th>
-                                                        <th class="Table_th__hCkcg">Số điện thoại</th>
-                                                        <th class="Table_th__hCkcg">Trạng thái</th>
-                                                        <th class="Table_th__hCkcg">Hành động</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tableBody">
-                                                </tbody>
-                                            </table>
-                                            <div id="pagination-container"></div>
-
-                                        </div>
-                                    </div>
+                                <p class="Admin_title__1Tk48">Quản lí đơn hàng</p>
+                            </div>
+                            <div class="Admin_boxFeature__ECXnm">
+                                <label for=""> Lọc đơn hàng:</label>
+                                <div style="position: relative">
+                                    <input class="Admin_input__LtEE-" type="date" id="dateStart" />
                                 </div>
+                                <label for=""> đến </label>
+                                <div style="position: relative">
+                                    <input class="Admin_input__LtEE-" type="date" id="dateEnd" />
+                                </div>
+                                <div style="position: relative">
+                                    <select style="height: 3rem; padding: 0.3rem;" class="Admin_input__LtEE-" id="TrangThai">
+                                        <option value="">Trạng thái : Tất Cả</option>
+                                        <option value="ChoDuyet">Chờ duyệt</option>
+                                        <option value="DaDuyet">Đã duyệt</option>
+                                        <option value="Huy">Hủy</option>
+                                        <option value="DangGiao">Đang giao</option>
+                                        <option value="GiaoThanhCong">Giao thành công</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="Admin_boxTable__hLXRJ">
+                                <table class="Table_table__BWPy">
+                                    <thead class="Table_head__FTUog">
+                                        <tr>
+                                            <th class="Table_th__hCkcg">Mã đơn</th>
+                                            <th class="Table_th__hCkcg">Ngày đặt</th>
+                                            <th class="Table_th__hCkcg">Tổng đơn</th>
+                                            <th class="Table_th__hCkcg">Khách hàng</th>
+                                            <th class="Table_th__hCkcg">Số điện thoại</th>
+                                            <th class="Table_th__hCkcg">Trạng thái</th>
+                                            <th class="Table_th__hCkcg">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                    </tbody>
+                                </table>
+                                <div id="pagination-container"></div>
+
                             </div>
                         </div>
                     </div>
@@ -87,6 +81,7 @@
             </div>
         </div>
     </div>
+
 </body>
 
 <script>

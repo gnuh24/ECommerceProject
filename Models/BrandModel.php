@@ -65,7 +65,8 @@ class BrandModel
                 "status" => 200,
                 "message" => "Brands fetched successfully",
                 "data" => $result,
-                "totalPages" => $totalPages
+                "totalPages" => $totalPages,
+                "totalElements" => $totalResult['total']
             ];
         } catch (PDOException $e) {
             return (object) [

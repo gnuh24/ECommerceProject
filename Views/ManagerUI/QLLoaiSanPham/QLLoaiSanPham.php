@@ -26,70 +26,62 @@
 </style>
 
 <body>
-  <div id="root">
-    <div>
-      <div class="App">
-        <div class="StaffLayout_wrapper__CegPk">
-          <?php require_once "../ManagerHeader.php" ?>
-          <div>
-            <div>
-              <div class="Manager_wrapper__vOYy">
-                <?php require_once "../ManagerMenu.php" ?>
+  <div class="App">
+    <div class="StaffLayout_wrapper__CegPk">
+      <?php require_once "../ManagerHeader.php" ?>
+      <div class="Manager_wrapper__vOYy">
+        <?php require_once "../ManagerMenu.php" ?>
 
-                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                  <div class="wrapper">
-                    <div style="
-                          display: flex;
-                          padding-top: 1rem;
-                          padding-bottom: 1rem;
+        <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+          <div class="wrapper">
+            <div style="
+                        display: flex;
+                        padding-top: 1rem;
+                        padding-bottom: 1rem;
+                      ">
+              <h2>Loại Sản Phẩm</h2>
+              <button style="
+                          margin-left: auto;
+                          font-family: Arial;
+                          font-size: 1.5rem;
+                          font-weight: 700;
+                          color: white;
+                          background-color: rgb(65, 64, 64);
+                          padding: 1rem;
+                          border-radius: 0.6rem;
+                          cursor: pointer;
                         ">
-                      <h2>Loại Sản Phẩm</h2>
-                      <button style="
-                            margin-left: auto;
-                            font-family: Arial;
-                            font-size: 1.5rem;
-                            font-weight: 700;
-                            color: white;
-                            background-color: rgb(65, 64, 64);
-                            padding: 1rem;
-                            border-radius: 0.6rem;
-                            cursor: pointer;
-                          ">
-                        <a href="./FromCreateLoaiSanPham.php"> Thêm Loại Sản Phẩm</a>
-                      </button>
-                    </div>
-                    <br>
-                    <div class="boxFeature">
-                      <div style="position: relative">
-                        <i class="fa fa-search"></i>
-                        <input class="Admin_input__LtEE-" placeholder="Tìm kiếm loại sản phẩm" />
-                        <button id="searchButton" style="cursor: pointer;"><i class="fa fa-search"></i></button>
-                      </div>
-
-
-                      <div style="margin-left: auto"></div>
-                    </div>
-                    <br>
-                    <div class="boxTable">
-                      <table class="Table_table__BWPy">
-                        <thead class="Table_head__FTUog">
-                          <tr>
-                            <th style="width: 25%" class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
-                            <th class="Table_th__hCkcg" scope="col">Loại sản phẩm</th>
-                            <th style="width: 15%" class="Table_th__hCkcg" scope="col">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody id="tableBody">
-
-                        </tbody>
-                      </table>
-                    </div>
-                    <div id="pagination-container"></div>
-
-                  </div>
-                </div>
-              </div>
+                <a href="./FromCreateLoaiSanPham.php"> Thêm Loại Sản Phẩm</a>
+              </button>
             </div>
+            <br>
+            <div class="boxFeature">
+              <div style="position: relative">
+                <i class="fa fa-search"></i>
+                <input class="Admin_input__LtEE-" placeholder="Tìm kiếm loại sản phẩm" />
+                <button id="searchButton" style="cursor: pointer;"><i class="fa fa-search"></i></button>
+              </div>
+
+
+              <div style="margin-left: auto"></div>
+            </div>
+            <br>
+            <div class="boxTable">
+              <table class="Table_table__BWPy">
+                <thead class="Table_head__FTUog">
+                  <tr>
+                    <th style="width: 25%" class="Table_th__hCkcg" scope="col">Mã loại sản phẩm</th>
+                    <th class="Table_th__hCkcg" scope="col">Loại sản phẩm</th>
+                    <th style="width: 15%" class="Table_th__hCkcg" scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+              </table>
+            </div>
+            <div id="pagination-container"></div>
+
           </div>
         </div>
       </div>
@@ -201,6 +193,9 @@
 
   // Hàm tạo nút phân trang
   function setupPagination(totalElements, currentPage) {
+    //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+    const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+    totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
     $('#pagination-container').pagination({
       dataSource: Array.from({
         length: totalElements
