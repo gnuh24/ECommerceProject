@@ -7,13 +7,15 @@
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="QLThuongHieu.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
   <link href="../../MemberUI/components/paginationjs.css" />
   <!-- <link rel="stylesheet" href="../bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
   <!-- Include Pagination.js -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
   <title>Quản lý thương hiệu</title>
 </head>
@@ -100,6 +102,9 @@
 <script>
   // Khởi tạo trang hiện tại
   fetchDataAndUpdateTable(currentPage, '');
+  var currentPage = 1;
+  var pageSizeGlobal = 5;
+  var search = "";
 
   // Hàm để xóa hết các dòng trong bảng
   function clearTable() {
@@ -112,8 +117,6 @@
   var search = "";
 
   function getAllThuongHieu(page, search) {
-    $('#loading-indicator').show();
-
     $.ajax({
       url: '../../../Controllers/BrandController.php',
       type: 'GET',
