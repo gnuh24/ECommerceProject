@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../AdminDemo.css" />
   <link rel="stylesheet" href="../QLLoaiSanPham/QLLoaiSanPham.css" />
+  <!-- Include Pagination.js -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+
   <title>Quản lý loại sản phẩm</title>
 </head>
 
@@ -69,7 +74,7 @@
                         </tbody>
                       </table>
                     </div>
-                    <div class="pagination">
+                    <div id="pagination-container">
 
                     </div>
                   </div>
@@ -97,8 +102,9 @@
     }
   }
 
-  var page = 1;
+  var currentPage = 1;
   var pageSizeGlobal = 5;
+  var search = "";
   function getAllLoaiSanPham(page, search) {
     $.ajax({
       url: "../../../Controllers/CategoryController.php",
@@ -158,7 +164,8 @@
         tableBody.innerHTML = tableContent;
 
         // Tạo phân trang
-        createPagination(page, response.totalPages);
+        setupPagination(response.totalElements, page);
+
       },
 
       error: function (xhr, status, error) {
@@ -174,13 +181,14 @@
 
 
 
-  // Hàm để gọi getAllNhaCungCap và cập nhật dữ liệu và phân trang
+  // Hàm để gọi getAllLoaiSanPham và cập nhật dữ liệu và phân trang
   function fetchDataAndUpdateTable(page, search) {
     clearTable();
-    // Gọi hàm getAllTaiKhoan và truyền các giá trị tương ứng
+    // Gọi hàm getAllLoaiSanPham và truyền các giá trị tương ứng
     getAllLoaiSanPham(page, search);
 
     // Tạo phân trang
+    setupPagination(response.totalElements, page);
   }
 
   // Khởi tạo trang hiện tại
@@ -189,37 +197,24 @@
 
 
   // Hàm tạo nút phân trang
-  function createPagination(currentPage, totalPages) {
-    var paginationContainer = document.querySelector('.pagination');
-    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
+  function setupPagination(totalElements, currentPage) {
+    $('#pagination-container').pagination({
+      dataSource: Array.from({
+        length: totalElements
+      }, (_, i) => i + 1),
+      pageSize: pageSizeGlobal,
+      showPrevious: true,
+      showNext: true,
+      pageNumber: currentPage,
 
-    // Xóa nút phân trang cũ (nếu có)
-    paginationContainer.innerHTML = '';
-
-    if (totalPages > 1) {
-      // Tạo nút cho từng trang và thêm vào chuỗi HTML
-      var paginationHTML = '';
-      for (var i = 1; i <= totalPages; i++) {
-        paginationHTML += '<button class="pageButton">' + i + '</button>';
+      callback: function (data, pagination) {
+        if (pagination.pageNumber !== currentPage) {
+          currentPage = pagination.pageNumber; // Cập nhật trang hiện tại
+          fetchDataAndUpdateTable(currentPage, search); // Tải dữ liệu mới cho trang
+        }
       }
-
-      // Thiết lập nút phân trang vào paginationContainer
-      paginationContainer.innerHTML = paginationHTML;
-
-      // Thêm sự kiện click cho từng nút phân trang
-      paginationContainer.querySelectorAll('.pageButton').forEach(function (button, index) {
-        button.addEventListener('click', function () {
-          // Gọi hàm fetchDataAndUpdateTable khi người dùng click vào nút phân trang
-          fetchDataAndUpdateTable(index + 1, searchValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
-        });
-      });
-
-      // Đánh dấu trang hiện tại
-      paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active'); // Sửa lại để chỉ chọn trang hiện tại
-    }
+    });
   }
-
-
 
   // Hàm xử lý sự kiện khi nút tìm kiếm được click
   document.getElementById('searchButton').addEventListener('click', function () {
