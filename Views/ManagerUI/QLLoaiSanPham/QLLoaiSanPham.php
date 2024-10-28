@@ -106,8 +106,6 @@
     }
   }
 
-
-
   function getAllLoaiSanPham(page, search) {
     $.ajax({
       url: "../../../Controllers/CategoryController.php",
@@ -190,8 +188,6 @@
     // Gọi hàm getAllLoaiSanPham và truyền các giá trị tương ứng
     getAllLoaiSanPham(page, search);
   }
-
-
 
 
   // Hàm tạo nút phân trang

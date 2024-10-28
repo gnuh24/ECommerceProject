@@ -22,25 +22,25 @@
     }
 </style>
 <div class="Sidebar_sideBar__CC4MK">
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLTaiKhoan/QLTaiKhoan.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=account">
         <span class="MenuItemSidebar_title__LLBtx">Tài khoản</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLLoaiSanPham/QLLoaiSanPham.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=category">
         <span class="MenuItemSidebar_title__LLBtx">Loại Sản Phẩm</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLSanPham/QLSanPham.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=product">
         <span class="MenuItemSidebar_title__LLBtx">Sản Phẩm</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLThuongHieu/QLThuongHieu.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=brand">
         <span class="MenuItemSidebar_title__LLBtx">Thương hiệu</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLDonHang/QLDonHang.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=order">
         <span class="MenuItemSidebar_title__LLBtx">Đơn Hàng</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../ThongKe/ThongKeDoanhThuChiTieu.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=bestSeller">
         <span class="MenuItemSidebar_title__LLBtx">Thống Kê bán chạy</span>
     </a>
-    <a class="MenuItemSidebar_menuItem__56b1m" href="../ThongKe/ThongKeDonHang.php">
+    <a class="MenuItemSidebar_menuItem__56b1m" href="./AdminHome.php?module=summaryOrder">
         <span class="MenuItemSidebar_title__LLBtx">Thống Kê Đơn Hàng</span>
     </a>
 </div>
