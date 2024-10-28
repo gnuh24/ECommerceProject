@@ -6,8 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="./QLDonHang.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
+
+    <!-- Include Pagination.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../HelperUI/formatOutput.js"></script>
 
     <title>Quản lý đơn hàng</title>
 </head>
@@ -68,8 +75,8 @@
                                                 <tbody id="tableBody">
                                                 </tbody>
                                             </table>
-                                            <div id="pagination" class="pagination">
-                                            </div>
+                                            <div id="pagination-container"></div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -83,68 +90,35 @@
 </body>
 
 <script>
-    var udPage = 1;
-    var udminNgayTao = 0;
-    var udmaxNgayTao = 0;
-    var udtrangThai = "";
+    var pageSizeGlobal = 5;
+    var currentPage = 1;
+    var filter_minOrderTime = null;
+    var filter_maxOrderTime = null;
+    var filter_status = null;
 
     $(document).ready(function() {
-        loadDataToTable(udPage, null, null, null);
+        loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
 
         $("#dateStart").on("change", function() {
             let value = $(this).val();
-            udminNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
-            loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
+            filter_minOrderTime = value ? value : null; // Nếu rỗng thì gán null
+            currentPage = 1;
+            loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
         });
 
         $("#dateEnd").on("change", function() {
             let value = $(this).val();
-            udmaxNgayTao = value ? convertDateFormat(value) : null; // Nếu rỗng thì gán null
-            loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
+            filter_maxOrderTime = value ? value : null; // Nếu rỗng thì gán null
+            currentPage = 1;
+            loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
         });
-
 
         $("#TrangThai").on("change", function() {
-            udtrangThai = $(this).val();
-            loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai);
+            filter_status = $(this).val();
+            currentPage = 1;
+            loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
         });
     });
-
-    function clearTable() {
-        var tableBody = document.getElementById("tableBody");
-        tableBody.innerHTML = ''; // Xóa nội dung trong tbody
-    }
-
-    function number_format_vnd(number) {
-        return Number(number).toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    }
-
-    function getUpdateStatusText(status) {
-        switch (status) {
-            case 'ChoDuyet':
-                return 'Duyệt';
-            case 'DaDuyet':
-                return 'Giao hàng';
-            case 'DangGiao':
-                return 'Hoàn tất';
-            default:
-                return 'Cập nhật trạng thái'; // Nội dung mặc định nếu không khớp với bất kỳ trạng thái nào
-        }
-    }
-
-    function getUpdateStatus(status) {
-        switch (status) {
-            case 'ChoDuyet':
-                return 'DaDuyet';
-            case 'DaDuyet':
-                return 'DangGiao';
-            case 'DangGiao':
-                return 'GiaoThanhCong';
-        }
-    }
 
     function updateStatus(orderId, currentStatus) {
         Swal.fire({
@@ -168,7 +142,7 @@
                     }),
                     success: function(response) {
                         Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
-                        loadDataToTable(udPage, udminNgayTao, udmaxNgayTao, udtrangThai); // Cập nhật lại bảng
+                        loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
                     },
                     error: function(error) {
                         Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
@@ -178,95 +152,64 @@
         });
     }
 
-
     function renderTableBody(data) {
-        console.log(data);
         var tableBody = document.getElementById("tableBody");
         var html = '';
-        $.each(data, function(index, record) {
-            let totalPriceFormat = number_format_vnd(record.TotalPrice);
-            html += '<tr>';
-            html += '<td>' + record.Id + '</td>';
-            html += '<td>' + record.OrderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
-            html += '<td>' + totalPriceFormat + '</td>';
-            html += '<td>' + record.Fullname + '</td>';
-            html += '<td>' + record.PhoneNumber + '</td>';
-            html += '<td>' + formatStatus(record.Status) + '</td>';
 
-            html += '<td style="display: flex; gap: 5px;">';
-            html += '<a href="./ChiTietDonHang.php?id=' + record.Id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
+        // Check if data is empty
+        if (data.length === 0) {
+            html = '<tr><td colspan="7" style="text-align: center;">Không tồn tại đơn hàng !</td></tr>';
+        } else {
+            $.each(data, function(index, record) {
+                let totalPriceFormat = formatCurrency(record.TotalPrice);
+                html += '<tr>';
+                html += '<td>' + record.Id + '</td>';
+                html += '<td>' + record.OrderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
+                html += '<td>' + totalPriceFormat + '</td>';
+                html += '<td>' + record.Fullname + '</td>';
+                html += '<td>' + record.PhoneNumber + '</td>';
+                html += '<td>' + fromEnumStatusToText(record.Status) + '</td>';
 
-            // Nút Cập nhật trạng thái (màu xanh lá) với nội dung tùy thuộc vào trạng thái
-            if (record.Status !== 'GiaoThanhCong' && record.Status !== 'Huy') {
-                const updateStatusText = getUpdateStatusText(record.Status);
-                const nextStatus = getUpdateStatus(record.Status);
+                html += '<td style="display: flex; gap: 5px;">';
+                html += '<a href="./ChiTietDonHang.php?id=' + record.Id + '" class="edit">Chi tiết</a> '; // Nút Chi tiết
 
-                html += `
-                    <button 
-                        type="button" 
-                        class="update-status" 
-                        onclick="updateStatus('${record.Id}', '${nextStatus}')"
-                    >
-                        ${updateStatusText}
-                    </button>`;
-            }
+                // Nút Cập nhật trạng thái (màu xanh lá) với nội dung tùy thuộc vào trạng thái
+                if (record.Status !== 'GiaoThanhCong' && record.Status !== 'Huy') {
+                    const updateStatusText = fromCurrentStatusToNextStatusText(record.Status);
+                    const nextStatus = fromCurrentStatusToNextStatus(record.Status);
 
-            // Kiểm tra trạng thái trước khi hiển thị nút Hủy
-            if (record.Status === "ChoDuyet") {
+                    html += `
+                        <button 
+                            type="button" 
+                            class="update-status" 
+                            onclick="updateStatus('${record.Id}', '${nextStatus}')"
+                        >
+                            ${updateStatusText}
+                        </button>`;
+                }
 
-                html += `
-                      <button 
-                          type="button" 
-                          class="cancel" 
-                          onclick="updateStatus('${record.Id}', 'Huy')"
-                      >
-                          Hủy
-                      </button>`;
-            }
-            html += '</td>';
-            html += '</tr>';
-        });
+                // Kiểm tra trạng thái trước khi hiển thị nút Hủy
+                if (record.Status === "ChoDuyet") {
+                    html += `
+                        <button 
+                            type="button" 
+                            class="cancel" 
+                            onclick="updateStatus('${record.Id}', 'Huy')"
+                        >
+                            Hủy
+                        </button>`;
+                }
+                html += '</td>';
+                html += '</tr>';
+            });
+        }
+
+        // Update the inner HTML of the table body
         tableBody.innerHTML = html;
     }
 
-    function convertDateFormat(dateString) {
-        // Kiểm tra định dạng đầu vào
-        const regex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!regex.test(dateString)) {
-            throw new Error("Định dạng ngày không hợp lệ. Vui lòng sử dụng 'yyyy-MM-dd'.");
-        }
-
-        // Tách các phần của ngày
-        const parts = dateString.split('-');
-        const year = parts[0];
-        const month = parts[1];
-        const day = parts[2];
-
-        // Trả về định dạng mới
-        return `${year}/${month}/${day}`; // Đổi thành yyyy/mm/dd
-    }
-
-
-    function formatStatus(status) {
-        switch (status) {
-            case 'ChoDuyet':
-                return 'Chờ Duyệt';
-            case 'DaDuyet':
-                return 'Đã duyệt';
-            case 'Huy':
-                return 'Đã Hủy';
-            case 'DangGiao':
-                return 'Đang Giao';
-            case 'GiaoThanhCong':
-                return 'Giao thành công';
-            default:
-                return status;
-        }
-    }
 
     function loadDataToTable(page, minNgayTao, maxNgayTao, trangThai) {
-        clearTable();
-
         if (!minNgayTao) {
             minNgayTao = null;
         }
@@ -281,13 +224,14 @@
 
             data: {
                 page: page,
+                pageSize: pageSizeGlobal,
                 from: minNgayTao,
                 to: maxNgayTao,
                 status: trangThai,
             },
             success: function(response) {
                 renderTableBody(response.data);
-                renderPagination(response.totalPages, page);
+                setupPagination(response.totalElements, page);
             },
             error: function(error) {
                 console.error('Error:', error);
@@ -296,50 +240,29 @@
 
     }
 
-    function renderPagination(totalPages, currentPage) {
-        var pagination = document.getElementById("pagination");
-        var html = '';
-        // First button
-        if (currentPage > 1) {
-            html += '<button class="pageButton" onclick="loadDataToTable(1, udminNgayTao, udmaxNgayTao, udtrangThai)"><<</button>';
-        }
+    function setupPagination(totalElements, currentPage) {
 
-        // Previous button
-        if (currentPage > 1) {
-            html += '<button class="pageButton" onclick="loadDataToTable(' + (currentPage - 1) + ', udminNgayTao, udmaxNgayTao, udtrangThai)">Trước</button>';
-        }
+        //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+        const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+        totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
 
+        $('#pagination-container').pagination({
+            dataSource: Array.from({
+                length: totalElements
+            }, (_, i) => i + 1),
 
-        // Calculate start and end page
-        var maxPagesToShow = 5;
-        var startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-        var endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+            pageSize: pageSizeGlobal,
+            showPrevious: true,
+            showNext: true,
+            pageNumber: currentPage,
 
-        // Adjust startPage if endPage is at the limit
-        if (endPage - startPage < maxPagesToShow - 1) {
-            startPage = Math.max(1, endPage - maxPagesToShow + 1);
-        }
-
-        // Page numbers
-        for (var i = startPage; i <= endPage; i++) {
-            if (i === currentPage) {
-                html += '<button class="pageButton active">' + i + '</button>';
-            } else {
-                html += '<button class="pageButton" onclick="loadDataToTable(' + i + ', udminNgayTao, udmaxNgayTao, udtrangThai)">' + i + '</button>';
+            callback: function(data, pagination) {
+                if (pagination.pageNumber !== currentPage) {
+                    currentPage = pagination.pageNumber; // Update current page
+                    loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
+                }
             }
-        }
-        // Next button
-        if (currentPage < totalPages) {
-            html += '<button class="pageButton" onclick="loadDataToTable(' + (currentPage + 1) + ', udminNgayTao, udmaxNgayTao, udtrangThai)">Sau</button>';
-        }
-        // Last button
-        if (currentPage < totalPages) {
-            html += '<button class="pageButton" onclick="loadDataToTable(' + totalPages + ', udminNgayTao, udmaxNgayTao, udtrangThai)">>></button>';
-        }
-
-
-
-        pagination.innerHTML = html;
+        });
     }
 </script>
 

@@ -25,13 +25,13 @@ class OrderModel
         // Kiểm tra điều kiện ngày bắt đầu và ngày kết thúc
         if (!empty($minNgayTao) && !empty($maxNgayTao)) {
             // Cả 2 ngày đều tồn tại
-            $query .= " AND o.OrderTime BETWEEN :from AND :to";
+            $query .= " AND DATE(o.OrderTime) BETWEEN :from AND :to";
         } elseif (!empty($minNgayTao)) {
             // Chỉ ngày bắt đầu tồn tại
-            $query .= " AND o.OrderTime >= :from";
+            $query .= " AND DATE(o.OrderTime) >= :from";
         } elseif (!empty($maxNgayTao)) {
             // Chỉ ngày kết thúc tồn tại
-            $query .= " AND o.OrderTime <= :to";
+            $query .= " AND DATE(o.OrderTime) <= :to";
         }
 
         // Điều kiện trạng thái đơn hàng nếu có
@@ -58,9 +58,9 @@ class OrderModel
         if (!empty($minNgayTao) && !empty($maxNgayTao)) {
             $countQuery .= " AND o.OrderTime BETWEEN :from AND :to";
         } elseif (!empty($minNgayTao)) {
-            $countQuery .= " AND o.OrderTime >= :from";
+            $countQuery .= " AND DATE(o.OrderTime) >= :from";
         } elseif (!empty($maxNgayTao)) {
-            $countQuery .= " AND o.OrderTime <= :to";
+            $countQuery .= " AND DATE(o.OrderTime) <= :to";
         }
 
         // Điều kiện trạng thái đơn hàng nếu có
@@ -113,6 +113,7 @@ class OrderModel
                 "status" => 200,
                 "message" => "Orders fetched successfully",
                 "totalPages" => $totalPages,
+                "totalElements" => $totalCount,
                 "data" => $result
             ];
         } catch (PDOException $e) {
@@ -122,6 +123,9 @@ class OrderModel
             ];
         }
     }
+
+
+
     // Kiểm tra xem đơn hàng có thuộc về ID người dùng không
     public function isOrderBelongToThisId($userInformationId, $orderId)
     {
@@ -393,27 +397,6 @@ class OrderModel
         }
     }
 
-    // Xóa đơn hàng theo Id
-    public function deleteOrder($orderId)
-    {
-        $query = "DELETE FROM `order` WHERE `Id` = :orderId";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->execute();
-
-            return (object) [
-                "status" => 200,
-                "message" => "Order deleted successfully"
-            ];
-        } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
 
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId
     public function getOrdersByAccountId($accountId)

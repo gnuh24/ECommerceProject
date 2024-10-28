@@ -96,7 +96,10 @@
 <script>
   // Khởi tạo trang hiện tại
   fetchDataAndUpdateTable(currentPage, '');
-  
+  var currentPage = 1;
+  var pageSizeGlobal = 5;
+  var search = "";
+
   function clearTable() {
     var tableBody = document.querySelector('.Table_table__BWPy tbody');
     if (tableBody) {
@@ -122,8 +125,7 @@
         pageSize: pageSizeGlobal,
         search: search
       },
-      success: function (response) {
-        console.log(response);
+      success: function(response) {
         var data = response.data;
         var tableBody = document.getElementById("tableBody");
         var tableContent = "";
