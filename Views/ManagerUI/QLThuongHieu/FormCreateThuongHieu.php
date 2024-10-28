@@ -25,29 +25,44 @@
 
                                 <div style="padding-left: 3%; width: 100%; padding-right: 2rem">
                                     <div class="wrapper">
-                                        <div style="display: flex; padding-top: 1rem; align-items: center; gap: 1rem; padding-bottom: 1rem;"></div>
+                                        <div style="
+                                        display: flex; 
+                                        padding-top: 1rem; 
+                                        align-items: center; 
+                                        gap: 1rem; 
+                                        padding-bottom: 1rem;"></div>
                                         <form id="submit-form" method="POST">
                                             <input type="hidden" name="action" value="createSupplier">
                                             <div class="boxFeature">
                                                 <div>
-                                                    <h2 style="font-size: 2.3rem">Thêm thương hiệu</h2>
+                                                    <h2 style="font-size: 1.5rem">Thêm thương hiệu</h2>
 
                                                 </div>
                                                 <div>
                                                     <a style="
                                                     font-family: Arial;
-                                                    font-size: 1.5rem;
-                                                    font-weight: 700;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
                                                     border: 1px solid rgb(140, 140, 140);
                                                     background-color: white;
                                                     color: rgb(80, 80, 80);
-                                                    padding: 1rem 2rem 1rem 2rem;
-                                                    border-radius: 0.6rem;
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
                                                     cursor: pointer;
                                                     " href="./QLThuongHieu.php">
                                                         Hủy
                                                     </a>
-                                                    <button id="updateSupplier_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white;  background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">
+                                                    <button id="updateSupplier_save" 
+                                                    style="
+                                                    margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
+                                                    font-family: Arial;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
+                                                    color: white;
+                                                    background-color: rgb(65, 64, 64);
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                                    cursor: pointer;">
                                                         Lưu
                                                     </button>
                                                 </div>
@@ -59,7 +74,7 @@
 
                                                         <div style="padding-left: 1rem">
                                                             <p class="text">Thương hiệu</p>
-                                                            <input id="brandName" class="input" type="text" name="brandName" style="width: 40rem" />
+                                                            <input id="brandName" class="input" type="text" name="brandName" style="width: 20rem; padding: 0.5rem; height: 1rem;" />
                                                             <span style="
                                                             margin-left: 1rem;
                                                             font-weight: 700;

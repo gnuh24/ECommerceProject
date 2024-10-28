@@ -24,16 +24,40 @@
                             <div class="Manager_wrapper__vOYy">
                                 <div style="padding-left: 3%; width: 100%; padding-right: 2rem">
                                     <div class="wrapper">
-                                        <div style="display: flex; padding-top: 1rem; align-items: center; gap: 1rem; padding-bottom: 1rem;"></div>
+                                        <div style="
+                                        display: flex;
+                                        padding-top: 2rem;
+                                        align-items: center;
+                                        gap: 1rem;
+                                        padding-bottom: 1rem;"></div>
                                         <form id="submit-form" method="post">
                                             <input type="hidden" name="action" value="updateSupplier">
                                             <div class="boxFeature">
                                                 <div>
-                                                    <h2 style="font-size: 2.3rem">Cập nhật thông tin loại sản phẩm</h2>
+                                                    <h2 style="font-size: 1.5rem">Cập nhật thông tin loại sản phẩm</h2>
                                                 </div>
                                                 <div>
-                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="./QLLoaiSanPham.php">Hủy</a>
-                                                    <button id="updateLoaiSanPham_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white; background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">Lưu</button>
+                                                    <a style="
+                                                    font-family: Arial;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
+                                                    border: 1px solid rgb(140, 140, 140);
+                                                    background-color: white;
+                                                    color: rgb(80, 80, 80);
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                                    cursor: pointer;" 
+                                                    href="./QLLoaiSanPham.php">Hủy</a>
+                                                    <button id="updateLoaiSanPham_save" style="margin-left: 1rem; 
+                                                    margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
+                                                    font-family: Arial;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
+                                                    color: white;
+                                                    background-color: rgb(65, 64, 64);
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                                    cursor: pointer;">Lưu</button>
                                                 </div>
                                             </div>
                                             <div class="boxTable">
@@ -55,12 +79,12 @@
                                                                 <div style="display: flex; gap: 2rem">
                                                                     <div>
                                                                         <p class="text">Mã loại sản phẩm<span style="color: red; margin-left: 10px;">🔒</span></p>
-                                                                        <input style="user-select: none; pointer-events: none; caret-color: transparent;" id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
+                                                                        <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
                                                                     </div>
                                                                 </div>
 
                                                                 <p class="text">Loại sản phẩm</p>
-                                                                <input id="CategoryName" class="input" type="text" name="CategoryName" style="width: 40rem" value="' . ($categoryName) . '" />
+                                                                <input id="CategoryName" class="input" type="text" name="CategoryName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($categoryName) . '" />
 
                                                             </div>';
 

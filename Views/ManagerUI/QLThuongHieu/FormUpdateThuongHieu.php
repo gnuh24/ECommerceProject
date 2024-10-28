@@ -25,25 +25,51 @@
                             <div class="Manager_wrapper__vOYy">
                                 <div style="padding-left: 3%; width: 100%; padding-right: 2rem">
                                     <div class="wrapper">
-                                        <div style="display: flex; padding-top: 1rem; align-items: center; gap: 1rem; padding-bottom: 1rem;"></div>
+                                        <div style="
+                                        display: flex; 
+                                        padding-top: 1rem; 
+                                        align-items: center; 
+                                        gap: 1rem; 
+                                        padding-bottom: 1rem;"></div>
                                         <form id="submit-form" method="post">
                                             <input type="hidden" name="action" value="updateSupplier">
                                             <div class="boxFeature">
                                                 <div>
-                                                    <h2 style="font-size: 2.3rem">Cập nhật thông tin thương hiệu</h2>
+                                                    <h2 style="font-size: 1.5rem">Cập nhật thông tin thương hiệu</h2>
                                                 </div>
                                                 <div>
-                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="./QLThuongHieu.php">Hủy</a>
-                                                    <button id="updateSupplier_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white; background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">Lưu</button>
+                                                    <a style="
+                                                    font-family: Arial;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
+                                                    border: 1px solid rgb(140, 140, 140);
+                                                    background-color: white;
+                                                    color: rgb(80, 80, 80);
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                                    cursor: pointer;" href="./QLThuongHieu.php">Hủy</a>
+                                                    <button id="updateSupplier_save" style="
+                                                    margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
+                                                    font-family: Arial;
+                                                    font-size: 1rem; /* Giảm kích thước font */
+                                                    font-weight: 600; /* Giảm độ đậm */
+                                                    color: white;
+                                                    background-color: rgb(65, 64, 64);
+                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
+                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                                    cursor: pointer;">Lưu</button>
                                                 </div>
                                             </div>
                                             <div class="boxTable">
-                                                <div style="display: flex; padding: 0rem 1rem 0rem 1rem; justify-content: space-between;">
+                                                <div style="
+                                                display: flex; 
+                                                padding: 0rem 1rem 0rem 1rem; 
+                                                justify-content: space-between;">
                                                     <div>
                                                         <?php
 
                                                         $brandId = "";
-                                                        $brandName =  "";
+                                                        $brandName = "";
 
                                                         if (isset($_GET['brandId'])) {
                                                             // Lấy các tham số được gửi từ AJAX
@@ -56,12 +82,12 @@
                                                                 <div style="display: flex; gap: 2rem">
                                                                     <div>
                                                                         <p class="text">Mã thương hiệu<span style="color: red; margin-left: 10px;">🔒</span></p>
-                                                                        <input style="user-select: none; pointer-events: none; caret-color: transparent;" id="brandId" class="input" name="brandId" readonly value="' . ($brandId) . '" />
+                                                                        <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="brandId" class="input" name="brandId" readonly value="' . ($brandId) . '" />
                                                                     </div>
                                                                 </div>
 
                                                                 <p class="text">Thương hiệu</p>
-                                                                <input id="brandName" class="input" type="text" name="brandName" style="width: 40rem" value="' . ($brandName) . '" />';
+                                                                <input id="brandName" class="input" type="text" name="brandName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($brandName) . '" />';
 
                                                         ?>
 
@@ -116,7 +142,7 @@
                 'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
             data: data,
-            success: function(data) {
+            success: function (data) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
@@ -125,7 +151,7 @@
                     window.location.href = 'QLThuongHieu.php'; // Chuyển hướng đến trang quản lý thương hiệu
                 });
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error: ' + xhr.status + ' - ' + xhr.responseText);
 
                 // Xử lý các mã lỗi cụ thể

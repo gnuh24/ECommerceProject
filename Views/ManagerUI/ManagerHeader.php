@@ -1,28 +1,37 @@
 <style>
     .StaffHeader_wrapper__IQw-U {
-        z-index: 9;
-        background-color: rgb(50, 49, 49);
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 2rem;
-        display: flex;
-        justify-content: space-between;
-    }
+    z-index: 9;
+    background-color: rgb(50, 49, 49);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem; /* Giảm padding hơn để phù hợp trên màn hình nhỏ */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    box-sizing: border-box;
+}
 
-    .StaffHeader_title__QxjW4 {
-        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-        font-size: 3rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
+.StaffHeader_title__QxjW4 {
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-size: 1.5rem; /* Giảm kích thước font để phù hợp hơn trên trang nhỏ */
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0; /* Đảm bảo không có khoảng cách thêm giữa tiêu đề */
+}
 
-    .StaffHeader_signOut__i2pcu {
-        cursor: pointer;
-        border: none;
-        background-color: transparent;
-    }
+.StaffHeader_signOut__i2pcu {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 1rem;
+    color: #ffffff; /* Thêm màu trắng cho nút đăng xuất để phù hợp với nền tối */
+    padding: 0.5rem; /* Thêm padding cho nút để dễ bấm hơn */
+    margin-left: 1rem; /* Khoảng cách giữa nút và tiêu đề */
+}
+
 </style>
 
 <div class="StaffHeader_wrapper__IQw-U">
