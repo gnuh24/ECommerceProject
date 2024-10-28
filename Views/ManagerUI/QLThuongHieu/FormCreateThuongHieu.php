@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../QLThuongHieu/QLThuongHieu.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <title>Thêm Nhà Cung Cấp</title>
+    <title>Thêm Thương Hiệu</title>
 </head>
 
 <body>
@@ -137,7 +137,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
-                    text: 'Tạo nhà cung cấp thành công!',
+                    text: 'Tạo thương hiệu thành công!',
                 }).then(function() {
                     window.location.href = 'QLThuongHieu.php'; // Chuyển hướng đến trang quản lý thương hiệu
                 });
@@ -164,7 +164,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
-                            text: 'Đã xảy ra lỗi khi tạo nhà cung cấp: ' + xhr.responseJSON.message,
+                            text: 'Đã xảy ra lỗi khi tạo thương hiệu: ' + xhr.responseJSON.message,
                         });
                         break;
                     default:

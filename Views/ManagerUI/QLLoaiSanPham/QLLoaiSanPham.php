@@ -7,11 +7,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="../QLLoaiSanPham/QLLoaiSanPham.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" /> <!-- PaginationJS CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+  <link href="../../MemberUI/components/paginationjs.css"/>
+  <!-- PaginationJS CSS -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script> <!-- PaginationJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+  <!-- PaginationJS -->
 
   <title>Quản lý loại sản phẩm</title>
 </head>
@@ -93,10 +96,7 @@
 <script>
   // Khởi tạo trang hiện tại
   fetchDataAndUpdateTable(currentPage, '');
-  var currentPage = 1;
-  var pageSizeGlobal = 1;
-  var search = "";
-
+  
   function clearTable() {
     var tableBody = document.querySelector('.Table_table__BWPy tbody');
     if (tableBody) {
@@ -106,6 +106,9 @@
     }
   }
 
+  var currentPage = 1;
+  var pageSizeGlobal = 5;
+  var search = "";
 
 
   function getAllLoaiSanPham(page, search) {
@@ -119,14 +122,14 @@
         pageSize: pageSizeGlobal,
         search: search
       },
-      success: function(response) {
+      success: function (response) {
         console.log(response);
         var data = response.data;
         var tableBody = document.getElementById("tableBody");
         var tableContent = "";
         // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
         if (data.length > 0) {
-          data.forEach(function(record, index) {
+          data.forEach(function (record, index) {
             var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
 
             var trContent = `
@@ -172,7 +175,7 @@
 
       },
 
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         if (xhr.status === 401) {
           alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -206,7 +209,7 @@
       showNext: true,
       pageNumber: currentPage,
 
-      callback: function(data, pagination) {
+      callback: function (data, pagination) {
         if (pagination.pageNumber !== currentPage) {
           currentPage = pagination.pageNumber; // Cập nhật trang hiện tại
           fetchDataAndUpdateTable(currentPage, search); // Tải dữ liệu mới cho trang
@@ -216,7 +219,7 @@
   }
 
   // Hàm xử lý sự kiện khi nút tìm kiếm được click
-  document.getElementById('searchButton').addEventListener('click', function() {
+  document.getElementById('searchButton').addEventListener('click', function () {
     var searchValue = document.querySelector('.Admin_input__LtEE-').value;
 
     // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
@@ -224,7 +227,7 @@
   });
 
   // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
-  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
+  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function (event) {
     // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
     if (event.key === 'Enter') {
       // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
@@ -253,13 +256,13 @@
           url: `../../../Controllers/CategoryController.php?id=${id}`, // Chèn đúng ID vào URL
           type: 'DELETE',
 
-          success: function(response) {
+          success: function (response) {
             // Hiển thị thông báo thành công bằng SweetAlert2
             Swal.fire('Thành công!', 'Xóa loại sản phẩm thành công !!', 'success').then(() => {
               fetchDataAndUpdateTable(currentPage, ''); // Cập nhật bảng sau khi xóa
             });
           },
-          error: function(xhr, status, error) {
+          error: function (xhr, status, error) {
             // Hiển thị thông báo lỗi nếu có
             Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi xóa loại sản phẩm.', 'error');
             console.error('Lỗi khi gọi API: ', xhr, status, error);

@@ -158,7 +158,10 @@ class CategoryController
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
         }
-
+        // Kiểm tra và thêm totalPages nếu có trong kết quả
+        if (isset($result->totalElements)) {
+            $response['totalElements'] = $result->totalElements;
+        }
         echo json_encode($response);
     }
 }

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="QLThuongHieu.css" />
+  <link href="../../MemberUI/components/paginationjs.css" />
   <!-- <link rel="stylesheet" href="../bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
@@ -97,13 +98,16 @@
 
 
 <script>
+  // Khởi tạo trang hiện tại
+  fetchDataAndUpdateTable(currentPage, '');
+
   // Hàm để xóa hết các dòng trong bảng
   function clearTable() {
     var tableBody = document.querySelector('.Table_table__BWPy tbody');
     tableBody.innerHTML = ''; // Xóa nội dung trong tbody
   }
 
-  var page = 1;
+  var currentPage = 1;
   var pageSizeGlobal = 5;
   var search = "";
 
@@ -119,14 +123,14 @@
         pageSize: pageSizeGlobal,
         search: search
       },
-      success: function(response) {
+      success: function (response) {
         var data = response.data; // Lấy mảng dữ liệu từ API
         var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
         var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
         // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
         if (data.length > 0) {
-          data.forEach(function(record, index) {
+          data.forEach(function (record, index) {
             var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
             var trContent = `
                         <form id="updateForm" method="post" action="FormUpdateThuongHieu.php">
@@ -174,7 +178,7 @@
         setupPagination(response.totalElements, page);
       },
 
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         if (xhr.status === 401) {
           alert('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
@@ -197,10 +201,6 @@
     getAllThuongHieu(page, search);
   }
 
-  // Khởi tạo trang hiện tại
-  var currentPage = 1;
-  fetchDataAndUpdateTable(currentPage, '');
-
   // Hàm tạo nút phân trang
   function setupPagination(totalElements, currentPage) {
     $('#pagination-container').pagination({
@@ -212,7 +212,7 @@
       showNext: true,
       pageNumber: currentPage,
 
-      callback: function(data, pagination) {
+      callback: function (data, pagination) {
         if (pagination.pageNumber !== currentPage) {
           currentPage = pagination.pageNumber; // Cập nhật trang hiện tại
           fetchDataAndUpdateTable(currentPage, search); // Tải dữ liệu mới cho trang
@@ -223,7 +223,7 @@
 
 
   // Hàm xử lý sự kiện khi nút tìm kiếm được click
-  document.getElementById('searchButton').addEventListener('click', function() {
+  document.getElementById('searchButton').addEventListener('click', function () {
     var searchValue = document.querySelector('.Admin_input__LtEE-').value;
 
     // Truyền giá trị của biến currentPage vào hàm fetchDataAndUpdateTable
@@ -231,7 +231,7 @@
   });
 
   // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
-  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
+  document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function (event) {
     // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
     if (event.key === 'Enter') {
       // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
@@ -264,16 +264,16 @@
           url: '../../../Controllers/BrandController.php?id=' + brandId,
           type: 'DELETE',
 
-          success: function(response) {
+          success: function (response) {
             Swal.fire({
               icon: 'success',
               title: 'Thành công!',
               text: 'Xóa thương hiệu thành công !!',
-            }).then(function() {
+            }).then(function () {
               fetchDataAndUpdateTable(currentPage, '');
             });
           },
-          error: function(xhr, status, error) {
+          error: function (xhr, status, error) {
             Swal.fire({
               icon: 'error',
               title: 'Lỗi!',

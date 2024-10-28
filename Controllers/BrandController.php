@@ -154,6 +154,9 @@ class BrandController
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
         }
+        if (isset($result->totalElements)) {
+            $response['totalElements'] = $result->totalElements;
+        }
 
         echo json_encode($response);
     }
