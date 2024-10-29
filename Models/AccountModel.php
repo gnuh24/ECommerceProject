@@ -41,7 +41,7 @@ class AccountModel
 
 
 
-    public function getAccountById($userInformationId = null, $filters = [], $page = 1, $search = '', $role = '', $status = null)
+    public function getAccountById($entityPerPage = 5, $userInformationId = null, $filters = [], $page = 1, $search = '', $role = '', $status = null)
     {
 
         // Xác định trang hiện tại, mặc định là 1 nếu không có giá trị hợp lệ
@@ -64,9 +64,6 @@ class AccountModel
             // Nếu không có userInformationId, bắt đầu với điều kiện WHERE luôn đúng
             $query .= " WHERE 1=1";
         }
-    
-        // Số phần tử mỗi trang
-        $entityPerPage = 10;
     
         // Tổng số trang
         $totalPages = null;
@@ -169,6 +166,7 @@ class AccountModel
                 "message" => "Truy vấn thành công",
                 "data" => $result,
                 "totalPages" => $totalPages,
+                "totalElements" => $totalRows,
                 "isExists" => $query
             ];
         } catch (PDOException $e) {

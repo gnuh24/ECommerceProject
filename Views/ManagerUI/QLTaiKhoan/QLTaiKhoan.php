@@ -4,20 +4,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="oneForAll.css" />
-    <link rel="stylesheet" href="Admin.css" />
     <title>Quản lý tài khoản</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+     <!-- Include Pagination.js -->
+     <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
+
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+
+    <link rel="stylesheet" href="oneForAll.css" />
+    <link rel="stylesheet" href="Admin.css" />
+
+
 </head>
 
 <body>
-    <div id="root">
-        <div>
-            <div class="App">
+
                 <div class="StaffLayout_wrapper__CegPk">
                     <?php require_once "../ManagerHeader.php" ?>
-                    <div>
-                        <div>
+               
                             <div class="Manager_wrapper__vOYy">
                                 <?php require_once "../ManagerMenu.php" ?>
 
@@ -62,41 +69,32 @@
                                                         <th class="Table_th__hCkcg">Thao tác</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="tableBody">
+                                                <tbody id="tableBody1">
 
                                                 </tbody>
                                             </table>
-                                            <div class="pagination"></div>
-                                        </div>
+                                            <div id="pagination-container"></div>
+                                            </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+    
                 </div>
-            </div>
-        </div>
-    </div>
-    </div>
+      
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <script>
     // Khởi tạo trang hiện tại
     var currentPage = 1;
-
+    var pageSizeGlobal = 5;
+    var search = "";
+    var status = "";
+    var role = "";
+    
     // Lắng nghe sự kiện click trên nút logout
     document.addEventListener('DOMContentLoaded', function() {
-        var logoutButton = document.getElementById('logoutButton');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function() {
-                sessionStorage.removeItem('key');
-                window.location.href = '../../MemberUI/Login/AdminLoginUI.php';
-            });
-        }
-
-
-        fetchDataAndUpdateTable(currentPage, '', '');
+      fetchDataAndUpdateTable(currentPage, '', '');
     });
 
     function clearTable() {
@@ -105,13 +103,14 @@
     }
 
 
-    function getAllTaiKhoan(page, search, status, role) {
+    function getAllTaiKhoan(page) {
     $.ajax({
         url: '../../../Controllers/AccountController.php',
         type: 'GET',
         dataType: "json",
         data: {
             page: page,
+            pageSize:pageSizeGlobal,
             search: search,
             action: 'getAccountById',
             status: status,
@@ -119,7 +118,7 @@
         },
         success: function(response) {
             var data = response.data;
-            var tableBody = document.getElementById("tableBody"); // Lấy thẻ tbody của bảng
+            var tableBody = document.getElementById("tableBody1"); // Lấy thẻ tbody của bảng
             var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
             if (data.length > 0) {
@@ -132,7 +131,7 @@
                     var buttonData = (record.Status === 0) ? "unlock" : "block";
                     var trContent = `
                     <form id="updateForm${record.Id}" method="post" action="FormUpdateTaiKhoan.php">
-                        <tr style="height: 20%"; max-height: 20%;>
+                      <tr style="height: 20%" ; max-height:=20%;>
                             <td class="${trClass}" style="width: 130px;">${record.Id}</td>
                             <td class="${trClass}">${record.Email}</td>
                             <td class="${trClass}">${record.CreateTime}</td>
@@ -164,6 +163,8 @@
 
                     trContent += `</tr></form>`;
                     tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
+
+                    setupPagination(response.totalElements, page);
                 });
             } else {
                 tableContent = `<tr><td style="text-align: center;" colspan="7">Không có tài khoản nào thỏa yêu cầu</td></tr>`;
@@ -173,7 +174,7 @@
             tableBody.innerHTML = tableContent;
 
             // Tạo phân trang
-            createPagination(page, response.totalPages);
+            setupPagination(response.totalElements, page);
         },
         error: function(xhr, status, error) {
             if (xhr.status === 401) {
@@ -217,81 +218,65 @@ function confirmRoleChange(accountId, newRole, oldRole) {
 }
 
 
-    function fetchDataAndUpdateTable(page, search, status, role) {
+    function fetchDataAndUpdateTable(page) {
         clearTable();
-        getAllTaiKhoan(page, search, status, role);
+        getAllTaiKhoan(page);
     }
 
 
-    // Hàm tạo nút phân trang
-    function createPagination(currentPage, totalPages) {
-        var paginationContainer = document.querySelector('.pagination');
-        var searchValue = document.querySelector('.Admin_input__LtEE-').value;
-        var quyenValue = document.querySelector('#selectQuyen').value;
-        // Xóa nút phân trang cũ (nếu có)
-        paginationContainer.innerHTML = '';
-        if (totalPages > 1) {
-            // Tạo nút cho từng trang và thêm vào chuỗi HTML
-            var paginationHTML = '';
-            for (var i = 1; i <= totalPages; i++) {
-                paginationHTML += '<button class="pageButton">' + i + '</button>';
-            }
-            // Thiết lập nút phân trang vào paginationContainer
-            paginationContainer.innerHTML = paginationHTML;
-            // Thêm sự kiện click cho từng nút phân trang
-            paginationContainer.querySelectorAll('.pageButton').forEach(function(button, index) {
-                button.addEventListener('click', function() {
+   function setupPagination(totalElements, currentPage) {
 
-                    fetchDataAndUpdateTable(index + 1, searchValue, quyenValue); // Thêm 1 vào index để chuyển đổi về trang 1-indexed
-                });
-            });
+        //Kiểm tra xem nếu totalPage ít hơn 1 thì ẩn luôn =))
+        const totalPage = Math.ceil(totalElements / pageSizeGlobal);
+        totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
 
-            // Đảm bảo rằng currentPage nằm trong phạm vi hợp lệ
-            if (currentPage >= 1 && currentPage <= totalPages) {
-                // Đánh dấu trang hiện tại
-                paginationContainer.querySelector('.pageButton:nth-child(' + currentPage + ')').classList.add('active');
-            } else {
-                console.error('currentPage is out of bounds');
+        $('#pagination-container').pagination({
+            dataSource: Array.from({
+                length: totalElements
+            }, (_, i) => i + 1),
+
+            pageSize: pageSizeGlobal,
+            showPrevious: true,
+            showNext: true,
+            pageNumber: currentPage,
+
+            callback: function(data, pagination) {
+                if (pagination.pageNumber !== currentPage) {
+                    currentPage = pagination.pageNumber; // Update current page
+                    getAllTaiKhoan(currentPage);                
+                }
             }
-        }
+        });
     }
 
 
    // Hàm xử lý sự kiện khi select Quyen thay đổi
 document.querySelector('#selectQuyen').addEventListener('change', function() {
-    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
-    var quyenValue = this.value;
-    var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
-    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+    status = this.value;
+    fetchDataAndUpdateTable(currentPage);
 });
 
 // Hàm xử lý sự kiện khi nút tìm kiếm được click
 document.getElementById('searchButton').addEventListener('click', function() {
-    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
-    var quyenValue = document.querySelector('#selectQuyen').value;
-    var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
-    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+    search= document.querySelector('.Admin_input__LtEE-').value;
+    fetchDataAndUpdateTable(currentPage);
 });
 
 // Hàm xử lý sự kiện khi select Role thay đổi
 document.querySelector('#selectRole').addEventListener('change', function() {
-    var searchValue = document.querySelector('.Admin_input__LtEE-').value;
-    var quyenValue = document.querySelector('#selectQuyen').value;
-    var roleValue = this.value;
-    fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+    role = this.value;
+    fetchDataAndUpdateTable(currentPage); 
 });
 
 // Bắt sự kiện khi người dùng ấn phím Enter trong ô tìm kiếm
 document.querySelector('.Admin_input__LtEE-').addEventListener('keypress', function(event) {
     // Kiểm tra xem phím được ấn có phải là Enter không (mã phím 13)
     if (event.key === 'Enter') {
-        // Ngăn chặn hành động mặc định của phím Enter (ví dụ: gửi form)
+      
         event.preventDefault();
         // Lấy giá trị của ô tìm kiếm và của select quyền
-        var searchValue = this.value;
-        var quyenValue = document.querySelector('#selectQuyen').value;
-        var roleValue = document.querySelector('#selectRole').value; // Lấy giá trị Role
-        fetchDataAndUpdateTable(currentPage, searchValue, quyenValue, roleValue); // Gọi hàm với 4 tham số
+        search= document.querySelector('.Admin_input__LtEE-').value;
+        fetchDataAndUpdateTable(currentPage); // Gọi hàm với 4 tham số
     }
 });
 

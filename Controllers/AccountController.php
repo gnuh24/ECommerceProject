@@ -527,6 +527,7 @@ class AccountController
         // Nhận các tham số từ GET, nếu không có thì gán là null
         $userInformationId = $_GET['UserInformationId'] ?? null;
         $email = $_GET['Email'] ?? null;
+        $pagesize= $_GET['pageSize'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
         $status = $_GET['status'] ?? null;
         $role = $_GET['role'] ?? null;
@@ -541,6 +542,7 @@ class AccountController
 
         // Gọi hàm getAccountById từ model với các tham số đã lấy được
         $response = $this->accountModel->getAccountById(
+            $pagesize,
             $userInformationId,
             $filter,
             $page,
@@ -599,6 +601,10 @@ class AccountController
         // Kiểm tra và thêm totalPages nếu có trong kết quả
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
+        }
+          // Kiểm tra và thêm totalElements nếu có trong kết quả
+        if (isset($result->totalElements)) {
+            $response['totalElements'] = $result->totalElements;
         }
 
         echo json_encode($response);
