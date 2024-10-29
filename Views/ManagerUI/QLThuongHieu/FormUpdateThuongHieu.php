@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../AdminDemo.css" />
+    <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../QLThuongHieu/QLThuongHieu.css" />
+    <link rel="stylesheet" href="./QLThuongHieu.css" />
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -142,7 +142,7 @@
                 'Content-Type': 'application/json' // Đảm bảo gửi dưới dạng JSON
             },
             data: data,
-            success: function (data) {
+            success: function(data) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
@@ -151,7 +151,7 @@
                     window.location.href = 'QLThuongHieu.php'; // Chuyển hướng đến trang quản lý thương hiệu
                 });
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 console.error('Error: ' + xhr.status + ' - ' + xhr.responseText);
 
                 // Xử lý các mã lỗi cụ thể
