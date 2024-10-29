@@ -58,9 +58,8 @@
             <br>
             <div class="boxFeature">
               <div style="position: relative">
-                <i class="fa fa-search"></i>
-                <input class="Admin_input__LtEE-" placeholder="Tìm kiếm loại sản phẩm" />
-                <button id="searchButton" style="cursor: pointer;"><i class="fa fa-search"></i></button>
+                <input style="border: 2px solid #333; height: 30px; padding: 0.5rem;" class="Admin_input__LtEE-" placeholder="Tìm kiếm loại sản phẩm" />
+                <button id="filter-button" style="cursor: pointer;"><i class="fa fa-search"></i></button>
               </div>
 
 

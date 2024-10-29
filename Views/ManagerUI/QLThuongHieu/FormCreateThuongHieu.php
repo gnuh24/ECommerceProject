@@ -66,7 +66,7 @@
 
                                     <div style="padding-left: 1rem">
                                         <p class="text">Thương hiệu</p>
-                                        <input id="brandName" class="input" type="text" name="brandName" style="width: 20rem; padding: 0.5rem; height: 1rem;" />
+                                        <input id="brandName" class="input" type="text" name="brandName"/>
                                         <span style="
                                                             margin-left: 1rem;
                                                             font-weight: 700;
