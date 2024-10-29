@@ -8,16 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
      <!-- Include Pagination.js -->
-     <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
-
+     
      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
-
+    <!-- <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" /> -->
     <link rel="stylesheet" href="oneForAll.css" />
     <link rel="stylesheet" href="Admin.css" />
 
-
+     <style>
+        
+.paginationjs {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+</style>
 </head>
 
 <body>
@@ -61,19 +67,19 @@
                                             <table class="Table_table__BWPy">
                                                 <thead class="Table_head__FTUog">
                                                     <tr>
-                                                        <th class="Table_th__hCkcg">Mã Tài Khoản</th>
-                                                        <th class="Table_th__hCkcg">Email</th>
-                                                        <th class="Table_th__hCkcg">Ngày tạo</th>
-                                                        <th class="Table_th__hCkcg">Trạng thái</th>
-                                                        <th class="Table_th__hCkcg">Quyền</th>
-                                                        <th class="Table_th__hCkcg">Thao tác</th>
+                                                        <th class="Table_th__hCkcg" style="width:5%">ID</th>
+                                                        <th class="Table_th__hCkcg" style="width:30%">Email</th>
+                                                        <th class="Table_th__hCkcg" style="width:20%">Ngày tạo</th>
+                                                        <th class="Table_th__hCkcg" style="width:5%">Trạng thái</th>
+                                                        <th class="Table_th__hCkcg" style="width:10%">Quyền</th>
+                                                        <th class="Table_th__hCkcg" style="width:10%">Thao tác</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="tableBody1">
 
                                                 </tbody>
                                             </table>
-                                            <div id="pagination-container"></div>
+                                            <div id="pagination-container" style="background-color: white;"></div>
                                             </div>
                                     </div>
                                 </div>
@@ -130,8 +136,8 @@
                     var buttonClass = (record.Status === 0) ? "unlock" : "block";
                     var buttonData = (record.Status === 0) ? "unlock" : "block";
                     var trContent = `
-                    <form id="updateForm${record.Id}" method="post" action="FormUpdateTaiKhoan.php">
-                      <tr style="height: 20%" ; max-height:=20%;>
+                   
+                            <tr style="height: 20%; max-height: 20%;">
                             <td class="${trClass}" style="width: 130px;">${record.Id}</td>
                             <td class="${trClass}">${record.Email}</td>
                             <td class="${trClass}">${record.CreateTime}</td>
@@ -161,7 +167,7 @@
                             }
 
 
-                    trContent += `</tr></form>`;
+                    trContent += `</tr>`;
                     tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
 
                     setupPagination(response.totalElements, page);
@@ -190,32 +196,39 @@
 
 
 function confirmRoleChange(accountId, newRole, oldRole) {
-    const confirmation = confirm("Bạn có chắc chắn muốn thay đổi quyền thành " + newRole + " không?");
-    const selectElement = document.getElementById("roleSelect" + accountId);
-
-    if (confirmation) {
-        // Gửi yêu cầu cập nhật quyền mới lên server
-        $.ajax({
-            url: '../../../Controllers/AccountController.php',
-            type: 'POST',
-            data: {
-                action: 'updateRole',
-                Id: accountId,
-                Role: newRole
-            },
-            success: function(response) {
-                alert("Cập nhật quyền thành công!");
-            },
-            error: function(xhr, status, error) {
-                alert("Có lỗi xảy ra trong quá trình cập nhật quyền.");
-                console.error('Lỗi khi gọi API: ', error);
-            }
-        });
-    } else {
-        // Nếu người dùng không đồng ý, reset giá trị select về giá trị cũ
-        selectElement.value = oldRole;  // Khôi phục giá trị cũ
-    }
+    Swal.fire({
+        title: `Bạn có chắc chắn muốn thay đổi quyền thành ${newRole} không?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Gửi yêu cầu cập nhật quyền mới lên server
+            $.ajax({
+                url: '../../../Controllers/AccountController.php',
+                type: 'POST',
+                data: {
+                    action: 'updateRole',
+                    Id: accountId,
+                    Role: newRole
+                },
+                success: function(response) {
+                    Swal.fire('Thành công!', 'Cập nhật quyền thành công!', 'success');
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('Lỗi!', 'Có lỗi xảy ra trong quá trình cập nhật quyền.', 'error');
+                    console.error('Lỗi khi gọi API: ', error);
+                }
+            });
+        } else {
+            // Nếu người dùng không đồng ý, reset giá trị select về giá trị cũ
+            const selectElement = document.getElementById("roleSelect" + accountId);
+            selectElement.value = oldRole; // Khôi phục giá trị cũ
+        }
+    });
 }
+
 
 
     function fetchDataAndUpdateTable(page) {
