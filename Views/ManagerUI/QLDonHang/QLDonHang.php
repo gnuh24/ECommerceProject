@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="./QLDonHang.css" />
-    <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
 
     <!-- Include Pagination.js -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+    <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../HelperUI/formatOutput.js"></script>

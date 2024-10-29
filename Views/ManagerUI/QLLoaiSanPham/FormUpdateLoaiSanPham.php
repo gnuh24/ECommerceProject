@@ -4,101 +4,82 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../AdminDemo.css" />
+    <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <link rel="stylesheet" href="../QLNhaCungCap/QLNhaCungCap.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>C:\xampp\htdocs\ECommerceProject\Views\ManagerUI\
+    <link rel="stylesheet" href="./QLLoaiSanPham.css" />
     <title>Cập nhật loại sản phẩm</title>
 </head>
 
 <body>
-    <div id="root">
-        <div>
-            <div class="App">
-                <div class="StaffLayout_wrapper__CegPk">
-                    <?php require_once "../ManagerHeader.php" ?>
+    <div class="StaffLayout_wrapper__CegPk">
+        <?php require_once "../ManagerHeader.php" ?>
+        <div class="Manager_wrapper__vOYy">
+            <div style="padding-left: 3%; width: 100%; padding-right: 2rem">
+                <div class="wrapper">
+                    <form id="submit-form" method="post">
+                        <input type="hidden" name="action" value="updateSupplier">
+                        <div class="boxFeature">
+                            <h2 style="font-size: 1.5rem">Cập nhật thông tin loại sản phẩm</h2>
+                            <div>
+                                <a style="
+                                font-family: Arial;
+                                font-size: 1rem; /* Giảm kích thước font */
+                                font-weight: 600; /* Giảm độ đậm */
+                                border: 1px solid rgb(140, 140, 140);
+                                background-color: white;
+                                color: rgb(80, 80, 80);
+                                padding: 0.5rem 1rem; /* Giảm phần padding */
+                                border-radius: 0.4rem; /* Giảm độ bo tròn */
+                                cursor: pointer;"
+                                    href="./QLLoaiSanPham.php">Hủy</a>
+                                <button id="updateLoaiSanPham_save" style="margin-left: 1rem; 
+                                margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
+                                font-family: Arial;
+                                font-size: 1rem; /* Giảm kích thước font */
+                                font-weight: 600; /* Giảm độ đậm */
+                                color: white;
+                                background-color: rgb(65, 64, 64);
+                                padding: 0.5rem 1rem;
+                                border-radius: 0.4rem; 
+                                cursor: pointer;">Lưu</button>
+                            </div>
+                        </div>
+                        <div class="boxTable">
+                            <div style="display: flex; padding: 0rem 1rem 0rem 1rem; justify-content: space-between;">
+                                <div>
+                                    <?php
 
-                    <div>
-                        <div>
-                            <div class="Manager_wrapper__vOYy">
-                                <div style="padding-left: 3%; width: 100%; padding-right: 2rem">
-                                    <div class="wrapper">
-                                        <div style="
-                                        display: flex;
-                                        padding-top: 2rem;
-                                        align-items: center;
-                                        gap: 1rem;
-                                        padding-bottom: 1rem;"></div>
-                                        <form id="submit-form" method="post">
-                                            <input type="hidden" name="action" value="updateSupplier">
-                                            <div class="boxFeature">
+                                    $id = "";
+                                    $categoryName =  "";
+
+                                    if (isset($_GET['id']) && isset($_GET['categoryName'])) {
+                                        // Lấy các tham số được gửi từ AJAX
+                                        $id = $_GET['id'];
+                                        $categoryName = $_GET['categoryName'];
+                                    }
+                                    echo '
+                                        <div style="padding-left: 1rem">
+
+                                            <div style="display: flex; gap: 2rem">
                                                 <div>
-                                                    <h2 style="font-size: 1.5rem">Cập nhật thông tin loại sản phẩm</h2>
-                                                </div>
-                                                <div>
-                                                    <a style="
-                                                    font-family: Arial;
-                                                    font-size: 1rem; /* Giảm kích thước font */
-                                                    font-weight: 600; /* Giảm độ đậm */
-                                                    border: 1px solid rgb(140, 140, 140);
-                                                    background-color: white;
-                                                    color: rgb(80, 80, 80);
-                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
-                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
-                                                    cursor: pointer;" 
-                                                    href="./QLLoaiSanPham.php">Hủy</a>
-                                                    <button id="updateLoaiSanPham_save" style="margin-left: 1rem; 
-                                                    margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
-                                                    font-family: Arial;
-                                                    font-size: 1rem; /* Giảm kích thước font */
-                                                    font-weight: 600; /* Giảm độ đậm */
-                                                    color: white;
-                                                    background-color: rgb(65, 64, 64);
-                                                    padding: 0.5rem 1rem; /* Giảm phần padding */
-                                                    border-radius: 0.4rem; /* Giảm độ bo tròn */
-                                                    cursor: pointer;">Lưu</button>
+                                                    <p class="text">Mã loại sản phẩm<span style="color: red; margin-left: 10px;">🔒</span></p>
+                                                    <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
                                                 </div>
                                             </div>
-                                            <div class="boxTable">
-                                                <div style="display: flex; padding: 0rem 1rem 0rem 1rem; justify-content: space-between;">
-                                                    <div>
-                                                        <?php
 
-                                                        $id = "";
-                                                        $categoryName =  "";
+                                            <p class="text">Loại sản phẩm</p>
+                                            <input id="CategoryName" class="input" type="text" name="CategoryName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($categoryName) . '" />
 
-                                                        if (isset($_GET['id'])) {
-                                                            // Lấy các tham số được gửi từ AJAX
-                                                            $id = $_GET['id'];
-                                                            $categoryName = $_GET['categoryName'];
-                                                        }
-                                                        echo '
-                                                            <div style="padding-left: 1rem">
+                                        </div>';
 
-                                                                <div style="display: flex; gap: 2rem">
-                                                                    <div>
-                                                                        <p class="text">Mã loại sản phẩm<span style="color: red; margin-left: 10px;">🔒</span></p>
-                                                                        <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
-                                                                    </div>
-                                                                </div>
+                                    ?>
 
-                                                                <p class="text">Loại sản phẩm</p>
-                                                                <input id="CategoryName" class="input" type="text" name="CategoryName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($categoryName) . '" />
-
-                                                            </div>';
-
-                                                        ?>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>

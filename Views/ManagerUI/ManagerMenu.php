@@ -64,9 +64,6 @@
         // Lấy giá trị href của thẻ <a> và loại bỏ ../
         const hrefPath = item.getAttribute('href').replace("../", "");
 
-        console.log("Path: " + currentPath);
-        console.log("Href: " + hrefPath);
-
         if (hrefPath === currentPath) {
             item.classList.add('active');
         }
