@@ -97,11 +97,11 @@
   .Admin_boxTable__hLXRJ {
     margin-top: 1rem;
     overflow-y: auto;
-    background-color: rgb(236, 233, 233);
     border-radius: 0.3rem;
   }
   .Table_table__BWPy {
     width: 100%;
+    background-color: rgb(236, 233, 233);
     border-collapse: collapse;
   }
   .Table_head__FTUog {
