@@ -16,53 +16,18 @@ function formatCurrency(number) {
     });
 }
 
-// // Hàm format ngày về dạng yyyy-MM-dd
-// function formatDateToYYYYMMDD(dateString) {
-//     var date = new Date(dateString);
-//     var year = date.getFullYear();
-//     var month = (date.getMonth() + 1).toString().padStart(2, '0');
-//     var day = date.getDate().toString().padStart(2, '0');
-//     return `${year}-${month}-${day}`;
-// }
 
+// Function to convert dd/MM/yyyy to yyyy-MM-dd
 function formatDateToYYYYMMDD(dateString) {
-    // Kiểm tra nếu dữ liệu đầu vào rỗng hoặc không hợp lệ
-    if (!dateString || dateString.trim() === '') {
-        return ''; // Trả về rỗng nếu đầu vào không hợp lệ
-    }
-
-    var parts = dateString.split('/'); // Tách chuỗi theo dấu '/'
-
-    // Kiểm tra nếu định dạng ngày không đúng (không đủ 3 phần: ngày, tháng, năm)
-    if (parts.length !== 3) {
-        return ''; // Trả về rỗng nếu không đúng định dạng
-    }
-
-    var day = parts[0]; // Ngày
-    var month = parts[1]; // Tháng
-    var year = parts[2]; // Năm
-
-    // Trả về định dạng yyyy-MM-dd
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    if (!dateString) return ''; // Return empty if input is invalid
+    const [day, month, year] = dateString.split('/'); // Destructure directly
+    return (day && month && year) ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : ''; // Check parts and format
 }
 
-// Hàm format ngày từ yyyy-MM-dd về dạng dd/MM/yyyy để sử dụng trong input type="date"
+// Function to convert yyyy-MM-dd to dd/MM/yyyy
 function formatDateToDDMMYYYY(dateString) {
-    // Tách chuỗi theo dấu gạch ngang "-"
-    var parts = dateString.split("-");
-
-    // Đảm bảo chuỗi có đủ các phần (năm, tháng, ngày)
-    if (parts.length === 3) {
-        var year = parts[0];
-        var month = parts[1];
-        var day = parts[2];
-
-        // Trả về định dạng dd/mm/yyyy
-        return `${day}/${month}/${year}`;
-    } else {
-        // Nếu chuỗi không hợp lệ, trả về giá trị ban đầu
-        return dateString;
-    }
+    const [year, month, day] = dateString.split("-"); // Destructure directly
+    return (year && month && day) ? `${day}/${month}/${year}` : dateString; // Check parts and format
 }
 
 
@@ -107,3 +72,18 @@ function fromCurrentStatusToNextStatus(status) {
             return 'GiaoThanhCong';
     }
 }
+
+// yyyy-MM-dd HH:mm:ss -> HH:mm:ss dd/MM/yyyy
+// Sample: 2024-07-14 09:30:00 -> 09:30:00 14/07/2024
+function convertDateTimeFormat(dateString) {
+    // Split date and time
+    const [datePart, timePart] = dateString.split(" ");
+  
+    // Split the date part into year, month, day
+    const [year, month, day] = datePart.split("-");
+  
+    // Return the new format
+    return `${timePart} ${day}/${month}/${year}`;
+}
+
+

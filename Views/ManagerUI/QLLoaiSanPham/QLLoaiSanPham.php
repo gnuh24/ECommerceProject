@@ -8,12 +8,13 @@
   <link rel="stylesheet" href="../AdminHome.css" />
   <link rel="stylesheet" href="../QLLoaiSanPham/QLLoaiSanPham.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
-  <!-- PaginationJS CSS -->
 
+  <!-- PaginationJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
-  <!-- PaginationJS -->
+  <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
+
 
   <title>Quản lý loại sản phẩm</title>
 </head>
@@ -146,13 +147,12 @@
               for (var i = data.length; i < 5; i++) {
                 var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng trống
                 trContent += `
-                                <form id="emptyForm" method="post" action="FormUpdateLoaiSanPham.php">
-                                    <tr style="height: 20%"; max-height: 20%;>
-                                        <td class="${emptyTrClass}" style="width: 130px;"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                    </tr>
-                                </form>`;
+                              <tr style="height: 20%"; max-height: 20%;>
+                                  <td class="${emptyTrClass}" style="width: 130px;"></td>
+                                  <td class="${emptyTrClass}"></td>
+                                  <td class="${emptyTrClass}"></td>
+                              </tr>
+                            `;
               }
             }
             tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
@@ -179,8 +179,6 @@
       }
     });
   }
-
-
 
   // Hàm để gọi getAllLoaiSanPham và cập nhật dữ liệu và phân trang
   function fetchDataAndUpdateTable(page, search) {
@@ -269,14 +267,6 @@
 
 
   function updateLoaiSanPham(id, categoryName) {
-
-    // Lấy ra form bằng id của nó
-    var form = document.querySelector("#updateForm");
-
     window.location.href = `FormUpdateLoaiSanPham.php?id=${id}&categoryName=${categoryName}`;
-
-    // Gửi form đi
-    form.submit();
-
   }
 </script>

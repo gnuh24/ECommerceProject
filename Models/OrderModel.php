@@ -10,11 +10,11 @@ class OrderModel
         $this->connection = MysqlConfig::getConnection();
     }
 
-    // Lấy tất cả các đơn hàng với phân trang và tìm kiếm
-    public function getAllOrder($pageNumber, $size, $minNgayTao, $maxNgayTao, $status)
+    // Lấy tất cả các đơn hàng với phân trang và filter
+    public function getAllOrder($pageNumber, $pageSize, $minNgayTao, $maxNgayTao, $status)
     {
         // Xác định phần sụt giảm và điều kiện cho truy vấn
-        $offset = ($pageNumber - 1) * $size;
+        $offset = ($pageNumber - 1) * $pageSize;
         $query = "
                     SELECT o.*, os.Status, u.Fullname, u.Email, u.PhoneNumber, u.Address, u.Birthday, u.Gender
                     FROM `Order` o
@@ -22,6 +22,7 @@ class OrderModel
                     LEFT JOIN `UserInformation` u ON o.AccountId = u.Id
                     WHERE 1=1
                 ";
+
         // Kiểm tra điều kiện ngày bắt đầu và ngày kết thúc
         if (!empty($minNgayTao) && !empty($maxNgayTao)) {
             // Cả 2 ngày đều tồn tại
@@ -39,6 +40,7 @@ class OrderModel
             $query .= " AND os.Status = :status";
         }
 
+        // Lọc ra đúng nh
         $query .= "
                     AND os.UpdateTime = (
                         SELECT MAX(os2.UpdateTime)
@@ -46,7 +48,9 @@ class OrderModel
                         WHERE os2.OrderId = o.Id
                     )
                 ";
-        $countQuery = "
+
+        //Tính tổng phần tử
+        $totalElementsQuery = "
                         SELECT COUNT(*) AS total
                         FROM `Order` o
                         LEFT JOIN `OrderStatus` os ON o.Id = os.OrderId
@@ -56,44 +60,49 @@ class OrderModel
 
         // Điều kiện ngày bắt đầu và ngày kết thúc cho truy vấn đếm
         if (!empty($minNgayTao) && !empty($maxNgayTao)) {
-            $countQuery .= " AND o.OrderTime BETWEEN :from AND :to";
+            $totalElementsQuery .= " AND o.OrderTime BETWEEN :from AND :to";
         } elseif (!empty($minNgayTao)) {
-            $countQuery .= " AND DATE(o.OrderTime) >= :from";
+            $totalElementsQuery .= " AND DATE(o.OrderTime) >= :from";
         } elseif (!empty($maxNgayTao)) {
-            $countQuery .= " AND DATE(o.OrderTime) <= :to";
+            $totalElementsQuery .= " AND DATE(o.OrderTime) <= :to";
         }
 
         // Điều kiện trạng thái đơn hàng nếu có
         if (!empty($status)) {
-            $countQuery .= " AND os.Status = :status";
+            $totalElementsQuery .= " AND os.Status = :status";
         }
 
-        $countQuery .= "
-                            AND os.UpdateTime = (
-                                SELECT MAX(os2.UpdateTime)
-                                FROM `OrderStatus` os2
-                                WHERE os2.OrderId = o.Id
-                            )
-                        ";
+        $totalElementsQuery .=  "
+                                    AND os.UpdateTime = (
+                                        SELECT MAX(os2.UpdateTime)
+                                        FROM `OrderStatus` os2
+                                        WHERE os2.OrderId = o.Id
+                                    )
+                                ";
 
         // Thực hiện truy vấn đếm
         try {
-            $countStatement = $this->connection->prepare($countQuery);
+
+
+            // Tính totalElements của truy vấn
+            $totalElementsStatement = $this->connection->prepare($totalElementsQuery);
             if (!empty($minNgayTao)) {
-                $countStatement->bindValue(':from', $minNgayTao, PDO::PARAM_STR);
+                $totalElementsStatement->bindValue(':from', $minNgayTao, PDO::PARAM_STR);
             }
             if (!empty($maxNgayTao)) {
-                $countStatement->bindValue(':to', $maxNgayTao, PDO::PARAM_STR);
+                $totalElementsStatement->bindValue(':to', $maxNgayTao, PDO::PARAM_STR);
             }
             if (!empty($status)) {
-                $countStatement->bindValue(':status', $status, PDO::PARAM_STR);
+                $totalElementsStatement->bindValue(':status', $status, PDO::PARAM_STR);
             }
-            $countStatement->execute();
-            $totalCount = $countStatement->fetchColumn();
-            $totalPages = ceil($totalCount / $size); // Tính tổng số trang
+            $totalElementsStatement->execute();
+            $totalElements = $totalElementsStatement->fetchColumn();
+
+
+
 
             // Truy vấn lấy dữ liệu đơn hàng
-            $query .= " ORDER BY o.OrderTime DESC LIMIT :offset, :size";
+            $query .= " ORDER BY o.OrderTime DESC LIMIT :offset, :pageSize";
             $statement = $this->connection->prepare($query);
             if (!empty($minNgayTao)) {
                 $statement->bindValue(':from', $minNgayTao, PDO::PARAM_STR);
@@ -105,15 +114,14 @@ class OrderModel
                 $statement->bindValue(':status', $status, PDO::PARAM_STR);
             }
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $statement->bindValue(':size', $size, PDO::PARAM_INT);
+            $statement->bindValue(':pageSize', $pageSize, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
             return (object) [
                 "status" => 200,
                 "message" => "Orders fetched successfully",
-                "totalPages" => $totalPages,
-                "totalElements" => $totalCount,
+                "totalElements" => $totalElements,
                 "data" => $result
             ];
         } catch (PDOException $e) {
@@ -123,26 +131,6 @@ class OrderModel
             ];
         }
     }
-
-
-
-    // Kiểm tra xem đơn hàng có thuộc về ID người dùng không
-    public function isOrderBelongToThisId($userInformationId, $orderId)
-    {
-        $query = "SELECT COUNT(*) FROM `order` WHERE `Id` = :orderId AND `AccountId` = :userId";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':userId', $userInformationId, PDO::PARAM_INT);
-            $statement->execute();
-            $count = $statement->fetchColumn();
-            return $count > 0; // Trả về true nếu có đơn hàng thuộc về người dùng
-        } catch (PDOException $e) {
-            return false; // Trả về false nếu có lỗi
-        }
-    }
-
 
     // Tạo đơn hàng mới
     public function createOrder($form)
@@ -261,8 +249,6 @@ class OrderModel
             ];
         }
     }
-
-
 
     public function getFullOrderById($orderId)
     {
@@ -402,36 +388,37 @@ class OrderModel
     public function getOrdersByAccountId($accountId)
     {
         $query = "
-        SELECT 
-            o.Id AS OrderId,
-            o.OrderTime,
-            o.TotalPrice,
-            o.Note,
-            os.Status,
-            os.UpdateTime
-        FROM 
-            `order` o
-        LEFT JOIN 
-            (
-                SELECT 
-                    os.OrderId,         -- Thêm tiền tố cho cột OrderId
-                    os.Status,
-                    os.UpdateTime
-                FROM 
-                    OrderStatus os
-                JOIN 
-                    (
-                        SELECT 
-                            OrderId, 
-                            MAX(UpdateTime) AS LatestUpdate
-                        FROM 
-                            OrderStatus
-                        GROUP BY 
-                            OrderId
-                    ) latest ON os.OrderId = latest.OrderId AND os.UpdateTime = latest.LatestUpdate
-            ) os ON o.Id = os.OrderId
-        WHERE 
-            o.AccountId = :accountId";
+                    SELECT 
+                        o.Id AS OrderId,
+                        o.OrderTime,
+                        o.TotalPrice,
+                        o.Note,
+                        os.Status,
+                        os.UpdateTime
+                    FROM 
+                        `order` o
+                    LEFT JOIN 
+                        (
+                            SELECT 
+                                os.OrderId,       
+                                os.Status,
+                                os.UpdateTime
+                            FROM 
+                                OrderStatus os
+                            JOIN 
+                                (
+                                    SELECT 
+                                        OrderId, 
+                                        MAX(UpdateTime) AS LatestUpdate
+                                    FROM 
+                                        OrderStatus
+                                    GROUP BY 
+                                        OrderId
+                                ) latest ON os.OrderId = latest.OrderId AND os.UpdateTime = latest.LatestUpdate
+                        ) os ON o.Id = os.OrderId
+                    WHERE 
+                        o.AccountId = :accountId
+                ";
 
         try {
             $statement = $this->connection->prepare($query);

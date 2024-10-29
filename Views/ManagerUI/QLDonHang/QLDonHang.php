@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="./QLDonHang.css" />
-    <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
 
     <!-- Include Pagination.js -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+    <link rel="stylesheet" href="../../MemberUI/components/paginationjs.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../HelperUI/formatOutput.js"></script>
@@ -20,68 +20,64 @@
 </head>
 
 <body>
+    <div class="StaffLayout_wrapper__CegPk">
+        <?php require_once "../ManagerHeader.php" ?>
+        <div class="Manager_wrapper__vOYy">
+            <?php require_once "../ManagerMenu.php" ?>
+            <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+                <div class="wrapper">
+                    <div class="Admin_rightBar__RXnS9">
+                        <div style="
+                                            display: flex;
+                                            margin-bottom: 1rem;
+                                            align-items: center;
+                                        ">
+                            <p class="Admin_title__1Tk48">Quản lí đơn hàng</p>
+                        </div>
+                        <div class="Admin_boxFeature__ECXnm">
+                            <label for=""> Lọc đơn hàng:</label>
+                            <div style="position: relative">
+                                <input class="Admin_input__LtEE-" type="date" id="dateStart" />
+                            </div>
+                            <label for=""> đến </label>
+                            <div style="position: relative">
+                                <input class="Admin_input__LtEE-" type="date" id="dateEnd" />
+                            </div>
+                            <div style="position: relative">
+                                <select style="height: 3rem; padding: 0.3rem;" class="Admin_input__LtEE-" id="TrangThai">
+                                    <option value="">Trạng thái : Tất Cả</option>
+                                    <option value="ChoDuyet">Chờ duyệt</option>
+                                    <option value="DaDuyet">Đã duyệt</option>
+                                    <option value="Huy">Hủy</option>
+                                    <option value="DangGiao">Đang giao</option>
+                                    <option value="GiaoThanhCong">Giao thành công</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="Admin_boxTable__hLXRJ">
+                            <table class="Table_table__BWPy">
+                                <thead class="Table_head__FTUog">
+                                    <tr>
+                                        <th class="Table_th__hCkcg" style="width: 10%;">Mã đơn</th>
+                                        <th class="Table_th__hCkcg" style="width: 15%;">Ngày đặt</th>
+                                        <th class="Table_th__hCkcg" style="width: 10%;">Tổng đơn</th>
+                                        <th class="Table_th__hCkcg" style="width: 15%;">Khách hàng</th>
+                                        <th class="Table_th__hCkcg" style="width: 10%;">Số điện thoại</th>
+                                        <th class="Table_th__hCkcg" style="width: 10%;">Trạng thái</th>
+                                        <th class="Table_th__hCkcg" style="width: 30%;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                </tbody>
+                            </table>
+                            <div id="pagination-container"></div>
 
-    <div class="App">
-        <div class="StaffLayout_wrapper__CegPk">
-            <?php require_once "../ManagerHeader.php" ?>
-            <div class="Manager_wrapper__vOYy">
-                <?php require_once "../ManagerMenu.php" ?>
-                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                    <div class="wrapper">
-                        <div class="Admin_rightBar__RXnS9">
-                            <div style="
-                                                display: flex;
-                                                margin-bottom: 1rem;
-                                                align-items: center;
-                                            ">
-                                <p class="Admin_title__1Tk48">Quản lí đơn hàng</p>
-                            </div>
-                            <div class="Admin_boxFeature__ECXnm">
-                                <label for=""> Lọc đơn hàng:</label>
-                                <div style="position: relative">
-                                    <input class="Admin_input__LtEE-" type="date" id="dateStart" />
-                                </div>
-                                <label for=""> đến </label>
-                                <div style="position: relative">
-                                    <input class="Admin_input__LtEE-" type="date" id="dateEnd" />
-                                </div>
-                                <div style="position: relative">
-                                    <select style="height: 3rem; padding: 0.3rem;" class="Admin_input__LtEE-" id="TrangThai">
-                                        <option value="">Trạng thái : Tất Cả</option>
-                                        <option value="ChoDuyet">Chờ duyệt</option>
-                                        <option value="DaDuyet">Đã duyệt</option>
-                                        <option value="Huy">Hủy</option>
-                                        <option value="DangGiao">Đang giao</option>
-                                        <option value="GiaoThanhCong">Giao thành công</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="Admin_boxTable__hLXRJ">
-                                <table class="Table_table__BWPy">
-                                    <thead class="Table_head__FTUog">
-                                        <tr>
-                                            <th class="Table_th__hCkcg">Mã đơn</th>
-                                            <th class="Table_th__hCkcg">Ngày đặt</th>
-                                            <th class="Table_th__hCkcg">Tổng đơn</th>
-                                            <th class="Table_th__hCkcg">Khách hàng</th>
-                                            <th class="Table_th__hCkcg">Số điện thoại</th>
-                                            <th class="Table_th__hCkcg">Trạng thái</th>
-                                            <th class="Table_th__hCkcg">Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tableBody">
-                                    </tbody>
-                                </table>
-                                <div id="pagination-container"></div>
-
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 
 <script>
@@ -157,9 +153,13 @@
         } else {
             $.each(data, function(index, record) {
                 let totalPriceFormat = formatCurrency(record.TotalPrice);
-                html += '<tr>';
+
+                // Check if the index is even; if true, set background color to white
+                let rowStyle = (index % 2 !== 0) ? 'background-color: white;' : '';
+
+                html += `<tr style="${rowStyle}">`; // Apply row style
                 html += '<td>' + record.Id + '</td>';
-                html += '<td>' + record.OrderTime + '</td>'; // Sử dụng orderTime trực tiếp từ BE
+                html += '<td>' + convertDateTimeFormat(record.OrderTime) + '</td>';
                 html += '<td>' + totalPriceFormat + '</td>';
                 html += '<td>' + record.Fullname + '</td>';
                 html += '<td>' + record.PhoneNumber + '</td>';
@@ -194,9 +194,11 @@
                             Hủy
                         </button>`;
                 }
+
                 html += '</td>';
                 html += '</tr>';
             });
+
         }
 
         // Update the inner HTML of the table body
