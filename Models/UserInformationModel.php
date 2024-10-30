@@ -40,7 +40,35 @@ class UserInformationModel
             ];
         }
     }
+    function getUserById($id)
+    {
+        $query = "SELECT * FROM `UserInformation` WHERE `Id` = :email";
 
+        try {
+            $statement = $this->connection->prepare($query);
+            $statement->bindValue(':email', $id, PDO::PARAM_STR);
+            $statement->execute();
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                return (object) [
+                    "status" => 200,
+                    "message" => "User found",
+                    "data" => $result,
+                ];
+            } else {
+                return (object) [
+                    "status" => 404,
+                    "message" => "User not found",
+                ];
+            }
+        } catch (PDOException $e) {
+            return (object) [
+                "status" => 400,
+                "message" => "Database query failed",
+            ];
+        }
+    }
     // Tạo người dùng mới
     function createUser($form)
     {

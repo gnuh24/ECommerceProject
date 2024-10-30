@@ -61,10 +61,15 @@ class OrderStatusModel
     }
 
     // Tạo trạng thái mới cho đơn hàng (không phải lần đầu)
-    public function createOrderStatus($orderId, $status, $updateTime)
+    public function createOrderStatus($orderId, $status, $updateTime = null)
     {
+        // Nếu không có thời gian cập nhật, hãy sử dụng thời gian hiện tại
+        if ($updateTime === null) {
+            $updateTime = date('Y-m-d H:i:s');
+        }
+
         $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
-                  VALUES (:orderId, :status, :updateTime)";
+              VALUES (:orderId, :status, :updateTime)";
 
         try {
             $statement = $this->connection->prepare($query);

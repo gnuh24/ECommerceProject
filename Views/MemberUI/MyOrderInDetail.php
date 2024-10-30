@@ -250,20 +250,23 @@
                         </div>`;
                 });
                 html = `
- <div class="container mt-4">
-    <div class="info__wrapper order_info2">
-        <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.data.info.OrderId}</span></p>
-        <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.data.info.OrderTime}</span></p>
-        <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note}</span></p>
-    </div>
+                        <div class="container mt-4">
+                            <div class="info__wrapper order_info2">
+                                <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.data.info.OrderId}</span></p>
+                                <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.data.info.OrderTime}</span></p>
+                                <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note}</span></p>
+                                <p><span class="span1">Tình trạng:</span><span class="span2" id="note">${response.data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}</span></p>
+                                <p><span class="span1">Phương thức thanh toán:</span><span class="span2" id="note">${response.data.info.Payment}</span></p>
 
-    <div class="divider"></div>
+                            </div>
 
-    <div class="total__info">
-        <p>Tổng cộng</p>
-        <p id="totalPrice">${response.data.info.TotalPrice}</p>
-    </div>
-</div>`
+                            <div class="divider"></div>
+
+                            <div class="total__info">
+                                <p>Tổng cộng</p>
+                                <p id="totalPrice">${response.data.info.TotalPrice}</p>
+                            </div>
+                        </div>`
                 // Chèn danh sách sản phẩm vào phần tử HTML
                 $('#product-list').html(productListHtml);
                 $('.divider').html(html)

@@ -2,23 +2,17 @@
 require_once __DIR__ . "/../Models/UserInformationModel.php";
 require '../vendor/autoload.php';
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-    // Đọc dữ liệu từ body của request
-    parse_str(file_get_contents("php://input"), $patchData);
+    $patchData = json_decode(file_get_contents("php://input"), true);
 
-    // Kiểm tra xem accountId có tồn tại trong dữ liệu không
     if (isset($patchData['accountId'])) {
         $userId = $patchData['accountId'];
+        $fullname = $patchData['fullname'] ?? null;
+        $phone = $patchData['phone'] ?? null;
+        $address = $patchData['address'] ?? null;
+        $birthday = $patchData['birthday'] ?? null;
+        $gender = $patchData['gender'] ?? null;
 
-        // Lấy các giá trị cần cập nhật từ dữ liệu nhận được
-        $fullname = isset($patchData['fullname']) ? $patchData['fullname'] : null;
-        $phone = isset($patchData['phone']) ? $patchData['phone'] : null;
-        $birthday = isset($patchData['birthday']) ? $patchData['birthday'] : null;
-        $gender = isset($patchData['gender']) ? $patchData['gender'] : null;
-        $address = isset($patchData['address']) ? $patchData['address'] : null;
-
-        // Kiểm tra các trường bắt buộc
-        if ($fullname && $phone && $birthday && $address) {
-            // Tạo mảng chứa dữ liệu để cập nhật
+        if ($fullname && $phone && $address) {
             $form = [
                 'fullname' => $fullname,
                 'phone' => $phone,
@@ -27,26 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
                 'address' => $address
             ];
 
-            // Gọi hàm updateUser từ controller để cập nhật dữ liệu
             $controller = new UserInformationController();
             $response = $controller->updateUser($userId, $form);
-
-            // Trả về phản hồi cho client
-            echo ($response);
+            echo json_encode(['status' => 200, 'message' => $response]);
         } else {
-            // Thiếu dữ liệu cần thiết
-            echo json_encode([
-                'status' => 400,
-                'message' => 'Vui lòng điền đầy đủ thông tin bắt buộc.'
-            ]);
+            echo json_encode(['status' => 400, 'message' => 'Vui lòng điền đầy đủ thông tin bắt buộc.']);
         }
     } else {
-        // Nếu không có accountId trong yêu cầu
-        echo json_encode([
-            'status' => 400,
-            'message' => 'Không tìm thấy tài khoản để cập nhật.'
-        ]);
+        echo json_encode(['status' => 400, 'message' => 'Không tìm thấy tài khoản để cập nhật.']);
     }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $controller = new UserInformationController();
+    echo ($controller->getUserById($_GET['Id']));
 }
 
 class UserInformationController
@@ -57,7 +43,10 @@ class UserInformationController
     {
         $this->UserInformationModel = new UserInformationModel();
     }
-
+    public function getUserById($id)
+    {
+        return $this->response($this->UserInformationModel->getUserById($id));
+    }
     // Lấy thông tin người dùng theo email
     public function getUserByEmail($email)
     {
@@ -102,7 +91,8 @@ class UserInformationController
         http_response_code($result->status);
         $response = [
             "message" => $result->message,
-            "status" => $result->status ?? null
+            "status" => $result->status ?? null,
+            "data" => $result->data ?? null
         ];
 
         // Kiểm tra và thêm totalPages nếu có trong kết quả

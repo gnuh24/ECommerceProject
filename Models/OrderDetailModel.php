@@ -34,30 +34,33 @@ class OrderDetailModel
     }
 
     // Tạo chi tiết đơn hàng mới
-    public function createOrderDetail($orderId, $productId, $quantity, $unitPrice, $total)
+    public function createOrderDetail($orderId, $detail)
     {
         $query = "INSERT INTO `OrderDetail` (`OrderId`, `ProductId`, `Quantity`, `UnitPrice`, `Total`) 
-                  VALUES (:orderId, :productId, :quantity, :unitPrice, :total)";
+              VALUES (:orderId, :productId, :quantity, :unitPrice, :total)";
 
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':productId', $productId, PDO::PARAM_INT);
-            $statement->bindValue(':quantity', $quantity, PDO::PARAM_INT);
-            $statement->bindValue(':unitPrice', $unitPrice, PDO::PARAM_INT);
-            $statement->bindValue(':total', $total, PDO::PARAM_INT);
+            $statement->bindValue(':productId', $detail['productId'], PDO::PARAM_INT);
+            $statement->bindValue(':quantity', $detail['quantity'], PDO::PARAM_INT);
+            $statement->bindValue(':unitPrice', $detail['unitPrice'], PDO::PARAM_INT);
+            $statement->bindValue(':total', $detail['total'], PDO::PARAM_INT);
+
             $statement->execute();
-            return (object) [
-                "status" => 201,
-                "message" => "Order detail created successfully"
+
+            return [
+                'status' => 201,
+                'message' => 'Order detail created successfully'
             ];
         } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
+            return [
+                'status' => 400,
+                'message' => 'Error creating order detail: ' . $e->getMessage()
             ];
         }
     }
+
 
     // Cập nhật chi tiết đơn hàng
     public function updateOrderDetail($orderId, $productId, $quantity, $unitPrice, $total)
