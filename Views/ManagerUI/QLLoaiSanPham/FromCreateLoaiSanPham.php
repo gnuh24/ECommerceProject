@@ -59,7 +59,7 @@
                                 <div style="padding-left: 1rem">
                                     <p class="text">Loại sản phẩm</p>
                                     <input id="categoryName" class="input" type="text"
-                                        name="categoryName" style="width: 20rem; padding: 0.5rem; height: 1rem;" />
+                                        name="categoryName"/>
 
                                     <span style="
                                         margin-left: 1rem;

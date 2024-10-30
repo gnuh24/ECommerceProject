@@ -191,3 +191,14 @@
   #tableBody{
     height: 400px;
   }
+
+  #filter-button {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    height: 35px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+  }

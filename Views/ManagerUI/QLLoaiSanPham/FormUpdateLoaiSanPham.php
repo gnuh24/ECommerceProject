@@ -65,12 +65,12 @@
                                             <div style="display: flex; gap: 2rem">
                                                 <div>
                                                     <p class="text">Mã loại sản phẩm<span style="color: red; margin-left: 10px;">🔒</span></p>
-                                                    <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
+                                                    <input id="Id" class="input" name="Id" readonly value="' . ($id) . '" />
                                                 </div>
                                             </div>
 
                                             <p class="text">Loại sản phẩm</p>
-                                            <input id="CategoryName" class="input" type="text" name="CategoryName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($categoryName) . '" />
+                                            <input id="CategoryName" class="input" type="text" name="CategoryName" value="' . ($categoryName) . '" />
 
                                         </div>';
 
