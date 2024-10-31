@@ -1,16 +1,18 @@
 <?php
 
 require_once __DIR__ . "/../Models/BrandModel.php";
-require '../vendor/autoload.php';
 $controller = new BrandController();
+
 // Kiểm tra phương thức HTTP
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
+
         // Lấy danh sách Brand có phân trang và tìm kiếm
         if (isset($_GET['page'])) {
             $response = $controller->getAllBrand($_GET['page'], $_GET['search']);
             echo $response;
         }
+
         // Lấy danh sách Brand không phân trang
         else {
             $response = $controller->getAllBrandNoPaging();
@@ -79,6 +81,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }
         break;
 
+
     default:
         // Phản hồi cho các phương thức không được hỗ trợ
         http_response_code(405); // Method Not Allowed
@@ -110,13 +113,6 @@ class BrandController
     {
         $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 5;
         $result = $this->BrandModel->getAllBrand($pageable, $search, $pageSize);
-        return $this->respond($result);
-    }
-
-    // Lấy Brand theo ID
-    public function getBrandById($id)
-    {
-        $result = $this->BrandModel->getBrandById($id);
         return $this->respond($result);
     }
 

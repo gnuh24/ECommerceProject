@@ -298,7 +298,6 @@ class ProductModel
         }
     }
 
-
     // Lấy sản phẩm theo ID của CommonUser
     public function getProductByIdCommonUser($id)
     {
@@ -460,7 +459,6 @@ class ProductModel
         }
     }
 
-
     public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status)
     {
         $fieldsToUpdate = [];
@@ -553,6 +551,80 @@ class ProductModel
             ];
         }
     }
+
+    public function increaseQuantity($id, $amount)
+    {
+        if ($amount <= 0) {
+            return (object)[
+                "status" => 400,
+                "message" => "Increase amount must be positive"
+            ];
+        }
+
+        // Fetch current quantity and product name
+        $productData = $this->getProductData($id);
+        if ($productData === null) {
+            return (object)[
+                "status" => 404,
+                "message" => "Product not found"
+            ];
+        }
+
+        $currentQuantity = $productData['Quantity'];
+        $newQuantity = $currentQuantity + $amount;
+
+        // Update quantity
+        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null);
+    }
+
+    public function decreaseQuantity($id, $amount)
+    {
+        if ($amount <= 0) {
+            return (object)[
+                "status" => 400,
+                "message" => "Decrease amount must be positive"
+            ];
+        }
+
+        // Fetch current quantity and product name
+        $productData = $this->getProductData($id);
+        if ($productData === null) {
+            return (object)[
+                "status" => 404,
+                "message" => "Product not found"
+            ];
+        }
+
+        $currentQuantity = $productData['Quantity'];
+        $productName = $productData['Name'];
+
+        // Check if there is enough quantity in stock
+        if ($currentQuantity < $amount) {
+            return (object)[
+                "status" => 400,
+                "message" => "Not enough quantity in inventory for product: $productName"
+            ];
+        }
+
+        $newQuantity = $currentQuantity - $amount;
+
+        // Update quantity
+        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null);
+    }
+
+    // Helper function to fetch product data including Quantity and Name
+    private function getProductData($id)
+    {
+        $query = "SELECT `Quantity`, `Name` FROM `product` WHERE `Id` = :id";
+        $statement = $this->connection->prepare($query);
+        $statement->bindValue(':id', intval($id), PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+
 
 
     private function getSQLWithParams($query, $params)

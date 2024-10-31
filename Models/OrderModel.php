@@ -136,12 +136,13 @@ class OrderModel
     public function createOrder($form)
     {
         $orderId = uniqid(); // Tạo ID cho đơn hàng mới
-        $orderTime = date('Y-m-d H:i:s'); // Lấy thời gian hiện tại
         $totalPrice = $form->totalPrice;
         $note = $form->note;
-        $accountId = $form->accountId; // Có thể lấy từ token
-
-        return $this->createNewOrder($orderId, $orderTime, $totalPrice, $note, $accountId);
+        $accountId = $form->accountId;
+        $payment = $form->payment;
+        $isPaid = $form->isPaid;
+        $voucherId = $form->voucherId;
+        return $this->createNewOrder($orderId, $totalPrice, $note, $accountId, $payment, $isPaid, $voucherId);
     }
 
 
@@ -358,18 +359,26 @@ class OrderModel
 
 
     // Tạo đơn hàng mới
-    private function createNewOrder($orderId, $orderTime, $totalPrice, $note, $accountId)
+    private function createNewOrder($orderId, $totalPrice, $note, $accountId, $payment, $isPaid, $voucherId)
     {
-        $query = "INSERT INTO `order` (`Id`, `OrderTime`, `TotalPrice`, `Note`, `AccountId`)
-                  VALUES (:orderId, :orderTime, :totalPrice, :note, :accountId)";
+        $query = "INSERT INTO `order` (`Id`, `TotalPrice`, `Note`, `AccountId`, `Payment`, `isPaid`, `VoucherId`)
+                  VALUES (:orderId,  :totalPrice, :note, :accountId, :payment, :isPaid, :voucherId)";
 
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':orderTime', $orderTime, PDO::PARAM_STR);
             $statement->bindValue(':totalPrice', $totalPrice, PDO::PARAM_INT);
             $statement->bindValue(':note', $note, PDO::PARAM_STR);
             $statement->bindValue(':accountId', $accountId, PDO::PARAM_INT);
+            $statement->bindValue(':payment', $payment, PDO::PARAM_STR);
+            $statement->bindValue(':isPaid', $isPaid, PDO::PARAM_BOOL);
+
+            if ($voucherId === null) {
+                $statement->bindValue(':voucherId', null, PDO::PARAM_NULL);
+            } else {
+                $statement->bindValue(':voucherId', $voucherId, PDO::PARAM_INT);
+            }
+
             $statement->execute();
             return (object) [
                 "status" => 201,

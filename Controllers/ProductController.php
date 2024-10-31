@@ -54,8 +54,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $id = intval($parsedData['id']);
         $productController = new ProductController();
 
-        // Gọi hàm updateProduct và truyền dữ liệu cần thiết
-        $result = $productController->updateProduct($id, $parsedData);
+        if ($parsedData['action'] == "up") {
+            $amount = $parsedData['amount'];
+            // Gọi hàm updateProduct và truyền dữ liệu cần thiết
+            $result = $productController->increaseQuantity($id, $amount);
+        } else if ($parsedData['action'] == "down") {
+            $amount = $parsedData['amount'];
+            // Gọi hàm updateProduct và truyền dữ liệu cần thiết
+            $result = $productController->decreaseQuantity($id, $amount);
+        } else if ($parsedData['action'] == "update") {
+            // Gọi hàm updateProduct và truyền dữ liệu cần thiết
+            $result = $productController->updateProduct($id, $parsedData);
+        }
     } else {
         http_response_code(400);
         echo json_encode(["status" => 400, "message" => "Product ID is required", "data" => $parsedData]);
@@ -180,8 +190,6 @@ class ProductController
         echo json_encode($result);
     }
 
-
-
     public function updateProduct($id, $parsedData)
     {
 
@@ -210,7 +218,6 @@ class ProductController
             isset($parsedData['status']) ? $parsedData['status'] : null
         );
 
-
         // Trả về phản hồi thành công
         return $this->response($result); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
 
@@ -233,5 +240,33 @@ class ProductController
         }
 
         echo json_encode($response);
+    }
+
+    // Increase product quantity
+    public function increaseQuantity($id, $amount)
+    {
+        if (!isset($id) || !isset($amount)) {
+            return $this->response((object)[
+                "status" => 400,
+                "message" => "Product ID and amount are required"
+            ]);
+        }
+
+        $result = $this->productModel->increaseQuantity($id, $amount);
+        return $this->response($result);
+    }
+
+    // Decrease product quantity
+    public function decreaseQuantity($id, $amount)
+    {
+        if (!isset($id) || !isset($amount)) {
+            return $this->response((object)[
+                "status" => 400,
+                "message" => "Product ID and amount are required"
+            ]);
+        }
+
+        $result = $this->productModel->decreaseQuantity($id, $amount);
+        return $this->response($result);
     }
 }

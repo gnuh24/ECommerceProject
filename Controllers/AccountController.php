@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 ]);
                 break;
                 // Cập nhật quyền cho tài khoản
-          
+
         }
     } else {
         echo json_encode([
@@ -67,8 +67,6 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra action
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
-
-                // Đăng nhập người dùng
             case 'loginUser':
                 $email = $_POST['email'] ?? null;
                 $password = $_POST['password'] ?? null;
@@ -227,7 +225,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                 }
                 break;
-          case 'updateRole':
+            case 'updateRole':
                 $Id = $_POST['Id'] ?? null;
                 $newRole = $_POST['Role'] ?? null;
 
@@ -261,7 +259,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'message' => 'Không tìm thấy tham số action!'
         ]);
     }
-} else {
+}
+
+// Xử lý đối với các yêu cầu không tồn tại
+else {
     echo json_encode([
         'status' => 405,
         'message' => 'Phương thức không được hỗ trợ!'
@@ -527,7 +528,7 @@ class AccountController
         // Nhận các tham số từ GET, nếu không có thì gán là null
         $userInformationId = $_GET['UserInformationId'] ?? null;
         $email = $_GET['Email'] ?? null;
-        $pagesize= $_GET['pageSize'] ?? null;
+        $pagesize = $_GET['pageSize'] ?? null;
         $createTime = $_GET['CreateTime'] ?? null;
         $status = $_GET['status'] ?? null;
         $role = $_GET['role'] ?? null;
@@ -602,7 +603,7 @@ class AccountController
         if (isset($result->totalPages)) {
             $response['totalPages'] = $result->totalPages;
         }
-          // Kiểm tra và thêm totalElements nếu có trong kết quả
+        // Kiểm tra và thêm totalElements nếu có trong kết quả
         if (isset($result->totalElements)) {
             $response['totalElements'] = $result->totalElements;
         }
@@ -611,20 +612,19 @@ class AccountController
     }
 
     // Phương thức cập nhật quyền cho tài khoản
-public function updateRole($Id, $newRole)
-{
-    // Kiểm tra xem tài khoản có tồn tại không
-    $accountExists = $this->accountModel->getAccountById($Id);
-    if ($accountExists->status !== 200) {
-        return (object)[
-            'status' => 400,
-            'message' => 'Tài khoản không tồn tại!'
-        ];
+    public function updateRole($Id, $newRole)
+    {
+        // Kiểm tra xem tài khoản có tồn tại không
+        $accountExists = $this->accountModel->getAccountById($Id);
+        if ($accountExists->status !== 200) {
+            return (object)[
+                'status' => 400,
+                'message' => 'Tài khoản không tồn tại!'
+            ];
+        }
+
+        // Cập nhật quyền cho tài khoản
+        $updateResponse = $this->accountModel->updateRole($Id, $newRole);
+        return $updateResponse;
     }
-
-    // Cập nhật quyền cho tài khoản
-    $updateResponse = $this->accountModel->updateRole($Id, $newRole);
-    return $updateResponse;
-}
-
 }

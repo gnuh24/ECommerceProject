@@ -76,31 +76,6 @@ class BrandModel
         }
     }
 
-
-
-    // Lấy Brand theo ID
-    public function getBrandById($id)
-    {
-        $query = "SELECT * FROM `brand` WHERE `Id` = :id";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':id', $id, PDO::PARAM_INT);
-            $statement->execute();
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
-            return (object) [
-                "status" => 200,
-                "message" => "Brand fetched successfully",
-                "data" => $result
-            ];
-        } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
-
     // Tạo Brand mới
     public function createBrand($brandName)
     {
@@ -205,7 +180,6 @@ class BrandModel
             ];
         }
     }
-
 
 
     // Xóa Brand theo ID sau khi chuyển sản phẩm sang BrandId 1 (trừ khi BrandId = 1)

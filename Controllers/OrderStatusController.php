@@ -15,18 +15,21 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'POST':
-        // Nhận dữ liệu từ POST request
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (isset($data['orderId']) && isset($data['status']) && isset($data['updateTime'])) {
-            // Tạo trạng thái đơn hàng lần đầu
-            $controller->createOrderStatusFirstTime($data);
+        // Validate orderId as a non-empty string and status as non-empty
+        if (isset($_POST['orderId'])  && isset($_POST['status'])) {
+            $orderId = $_POST['orderId'];
+            $status = $_POST['status'];
+            $controller->createOrderStatus($orderId, $status);
         } else {
             http_response_code(400);
-            echo json_encode(["status" => 400, "message" => "Order ID, status, and update time are required."]);
+            echo json_encode([
+                "status" => 400,
+                "message" => "Order ID (non-empty, alphanumeric) and status (non-empty) are required."
+            ]);
         }
         break;
 
-    case 'PATCH':
+
         // Nhận dữ liệu từ PATCH request
         $data = json_decode(file_get_contents('php://input'), true);
 
@@ -65,17 +68,10 @@ class OrderStatusController
         $this->response($response);
     }
 
-    // Tạo trạng thái đơn hàng lần đầu tiên
-    public function createOrderStatusFirstTime($data)
-    {
-        $response = $this->orderStatusModel->createOrderStatusFirstTime((object) $data);
-        $this->response($response);
-    }
-
     // Tạo trạng thái mới cho đơn hàng (không phải lần đầu)
-    public function createOrderStatus($orderId, $status, $updateTime)
+    public function createOrderStatus($orderId, $status)
     {
-        $response = $this->orderStatusModel->createOrderStatus($orderId, $status, $updateTime);
+        $response = $this->orderStatusModel->createOrderStatus($orderId, $status);
         $this->response($response);
     }
 

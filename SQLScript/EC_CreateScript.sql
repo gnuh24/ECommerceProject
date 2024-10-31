@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `Voucher` (
 -- DROP TABLE IF EXISTS `Order`;
 CREATE TABLE IF NOT EXISTS `Order` (
     `Id`                CHAR(12)           NOT NULL    PRIMARY KEY,
-    `OrderTime`         DATETIME           NOT NULL,
+    `OrderTime`         DATETIME           NOT NULL		DEFAULT NOW(),
     `TotalPrice`        INT UNSIGNED       NOT NULL,
     `Note`              TEXT,		
     `AccountId`         INT UNSIGNED, 
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `Order` (
 CREATE TABLE IF NOT EXISTS `OrderStatus` (
     `OrderId`       CHAR(12)                                                        NOT NULL,
     `Status`        ENUM("ChoDuyet", "DaDuyet", "DangGiao", "GiaoThanhCong", "Huy") NOT NULL,
-    `UpdateTime`    DATETIME                                                        NOT NULL,
+    `UpdateTime`    DATETIME                                                        NOT NULL	DEFAULT NOW(),
     PRIMARY KEY (`OrderId`, `Status`),
     FOREIGN KEY (`OrderId`) REFERENCES `Order`(`Id`)
 );

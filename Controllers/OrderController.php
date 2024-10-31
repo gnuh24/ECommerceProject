@@ -29,9 +29,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'POST':
-        // $response = $controller->createOrder();
-        // echo $response;
-        // break;
+        $response = $controller->createOrder();
+        echo $response;
+        break;
 
     case 'PUT':
         if (isset($_GET['orderId'])) {
@@ -72,6 +72,7 @@ class OrderController
         $response = $this->orderModel->getFullOrderById($orderId);
         $this->response($response);
     }
+
     public function createOrder($data)
     {
         if (!isset($data['totalPrice'], $data['note'], $data['accountId'])) {

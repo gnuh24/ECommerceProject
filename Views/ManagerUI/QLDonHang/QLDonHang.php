@@ -111,7 +111,7 @@
         });
     });
 
-    function updateStatus(orderId, currentStatus) {
+    function updateStatus(orderId, nextStatus, currnetStatus) {
         Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: "Bạn muốn cập nhật trạng thái của đơn hàng này?",
@@ -122,15 +122,21 @@
             confirmButtonText: 'Xác nhận'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    type: "PATCH",
-                    url: "../../../Controllers/OrderStatusController.php?orderId=" + orderId, // Thêm orderId vào URL
 
-                    contentType: "application/json", // Định dạng dữ liệu là JSON
-                    data: JSON.stringify({
-                        status: currentStatus,
-                        updateTime: new Date().toISOString() // Thêm thời gian hiện tại vào dữ liệu
-                    }),
+                if (currnetStatus === "ChoDuyet" && nextStatus === "DaDuyet") {
+
+                } else if (currnetStatus === "DaDuyet" && nextStatus === "Huy") {
+
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../../Controllers/OrderStatusController.php", // Thêm orderId vào URL
+                    dataType: "json",
+                    data: {
+                        orderId: orderId,
+                        status: nextStatus
+                    },
                     success: function(response) {
                         Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
                         loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
@@ -177,7 +183,7 @@
                         <button 
                             type="button" 
                             class="update-status" 
-                            onclick="updateStatus('${record.Id}', '${nextStatus}')"
+                            onclick="updateStatus('${record.Id}', '${nextStatus}', '${record.Status}')"
                         >
                             ${updateStatusText}
                         </button>`;
@@ -207,6 +213,7 @@
 
 
     function loadDataToTable(page, minNgayTao, maxNgayTao, trangThai) {
+
         if (!minNgayTao) {
             minNgayTao = null;
         }
