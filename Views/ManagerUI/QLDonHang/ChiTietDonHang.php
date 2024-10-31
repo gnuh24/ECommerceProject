@@ -36,13 +36,15 @@
                                         <p id='ngaysinh'></p>
                                         <p id='gioitinh'></p>
                                         <p id="orderTime"></p>
+                                        <p id="tinhtrang"></p>
+
 
                                     </div>
                                 </div>
                                 <div class="payment_method__wrapper">
                                     <p class="title">Phương thức thanh toán:</p>
                                     <div class="divider"></div>
-                                    <p id="tenphuongthuc">Chưa có thông tin<br></p>
+                                    <p id="tenphuongthuc"><br></p>
                                 </div>
                                 <div class="note_wrapper">
                                     <p class="title">Ghi chú:</p>
@@ -122,12 +124,14 @@
                 });
                 transaction_list.innerHTML = items;
 
-                document.getElementById("hoten").innerHTML = `<span>Họ tên:</span> ${data.infor.Fullname}`;
-                document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.infor.Address}`;
-                document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.infor.PhoneNumber}`;
-                document.getElementById("note").innerText = data.infor.Note; // Added note
-                document.getElementById("totalPrice").innerText = number_format_vnd(data.infor.TotalPrice);
-                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${data.infor.OrderTime}`; // Added order time
+                document.getElementById("hoten").innerHTML = `<span>Họ tên:</span> ${data.info.Fullname}`;
+                document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.info.Address}`;
+                document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.info.PhoneNumber}`;
+                document.getElementById("note").innerText = data.info.Note; // Added note
+                document.getElementById("totalPrice").innerText = number_format_vnd(data.info.TotalPrice);
+                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${data.info.OrderTime}`; // Added order time
+                document.getElementById("tenphuongthuc").innerHTML = `<span>Phương thức thanh toán: </span>${data.info.Payment}`;
+                document.getElementById("tinhtrang").innerHTML = `<span>Tình trạng: </span>${data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}`;
 
                 // Handle order status
                 var order_status = document.getElementById("order_status");
