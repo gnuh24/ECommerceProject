@@ -8,8 +8,8 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
  * and open the template in the editor.
  */
   
-$vnp_TmnCode = "D1VILURA"; //Website ID in VNPAY System
-$vnp_HashSecret = "K5Z6RHOSDXLRRUXXPND6IAKNNAITFU5T"; //Secret key
+$vnp_TmnCode = "6EY8JQIE"; //Website ID in VNPAY System
+$vnp_HashSecret = "8SM1NP5VJS2QRX2MJDEYJDANTNOREJC0"; //Secret key
 $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 $vnp_Returnurl = "http://localhost/ECommerceProject/Views/MemberUI/vnpay_payment/xuLyTraVe_vnpay.php";
 $vnp_apiUrl = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
