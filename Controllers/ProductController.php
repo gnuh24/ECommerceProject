@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . "/../Models/ProductModel.php";
-require '../vendor/autoload.php';
 // Xử lý yêu cầu RESTful cho ProductController
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action']) && $_GET['action'] === 'getAllProductsCommonUser') {

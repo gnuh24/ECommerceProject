@@ -3,6 +3,7 @@ require_once __DIR__ . "/../Models/UserInformationModel.php";
 require '../vendor/autoload.php';
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
     $patchData = json_decode(file_get_contents("php://input"), true);
+    print_r($patchData); // In toàn bộ dữ liệu
 
     if (isset($patchData['accountId'])) {
         $userId = $patchData['accountId'];

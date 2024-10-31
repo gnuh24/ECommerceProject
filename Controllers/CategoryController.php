@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . "/../Models/CategoryModel.php";
-require '../vendor/autoload.php';
 
 // Khởi tạo controller
 $controller = new CategoryController();

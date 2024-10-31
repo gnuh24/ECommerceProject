@@ -42,18 +42,16 @@
         }
 
         $.ajax({
-            url: '../../Controllers/AccountController.php',
+            url: '../../Controllers/UserInformationController.php',
             method: "GET",
             dataType: "json",
             data: {
-                action: 'getAccountById',
-                UserInformationId: userData
+                Id: userData
             },
             success: function(response) {
                 // Kiểm tra nếu phản hồi chứa dữ liệu
-                if (response && response.data && response.data.length > 0) {
-                    var userInfo = response.data[0]; // Lấy thông tin người dùng đầu tiên từ mảng dữ liệu
-
+                if (response && response.data) {
+                    var userInfo = response.data; // Lấy thông tin người dùng đầu tiên từ mảng dữ liệu
                     // Format thông tin hiển thị
                     var infoPage = document.getElementById("contentprofile");
                     infoPage.innerHTML = `
@@ -82,7 +80,7 @@
                                     </div>
                                     <div class='col-md-6'>
                                         <label for='birthday'>Ngày sinh</label>
-                                        <input type='date' class='form-control' id='birthday' name='ngaysinh' onchange='validateAge()' value='${formatDateToYYYYMMDD(userInfo.Birthday)}'>
+                                        <input type='date' class='form-control' id='birthday' name='ngaysinh' onchange='validateAge()' value='${(userInfo.Birthday)}'>
                                     </div>
                                     <div class='col-md-6'>
                                         <label for='inputEmail4' class='form-label'>Email *</label>
@@ -161,55 +159,54 @@
                 title: 'Lỗi',
                 text: 'Vui lòng điền đầy đủ thông tin!'
             });
-            return;
+            return false; // Ngăn chặn form gửi theo cách truyền thống
         }
 
         // Lấy accountId từ URL
         var accountId = new URLSearchParams(window.location.search).get('maTaiKhoan');
+        if (!accountId) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Không tìm thấy mã tài khoản!'
+            });
+            return false;
+        }
 
         // Chuẩn bị dữ liệu gửi đi
-        var formData = new FormData();
-        formData.append('accountId', accountId);
-        formData.append('fullname', fullname);
-        formData.append('phone', phone);
-        formData.append('birthday', birthday);
-        formData.append('gender', gender);
-        formData.append('address', address);
+        var formData = {
+            accountId: accountId,
+            fullname: fullname,
+            phone: phone,
+            birthday: birthday,
+            gender: gender,
+            address: address
+        };
 
-        // Gửi request PATCH đến server
-        fetch('../../../Controllers/UserInformationController.php', {
-                method: 'PATCH',
-                body: new URLSearchParams(formData), // Chuyển FormData thành URL encoded
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 200) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Thành công',
-                        text: 'Cập nhật thông tin thành công!'
-                    }).then(() => {
-                        location.reload(); // Reload lại trang sau khi cập nhật thành công
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Lỗi',
-                        text: data.message || 'Có lỗi xảy ra khi cập nhật thông tin!'
-                    });
-                }
-            })
-            .catch(error => {
+        $.ajax({
+            url: "../../Controllers/UserInformationController.php",
+            method: "PATCH",
+            data: JSON.stringify(formData), // Dữ liệu ở dạng JSON
+            contentType: "application/json",
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công',
+                    text: 'Cập nhật thông tin thành công!'
+                }).then(() => {
+                    location.reload(); // Reload lại trang sau khi cập nhật thành công
+                });
+
+            },
+            error: function(error) {
                 console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Lỗi',
                     text: 'Có lỗi xảy ra khi gửi yêu cầu!'
                 });
-            });
+            }
+        });
 
         return false; // Ngăn chặn form gửi theo cách truyền thống
     }
