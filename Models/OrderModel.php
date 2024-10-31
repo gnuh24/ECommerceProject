@@ -437,6 +437,7 @@ class OrderModel
                         ) os ON o.Id = os.OrderId
                     WHERE 
                         o.AccountId = :accountId
+                    ORDER BY o.OrderTime desc
                 ";
 
         try {

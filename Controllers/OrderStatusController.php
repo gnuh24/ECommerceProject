@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . "/../Models/OrderStatusModel.php";
-require_once __DIR__ . "/../Models/ProductModel.php";
-$controller = new ProductController();
+// require_once __DIR__ . "/../Models/ProductModel.php";
+// $productController = new ProductController();
 $controller = new OrderStatusController();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'POST':
-        // Validate orderId as a non-empty string and status as non-empty
+
         if (isset($_POST['orderId'])  && isset($_POST['status'])) {
             $orderId = $_POST['orderId'];
             $status = $_POST['status'];

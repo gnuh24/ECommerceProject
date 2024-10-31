@@ -121,7 +121,7 @@
                         </tbody>
                     </table>
                     <div class='orderManagement_order_thanhTien'>
-                        <p style="width: 50%;">Trạng thái: ${translateStatus(hoaDon.Status)}</p>
+                        <p style="width: 50%;">Trạng thái: ${fromEnumStatusToText(hoaDon.Status)}</p>
                         <p>Tổng giá trị: ${formatCurrency(hoaDon.TotalPrice)}</p>
                         <button class='order_detail_button' onclick="toOrderDetail('${hoaDon.OrderId}')"> Chi tiết</button>`;
 
@@ -135,28 +135,8 @@
         });
     }
 
-
-    // Chuyển đổi trạng thái
-    function translateStatus(status) {
-        switch (status) {
-            case 'ChoDuyet':
-                return 'Chờ duyệt';
-            case 'DaDuyet':
-                return 'Đã duyệt';
-            case 'DangGiao':
-                return 'Đang giao hàng';
-            case 'GiaoThanhCong':
-                return 'Giao thành công';
-            case 'Huy':
-                return 'Đã hủy';
-            default:
-                return status;
-        }
-    }
-
     // Hàm xử lý hủy đơn hàng
     function cancelOrder(maDonHang) {
-        console.log(maDonHang);
         // Hiển thị hộp thoại xác thực
         Swal.fire({
             title: 'Xác nhận hủy đơn hàng?',
@@ -170,13 +150,12 @@
             // Nếu người dùng xác nhận hủy đơn hàng
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '../../Controllers/OrderStatusController.php?orderId=' + maDonHang, // Đường dẫn API lấy chi tiết đơn hàng
-                    type: 'PATCH',
-
-                    data: JSON.stringify({
+                    url: '../../Controllers/OrderStatusController.php', // Đường dẫn API lấy chi tiết đơn hàng
+                    type: 'POST',
+                    data: {
+                        orderId: maDonHang,
                         status: "Huy",
-                        updateTime: new Date().toISOString() // Thêm thời gian hiện tại vào dữ liệu
-                    }),
+                    },
                     success: function(response) {
 
                         // Hiển thị thông báo và reload trang
