@@ -45,7 +45,7 @@ class OrderDetailModel
             $statement->bindValue(':productId', $detail['productId'], PDO::PARAM_INT);
             $statement->bindValue(':quantity', $detail['quantity'], PDO::PARAM_INT);
             $statement->bindValue(':unitPrice', $detail['unitPrice'], PDO::PARAM_INT);
-            $statement->bindValue(':total', $detail['total'], PDO::PARAM_INT);
+            $statement->bindValue(':total', $detail['unitPrice'] * $detail['quantity'], PDO::PARAM_INT);
 
             $statement->execute();
 
@@ -60,6 +60,4 @@ class OrderDetailModel
             ];
         }
     }
-
-
 }
