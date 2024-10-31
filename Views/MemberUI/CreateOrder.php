@@ -48,6 +48,21 @@
                                     <input type='text' name='address1' id='address1' placeholder='Địa chỉ' />
                                 </div>
                                 <div class='payment__wrapper'>
+                                    <label for='payment'>Phương thức thanh toán: </label>
+                                    <div>
+                                        <input type='radio' name='payment' id='paymentCOD' value='COD' checked />
+                                        <label for='paymentCOD'>COD</label>
+                                    </div>
+                                    <div>
+                                        <input type='radio' name='payment' id='paymentVNPAY' value='VNPAY' />
+                                        <label for='paymentVNPAY'>VNPAY</label>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class='payment__wrapper'>
                                     <label>Các sản phẩm đặt mua</label>
                                     <div id="cartItems"></div>
                                 </div>
@@ -66,6 +81,8 @@
                                 <p><span class="span1">Số điện thoại:</span><span class="span2" id="spanSoDienThoai"></span></p>
                                 <p><span class="span1">Địa chỉ:</span><span class="span2" id="spanDiaChi1"></span></p>
                                 <p><span class="span1">Ghi chú:</span><span class="span2" id="spanDiaChi"></span></p>
+                                <p><span class="span1">Tình trạng:</span><span class="span2" id="tinhtrang">Chưa thanh toán</span></p>
+
                             </div>
                             <div class="divider"></div>
                             <div class="info__wrapper total__info">
@@ -108,68 +125,6 @@
         if (localCart.length > 0) {
             // If items are in LocalStorage, render them directly
             renderCart(localCart);
-        } else {
-            // If no items in LocalStorage, fetch from API
-            $.ajax({
-                url: 'http://localhost:8080/CartItem/' + maTaiKhoan,
-                method: 'GET',
-                dataType: 'json',
-
-                success: function(response) {
-                    let cartHTML = '';
-                    let totalPrice = 0;
-                    let listproduct = []; // Initialize or reset the listproduct array
-
-                    // Process the API response and generate HTML
-                    response.forEach(function(cartProduct) {
-                        totalPrice += cartProduct.total;
-                        var maSanPham = cartProduct.productId;
-                        var donGia = cartProduct.unitPrice;
-                        var soLuong = cartProduct.quantity;
-                        var total1 = cartProduct.total;
-
-                        var productItem = {
-                            'idProductId': maSanPham,
-                            'unitPrice': donGia,
-                            'quantity': soLuong,
-                            'total': total1
-                        };
-                        listproduct.push(productItem);
-                        cartHTML += `
-                            <div class='radio__wrapper'>
-                                <div>
-                                    <div class='cartItem' id='${cartProduct.productId}'>
-                                        <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
-                                        <div class='inforCart'>
-                                            <div class='nameAndPrice'>
-                                                <p class='priceCart'>${formatCurrency(cartProduct.unitPrice)}</p>
-                                            </div>
-                                            <div class='quantity'>
-                                                <div class='txtQuantity'>${cartProduct.quantity}</div>
-                                            </div>
-                                        </div>
-                                        <div class='wrapTotalPriceOfCart'>
-                                            <div class='totalPriceOfCart'>
-                                                <p class='lablelPrice'>Thành tiền</p>
-                                                <p class='valueTotalPrice'>${formatCurrency(cartProduct.total)}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
-                    });
-
-                    // Store the fetched cart in LocalStorage
-                    localStorage.setItem('cart', JSON.stringify(listproduct));
-
-                    // Display cart on the page
-                    $('#cartItems').html(cartHTML);
-                    $('#totalPrice').text(formatCurrency(totalPrice));
-                },
-                error: function(xhr, status, error) {
-                    console.error('Có lỗi xảy ra: ', error);
-                }
-            });
         }
     }
 
@@ -206,6 +161,7 @@
 
         $('#cartItems').html(cartHTML);
         $('#totalPrice').text(formatCurrency(totalPrice));
+        totalpriceall = totalPrice;
     }
 
 
@@ -236,19 +192,21 @@
     function loadUserInfoFromsessionStorage() {
         var userData = sessionStorage.getItem("id");
         $.ajax({
-            url: "http://localhost:8080/Account/" + userData,
+            url: "../../Controllers/UserInformationController.php",
             method: "GET",
+            data: {
+                Id: userData
+            },
             dataType: "json",
             success: function(response) {
-                console.log(response)
-                document.getElementById('spanHoTen').textContent = response.fullname;
-                document.getElementById('spanSoDienThoai').textContent = response.phoneNumber;
-                document.getElementById('spanDiaChi1').textContent = response.address;
+                document.getElementById('spanHoTen').textContent = response.data.Fullname;
+                document.getElementById('spanSoDienThoai').textContent = response.data.PhoneNumber;
+                document.getElementById('spanDiaChi1').textContent = response.data.Address;
 
-                document.getElementById('username').value = response.fullname;
-                document.getElementById('address1').value = response.address;
+                document.getElementById('username').value = response.data.Fullname;
+                document.getElementById('address1').value = response.data.Address;
 
-                document.getElementById('phonenumber').value = response.phoneNumber;
+                document.getElementById('phonenumber').value = response.data.PhoneNumber;
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -304,8 +262,10 @@
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then((result1) => {
+                    localStorage.removeItem('cart');
+
                     if (result1.isConfirmed) {
-                        window.location.href = 'SignedProduct.php'; // Chuyển hướng đến trang sản phẩm
+                        window.location.href = 'HomePage.php'; // Chuyển hướng đến trang sản phẩm
                     }
                 });
             }
@@ -313,21 +273,22 @@
     });
 
     function updateInfor() {
-        var formData = new FormData();
         const maTaiKhoan = sessionStorage.getItem("id");
+        const formData = {
+            accountId: maTaiKhoan,
+            fullname: document.getElementById('username').value,
+            phone: document.getElementById('phonenumber').value,
+            address: document.getElementById('address1').value
+        };
 
-        formData.append('accountId', maTaiKhoan);
-        formData.append('fullname', document.getElementById('username').value);
-        formData.append('phone', document.getElementById('phonenumber').value);
-        formData.append('address', document.getElementById('address1').value);
         $.ajax({
-            url: 'http://localhost:8080/Account/UpdateInformation',
-            type: 'PATCH',
-            data: formData,
-            contentType: false,
-            processData: false,
-
-            success: function(response) {},
+            url: "../../Controllers/UserInformationController.php",
+            method: "PATCH",
+            data: JSON.stringify(formData),
+            contentType: "application/json",
+            success: function(response) {
+                console.log("Update successful:", response);
+            },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
@@ -335,51 +296,45 @@
     }
 
 
+
     function createDonHang() {
         var userData = sessionStorage.getItem("id");
         var formData = new FormData();
         formData.append('totalPrice', totalpriceall);
         var diaChi = document.getElementById('address').value;
+        const selectedPaymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
         formData.append('accountId', userData);
         formData.append('note', diaChi);
+        let listproduct = JSON.parse(localStorage.getItem("cart"));
+        formData.append('Payment', selectedPaymentMethod)
+        if (Array.isArray(listproduct)) {
+            listproduct.forEach((item, index) => {
+                formData.append(`listOrderDetail[${index}][productId]`, item.productId);
+                formData.append(`listOrderDetail[${index}][unitPrice]`, item.unitPrice);
+                formData.append(`listOrderDetail[${index}][quantity]`, item.quantity);
+                formData.append(`listOrderDetail[${index}][total]`, item.total);
+            });
+        } else {
+            console.error("Dữ liệu giỏ hàng không hợp lệ");
+        }
 
-        listproduct.forEach((item, index) => {
-            formData.append(`listOrderDetail[${index}].productId`, item.idProductId);
-            formData.append(`listOrderDetail[${index}].unitPrice`, item.unitPrice);
-            formData.append(`listOrderDetail[${index}].quantity`, item.quantity);
-            formData.append(`listOrderDetail[${index}].total`, item.total);
-        });
+
         $.ajax({
-            url: "http://localhost:8080/Order/User",
+            url: "../../Controllers/OrderController.php",
             method: "POST",
             data: formData,
             processData: false, // Ngăn jQuery xử lý dữ liệu
             contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
 
-            success: function(response) {},
+            success: function(response) {
+                // Xử lý phản hồi thành công
+                console.log("Đơn hàng đã được tạo:", response);
+            },
             error: function(xhr, status, error) {
-                console.error("Error:", error);
+                console.error("Lỗi:", error);
             }
         });
-        listproduct.forEach((item, index) => {
-            var formData1 = new FormData();
-            formData1.append('accountId', userData);
-            formData1.append('productId', item.idProductId);
-            $.ajax({
-                url: "http://localhost:8080/CartItem",
-                method: "DELETE",
-                data: formData1,
-                processData: false, // Ngăn jQuery xử lý dữ liệu
-                contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
-
-                success: function(response) {},
-                error: function(xhr, status, error) {
-                    console.error("Error:", error);
-                }
-            });
-        });
-
     }
 </script>
 

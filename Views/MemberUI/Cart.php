@@ -122,7 +122,6 @@
     function bindCartItemEvents() {
         // Sự kiện tăng số lượng
         $('.increase').off('click').on('click', function() {
-            console.log("Tao vừa click nút tăng !")
             var productId = $(this).closest('.cartItem').attr('id');
             var quantityElem = $(`#quantity_${productId}`);
             var currentQuantity = parseInt(quantityElem.text());
@@ -131,7 +130,6 @@
 
         // Sự kiện giảm số lượng
         $('.decrease').off('click').on('click', function() {
-            console.log("Tao vừa click nút giảm !")
 
             var productId = $(this).closest('.cartItem').attr('id');
             var quantityElem = $(`#quantity_${productId}`);
@@ -143,7 +141,6 @@
 
         // Sự kiện xóa sản phẩm
         $('.btnRemove').off('click').on('click', function() {
-            console.log("Tao vừa click nút xóa !");
 
             var productId = $(this).closest('.cartItem').attr('id');
 
@@ -151,7 +148,7 @@
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
             // Tìm và xóa sản phẩm khỏi giỏ hàng
-            cart = cart.filter(item => item.productId !== productId);
+            cart = cart.filter(item => item.productId != productId);
 
             // Cập nhật lại localStorage
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -245,12 +242,11 @@
 
 
     function updateQuantity(productId, quantity) {
-        console.log(`Update số lượng sản phẩm ${productId} thành ${quantity}`);
         // Lấy giỏ hàng từ localStorage
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
         // Tìm sản phẩm cần cập nhật
-        const itemIndex = cart.findIndex(item => item.productId === productId);
+        const itemIndex = cart.findIndex(item => item.productId == productId);
 
         if (itemIndex !== -1) {
             // Cập nhật số lượng sản phẩm

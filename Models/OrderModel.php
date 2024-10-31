@@ -132,20 +132,6 @@ class OrderModel
         }
     }
 
-    // Tạo đơn hàng mới
-    public function createOrder($form)
-    {
-        $orderId = uniqid(); // Tạo ID cho đơn hàng mới
-        $totalPrice = $form->totalPrice;
-        $note = $form->note;
-        $accountId = $form->accountId;
-        $payment = $form->payment;
-        $isPaid = $form->isPaid;
-        $voucherId = $form->voucherId;
-        return $this->createNewOrder($orderId, $totalPrice, $note, $accountId, $payment, $isPaid, $voucherId);
-    }
-
-
     public function getOrderById($orderId)
     {
         // Truy vấn chính lấy thông tin đơn hàng và chi tiết sản phẩm
@@ -201,6 +187,8 @@ class OrderModel
                 "Address" => $orderResults[0]['Address'],
                 "Fullname" => $orderResults[0]['Fullname'],
                 "PhoneNumber" => $orderResults[0]['PhoneNumber'],
+                "Payment" => $orderResults[0]['Payment'],
+                "isPaid" => $orderResults[0]['isPaid']
             ];
 
             // Tạo danh sách chi tiết sản phẩm (loại bỏ trùng lặp)
@@ -255,33 +243,33 @@ class OrderModel
     {
         // Truy vấn chính lấy thông tin đơn hàng, chi tiết sản phẩm, thông tin người dùng và thông tin sản phẩm
         $orderQuery = "
-        SELECT o.*, 
-               od.ProductId, 
-               od.Quantity, 
-               od.UnitPrice, 
-               od.Total,
-               ui.Email, 
-               ui.Address, 
-               ui.Birthday, 
-               ui.Fullname, 
-               ui.Gender, 
-               ui.PhoneNumber,
-               p.Image, 
-               p.ProductName
-        FROM `Order` o
-        LEFT JOIN `OrderDetail` od ON o.Id = od.OrderId
-        LEFT JOIN `UserInformation` ui ON o.AccountId = ui.Id
-        LEFT JOIN `Product` p ON od.ProductId = p.Id
-        WHERE o.Id = :orderId
-    ";
+                    SELECT o.*, 
+                        od.ProductId, 
+                        od.Quantity, 
+                        od.UnitPrice, 
+                        od.Total,
+                        ui.Email, 
+                        ui.Address, 
+                        ui.Birthday, 
+                        ui.Fullname, 
+                        ui.Gender, 
+                        ui.PhoneNumber,
+                        p.Image, 
+                        p.ProductName
+                    FROM `Order` o
+                    LEFT JOIN `OrderDetail` od ON o.Id = od.OrderId
+                    LEFT JOIN `UserInformation` ui ON o.AccountId = ui.Id
+                    LEFT JOIN `Product` p ON od.ProductId = p.Id
+                    WHERE o.Id = :orderId
+                ";
 
         // Truy vấn lấy toàn bộ trạng thái đơn hàng
         $statusQuery = "
-        SELECT os.Status, os.UpdateTime
-        FROM `OrderStatus` os
-        WHERE os.OrderId = :orderId
-        ORDER BY os.UpdateTime ASC
-    ";
+                    SELECT os.Status, os.UpdateTime
+                    FROM `OrderStatus` os
+                    WHERE os.OrderId = :orderId
+                    ORDER BY os.UpdateTime ASC
+                ";
 
         try {
             // Thực hiện truy vấn cho thông tin đơn hàng
@@ -307,6 +295,8 @@ class OrderModel
                 "Address" => $orderResults[0]['Address'],
                 "Fullname" => $orderResults[0]['Fullname'],
                 "PhoneNumber" => $orderResults[0]['PhoneNumber'],
+                "Payment" => $orderResults[0]['Payment'],
+                "isPaid" => $orderResults[0]['isPaid']
             ];
 
             // Tạo danh sách chi tiết sản phẩm (loại bỏ trùng lặp)
@@ -358,31 +348,35 @@ class OrderModel
     }
 
 
-    // Tạo đơn hàng mới
-    private function createNewOrder($orderId, $totalPrice, $note, $accountId, $payment, $isPaid, $voucherId)
+    public function createOrder($orderData)
     {
-        $query = "INSERT INTO `order` (`Id`, `TotalPrice`, `Note`, `AccountId`, `Payment`, `isPaid`, `VoucherId`)
-                  VALUES (:orderId,  :totalPrice, :note, :accountId, :payment, :isPaid, :voucherId)";
+        $orderId = $this->generateOrderId(); // Gọi hàm để tạo ID
+
+        $query = "INSERT INTO `Order` (`Id`, `OrderTime`, `TotalPrice`, `Note`, `AccountId`, `Payment`, `isPaid`, `VoucherId`)
+              VALUES (:orderId, :orderTime, :totalPrice, :note, :accountId, :payment, :isPaid, :voucherId)";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':totalPrice', $totalPrice, PDO::PARAM_INT);
-            $statement->bindValue(':note', $note, PDO::PARAM_STR);
-            $statement->bindValue(':accountId', $accountId, PDO::PARAM_INT);
-            $statement->bindValue(':payment', $payment, PDO::PARAM_STR);
-            $statement->bindValue(':isPaid', $isPaid, PDO::PARAM_BOOL);
 
-            if ($voucherId === null) {
-                $statement->bindValue(':voucherId', null, PDO::PARAM_NULL);
-            } else {
-                $statement->bindValue(':voucherId', $voucherId, PDO::PARAM_INT);
-            }
+            // Lấy thời gian hiện tại cho `orderTime`
+            $currentDateTime = date("Y-m-d H:i:s");
+
+            // Gán giá trị và kiểm tra nếu trống thì để là NULL
+            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
+            $statement->bindValue(':orderTime', $currentDateTime, PDO::PARAM_STR);
+            $statement->bindValue(':totalPrice', $orderData['totalPrice'] ?? null, PDO::PARAM_INT);
+            $statement->bindValue(':note', !empty($orderData['note']) ? $orderData['note'] : null, PDO::PARAM_STR);
+            $statement->bindValue(':accountId', $orderData['accountId'] ?? null, PDO::PARAM_INT);
+            $statement->bindValue(':payment', !empty($orderData['Payment']) ? $orderData['Payment'] : 'COD', PDO::PARAM_STR);
+            $statement->bindValue(':isPaid', $orderData['isPaid'] ?? false, PDO::PARAM_BOOL);
+            $statement->bindValue(':voucherId', !empty($orderData['voucherId']) ? $orderData['voucherId'] : null, PDO::PARAM_INT);
 
             $statement->execute();
+
             return (object) [
                 "status" => 201,
-                "message" => "Order created successfully"
+                "message" => "Order created successfully",
+                "orderId" => $orderId
             ];
         } catch (PDOException $e) {
             return (object) [
@@ -391,6 +385,22 @@ class OrderModel
             ];
         }
     }
+
+    private function generateOrderId()
+    {
+        // Lấy số lượng đơn hàng hiện tại
+        $query = "SELECT COUNT(*) as count FROM `Order`";
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $count = $result['count'] + 1; // Tăng số đếm lên 1
+        return 'ORD' . str_pad($count, 8, '0', STR_PAD_LEFT); // Tạo ID theo định dạng ORD00000030
+    }
+
+
+
+
 
 
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId

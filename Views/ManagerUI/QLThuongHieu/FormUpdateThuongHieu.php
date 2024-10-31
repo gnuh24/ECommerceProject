@@ -66,20 +66,20 @@
                                         $brandId = $_GET['brandId'];
                                         $brandName = $_GET['brandName'];
                                     }
-                                    echo '
-                                        <div style="padding-left: 1rem">
 
-                                            <div style="display: flex; gap: 2rem">
-                                                <div>
-                                                    <p class="text">Mã thương hiệu<span style="color: red; margin-left: 10px;">🔒</span></p>
-                                                    <input style="width: 20rem; padding: 0.5rem; height: 1rem;" id="brandId" class="input" name="brandId" readonly value="' . ($brandId) . '" />
-                                                </div>
-                                            </div>
-
-                                            <p class="text">Thương hiệu</p>
-                                            <input id="brandName" class="input" type="text" name="brandName" style="width: 20rem; padding: 0.5rem; height: 1rem;" value="' . ($brandName) . '" />';
 
                                     ?>
+
+                                    <div style="display: flex; gap: 2rem">
+                                        <div>
+                                            <p class="text">Mã thương hiệu<span style="color: red; margin-left: 10px;">🔒</span></p>
+                                            <input id="brandId" class="input" name="brandId" readonly value=<?php echo $brandId ?> />
+                                        </div>
+                                    </div>
+
+                                    <p class="text">Thương hiệu</p>
+                                    <input id="brandName" class="input" type="text" name="brandName" value=<?php echo $brandName ?> />';
+
 
                                 </div>
                             </div>
@@ -88,6 +88,11 @@
                 </div>
             </div>
         </div>
+    </div>
+    </form>
+    </div>
+    </div>
+    </div>
 
     </div>
 </body>
