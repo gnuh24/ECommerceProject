@@ -623,10 +623,6 @@ class ProductModel
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
-
-
-
-
     private function getSQLWithParams($query, $params)
     {
         foreach ($params as $param => $value) {

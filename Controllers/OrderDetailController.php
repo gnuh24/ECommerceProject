@@ -11,11 +11,10 @@ class OrderDetailController
     }
 
 
-
     // Lấy chi tiết đơn hàng theo OrderId
     public function getAllOrderDetailByOrderId($orderId)
     {
-        $response = $this->orderDetailModel->getDetailsByOrderId($orderId);
+        $response = $this->orderDetailModel->getAllOrderDetailByOrderId($orderId);
         $this->response($response);
     }
 
@@ -45,34 +44,7 @@ class OrderDetailController
         }
     }
 
-    // Cập nhật chi tiết đơn hàng
-    public function updateOrderDetail()
-    {
-        $data = json_decode(file_get_contents("php://input"), true);
 
-        if (isset($data['OrderId'], $data['ProductId'], $data['Quantity'], $data['UnitPrice'], $data['Total'])) {
-            $orderId = $data['OrderId'];
-            $productId = $data['ProductId'];
-            $quantity = $data['Quantity'];
-            $unitPrice = $data['UnitPrice'];
-            $total = $data['Total'];
-
-            $response = $this->orderDetailModel->updateOrderDetail($orderId, $productId, $quantity, $unitPrice, $total);
-            $this->response($response);
-        } else {
-            $this->response((object) [
-                "status" => 400,
-                "message" => "Missing required fields"
-            ]);
-        }
-    }
-
-    // Xóa chi tiết đơn hàng
-    public function deleteOrderDetail($orderId, $productId)
-    {
-        $response = $this->orderDetailModel->deleteOrderDetail($orderId, $productId);
-        $this->response($response);
-    }
     private function response($result)
     {
         http_response_code($result->status);

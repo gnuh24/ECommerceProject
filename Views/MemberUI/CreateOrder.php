@@ -11,6 +11,8 @@
     <title>Thanh toán</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../HelperUI/formatOutput.js"></script>
+
 </head>
 
 <body>
@@ -109,12 +111,6 @@
     var listproduct = [];
     var totalpriceall = 0;
 
-    function convertPriceToNumber(priceString) {
-        var priceWithoutDot = priceString.replace(/\./g, '');
-        var priceWithoutDong = priceWithoutDot.replace('đ', '');
-        var priceNumber = parseInt(priceWithoutDong);
-        return priceNumber;
-    }
 
     function loadCart() {
         var maTaiKhoan = sessionStorage.getItem("id");
@@ -133,7 +129,10 @@
         let totalPrice = 0;
 
         cart.forEach(function(cartProduct) {
-            totalPrice += cartProduct.total;
+
+            let total = cartProduct.unitPrice * cartProduct.quantity;
+
+            totalPrice += total;
 
             cartHTML += `
                 <div class='radio__wrapper'>
@@ -151,7 +150,7 @@
                             <div class='wrapTotalPriceOfCart'>
                                 <div class='totalPriceOfCart'>
                                     <p class='lablelPrice'>Thành tiền</p>
-                                    <p class='valueTotalPrice'>${formatCurrency(cartProduct.total)}</p>
+                                    <p class='valueTotalPrice'>${formatCurrency(total)}</p>
                                 </div>
                             </div>
                         </div>
@@ -165,17 +164,6 @@
     }
 
 
-    function formatCurrency(number) {
-        // Chuyển đổi số thành chuỗi và đảm bảo nó là số nguyên
-        number = parseInt(number);
-
-        // Sử dụng hàm toLocaleString() để định dạng số tiền
-        // và thêm đơn vị tiền tệ "đ" vào cuối chuỗi
-        return number.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    }
     document.getElementById('address').addEventListener('input', function() {
         fillOrderInfo();
     });

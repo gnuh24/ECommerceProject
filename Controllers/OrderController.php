@@ -118,16 +118,19 @@ class OrderController
         $response = $this->orderModel->getAllOrder($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);
         $this->response($response);
     }
+    
     public function getOrderById($orderId)
     {
         $response = $this->orderModel->getOrderById($orderId);
         $this->response($response);
     }
+
     public function getFullOrderById($orderId)
     {
         $response = $this->orderModel->getFullOrderById($orderId);
         $this->response($response);
     }
+
     public function createOrder($orderData, $orderDetails)
     {
         require_once __DIR__ . "../../Configure/MysqlConfig.php";
@@ -157,21 +160,6 @@ class OrderController
             return ['status' => 500, 'message' => 'Lỗi tạo hóa đơn: ' . $e->getMessage()];
         }
     }
-
-
-    // Cập nhật thông tin đơn hàng
-    // public function updateOrder($orderId, $data)
-    // {
-    //     if (!isset($data['totalPrice'], $data['note'])) {
-    //         return $this->response((object)[
-    //             "status" => 400,
-    //             "message" => "Invalid input data"
-    //         ]);
-    //     }
-
-    //     $response = $this->orderModel->updateOrder($orderId, $data['totalPrice'], $data['note']);
-    //     $this->response($response);
-    // }
 
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId
     public function getOrdersByAccountId($accountId)

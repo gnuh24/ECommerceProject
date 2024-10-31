@@ -16,6 +16,14 @@ function formatCurrency(number) {
     });
 }
 
+// // Hàm này dùng để quy đổi tiền trở về dạng số
+// function convertPriceToNumber(priceString) {
+//     var priceWithoutDot = priceString.replace(/\./g, '');
+//     var priceWithoutDong = priceWithoutDot.replace('đ', '');
+//     var priceNumber = parseInt(priceWithoutDong);
+//     return priceNumber;
+// }
+
 
 // Function to convert dd/MM/yyyy to yyyy-MM-dd
 function formatDateToYYYYMMDD(dateString) {

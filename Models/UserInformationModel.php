@@ -171,35 +171,5 @@ class UserInformationModel
         }
     }
 
-
-
-
-    // Xóa người dùng theo ID
-    function deleteUser($userId)
-    {
-        $query = "DELETE FROM `UserInformation` WHERE `Id` = :id";
-
-        try {
-            $statement = $this->connection->prepare($query);
-            $statement->bindValue(':id', $userId, PDO::PARAM_INT);
-            $statement->execute();
-
-            if ($statement->rowCount() > 0) {
-                return (object) [
-                    "status" => 200,
-                    "message" => "User deleted successfully",
-                ];
-            } else {
-                return (object) [
-                    "status" => 404,
-                    "message" => "No record was deleted",
-                ];
-            }
-        } catch (PDOException $e) {
-            return (object) [
-                "status" => 400,
-                "message" => $e->getMessage()
-            ];
-        }
-    }
+    
 }
