@@ -141,85 +141,99 @@
                     const capacity = product.capacity ? product.capacity : 'N/A';
                     const description = product.description ? product.description : 'Thông tin chi tiết chưa được cập nhật.';
                     const price = product.price ? product.price : 'Giá chưa cập nhật';
+                    let discountedPrice, originalPriceDisplay;
 
+                    if (product.sale === 0) {
+                        discountedPrice = (price).toFixed(2); // Tính giá giảm 10%
+                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: red;">${formatCurrency((price * 1.1).toFixed(2))}</p>`;
+                    } else {
+                        discountedPrice = price; // Giá không giảm
+                        originalPriceDisplay = '';
+                    }
 
                     let htmlContent = `
-                        <div class="product_images__wrapper">
-                            <div class="image">
-                                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${productImage}" alt="${productName}" class="product_img">
-                            </div>
-                        </div>
-                        <div class="info__wrapper">
-                            <div class="title__wrapper">
-                                <h2 class="title__wrapper">${productName}</h2>
-                            </div>
-                            <div class="price__wrapper">
-                                <p class="price">${formatCurrency(price)}</p>
-                            </div>
-                            <div class="quantity-available">
-                                <p class="title">${quantityMessage}</p>
-                            </div>
-                            <div class="divider" style="border-bottom: 1px solid #ccc; margin: 20px 0;"></div>
-                            <div class="detail_info__wrapper">
-                                <div class="specification__wrapper">
-                                    <span class="origin specification_item">
-                                        <i class="fa-solid fa-plane"></i>
-                                        <p>${origin}</p>
-                                    </span>
-                                    <span class="specification_item">
-                                        <i class="fa-solid fa-wine-bottle"></i>
-                                        <p>${categoryName}</p>
-                                    </span>
-                                    <span class="origin specification_item">
-                                        <i class="fa-solid fa-tag"></i>
-                                        <p>${brandName}</p>
-                                    </span>                              
-                                </div>
-                                <div class="size__wrapper">
-                                    <p class="title">Nồng độ cồn</p>
-                                    <p>${abv}%</p>
-                                </div>
-                                <div class="size__wrapper">
-                                    <p class="title">Dung tích</p>
-                                    <p>${capacity}ml</p>
-                                </div>
-                                <div class="quantity__wrapper" style="display: flex; align-items: center;">`;
+    <div class="product_images__wrapper">
+        <div class="image" style="position: relative;">
+            <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${productImage}" alt="${productName}" class="product_img">
+            <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.sale == 0 ? 'block' : 'none'};  position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 100px;
+        height: auto;
+        z-index: 10;">
+        </div>
+    </div>
+    <div class="info__wrapper">
+        <div class="title__wrapper">
+            <h2 class="title__wrapper">${productName}</h2>
+        </div>
+        <div class="price__wrapper">
+            ${originalPriceDisplay} <!-- Giá gốc -->
+            <p class="price">${formatCurrency(discountedPrice)}</p> <!-- Giá giảm -->
+        </div>
+        <div class="quantity-available">
+            <p class="title">${quantityMessage}</p>
+        </div>
+        <div class="divider" style="border-bottom: 1px solid #ccc; margin: 20px 0;"></div>
+        <div class="detail_info__wrapper">
+            <div class="specification__wrapper">
+                <span class="origin specification_item">
+                    <i class="fa-solid fa-plane"></i>
+                    <p>${origin}</p>
+                </span>
+                <span class="specification_item">
+                    <i class="fa-solid fa-wine-bottle"></i>
+                    <p>${categoryName}</p>
+                </span>
+                <span class="origin specification_item">
+                    <i class="fa-solid fa-tag"></i>
+                    <p>${brandName}</p>
+                </span>                              
+            </div>
+            <div class="size__wrapper">
+                <p class="title">Nồng độ cồn</p>
+                <p>${abv}%</p>
+            </div>
+            <div class="size__wrapper">
+                <p class="title">Dung tích</p>
+                <p>${capacity}ml</p>
+            </div>
+            <div class="quantity__wrapper" style="display: flex; align-items: center;">`;
 
                     if (soLuongConLai > 0) {
                         htmlContent += `
-                            <p class="title">Số lượng</p>
-                            <div class="quantity d-flex align-items-center">
-                                <button class="btn btn-outline-secondary minusBtn"><i class="fa-solid fa-minus"></i></button>
-                                <input id="quantityAddToCart" type="number" value="1" min="1" max="${soLuongConLai}" class="form-control mx-2" oninput="checkQuantity(this)">
-                                <button class="btn btn-outline-secondary plusBtn"><i class="fa-solid fa-plus"></i></button>
-                            </div>`;
+                    <p class="title">Số lượng</p>
+                    <div class="quantity d-flex align-items-center">
+                        <button class="btn btn-outline-secondary minusBtn"><i class="fa-solid fa-minus"></i></button>
+                        <input id="quantityAddToCart" type="number" value="1" min="1" max="${soLuongConLai}" class="form-control mx-2" oninput="checkQuantity(this)">
+                        <button class="btn btn-outline-secondary plusBtn"><i class="fa-solid fa-plus"></i></button>
+                    </div>`;
                     }
 
                     htmlContent += `</div>
-                            <div class="button__wrapper">`;
-
-
+                <div class="button__wrapper">`;
 
                     if (soLuongConLai > 0) {
                         htmlContent += `
-                            <button class="btn btn-secondary"  onclick="addToCart(${product.id}, '${productName}', '${productImage}', ${price})">
-                                <span>Thêm vào giỏ hàng</span>
-                            </button>`;
+                    <button class="btn btn-secondary" onclick="addToCart(${product.id}, '${productName}', '${productImage}', ${price})">
+                        <span>Thêm vào giỏ hàng</span>
+                    </button>`;
                     }
 
                     htmlContent += `
-                            <button class="btn btn-primary" style="visibility: hidden;">
-                                <span>Mua ngay</span>
-                            </button>
-                        </div>
-                    </div>
-                    </div>
-                    
-                    `;
+                <button class="btn btn-primary" style="visibility: hidden;">
+                    <span>Mua ngay</span>
+                </button>
+            </div>
+        </div>
+    </div>`;
+
                     htmlContent += `<div class="description text-center"><h1>Thông tin chi tiết</h1>
-                    <div> ${description}</div>
-                    </div>`;
+    <div>${description}</div>
+</div>`;
                     $('.product__wrapper').html(htmlContent);
+
+
 
                     // Gắn các sự kiện sau khi HTML đã được thêm vào DOM
                     document.querySelector(".minusBtn").addEventListener("click", function() {

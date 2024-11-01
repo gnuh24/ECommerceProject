@@ -14,6 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMlI4F/x3Rgx31ZobM4uZ5dI6cuJg6RZ/aXjmD" crossorigin="anonymous">
 
 
     <script src="../HelperUI/formatOutput.js"></script>
@@ -21,6 +22,52 @@
 
     <title>Các sản phẩm</title>
 </head>
+<style>
+    .sale-badge {
+        position: absolute;
+        /* Định vị tuyệt đối */
+        top: 10px;
+        /* Cách từ trên cùng */
+        right: 10px;
+        /* Cách từ bên phải */
+        width: 100px;
+        /* Điều chỉnh kích thước của hình ảnh nếu cần */
+        height: auto;
+        /* Đảm bảo giữ tỷ lệ */
+        z-index: 10;
+        /* Đảm bảo hình ảnh nằm trên các phần tử khác */
+    }
+
+    .sale-banner {
+        position: absolute;
+        /* Position it relative to the parent */
+        top: 10px;
+        /* Distance from the top */
+        right: 10px;
+        /* Distance from the right */
+        background-color: rgba(255, 0, 0, 0.8);
+        /* Semi-transparent red background */
+        color: white;
+        /* Text color */
+        padding: 5px 10px;
+        /* Padding around the text */
+        border-radius: 5px;
+        /* Rounded corners */
+        font-size: 14px;
+        /* Font size */
+        z-index: 10;
+        /* Ensure it appears above the image */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        /* Subtle shadow for depth */
+    }
+
+    .sale-banner i {
+        margin-right: 5px;
+        /* Space between icon and text */
+        color: yellow;
+        /* Color of the star icon */
+    }
+</style>
 
 <body>
     <?php require_once "./Header.php"; ?>
@@ -202,23 +249,51 @@
                     let htmlContent = '';
                     $.each(response.data, function(index, product) {
                         htmlContent += `
-                            <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
-                                <div class="row">
-                                    <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block;">
-                                        <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
-                                        <div class="product-card-content">
-                                            <div class="price">
-                                                <h4 class="name-product">${product.ProductName}</h4>
-                                                <p class="price-tea">${formatCurrency(product.UnitPrice)}</p>
-                                            </div>
-                                            <div class="buy-btn-container">
-                                                MUA NGAY
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </form>
-                        `;
+    <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
+        <div class="row">
+            <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block; position: relative;">
+                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
+                <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};">
+                <div class="product-card-content">
+                    <div class="price">
+                        <h4 class="name-product">${product.ProductName}</h4>`;
+
+                        if (product.Sale === 0) {
+                            const inflatedPrice = product.UnitPrice * 1.1; // 110% of the original price
+                            const discountPrice = inflatedPrice * 0.9; // 90% of the inflated price
+
+                            htmlContent += `
+        <p class="price-tea" style="text-decoration: line-through; color: gray;">
+            <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
+        </p>
+        <p class="price-tea" style="color: red; font-weight: bold;">
+            <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
+        </p>`;
+                        } else {
+                            const salePrice = product.UnitPrice * (1 - product.Sale / 100);
+
+                            htmlContent += `
+        <p class="price-tea" style="text-decoration: line-through; color: gray;">
+            <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
+        </p>
+        <p class="price-tea" style="color: red; font-weight: bold;">
+            <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
+        </p>`;
+                        }
+
+                        htmlContent += `
+                    </div>
+                    <div class="buy-btn-container">
+                        MUA NGAY
+                    </div>
+                </div>
+            </a>
+        </div>
+    </form>
+`;
+
+
+
                     });
 
                     // Update product list and pagination

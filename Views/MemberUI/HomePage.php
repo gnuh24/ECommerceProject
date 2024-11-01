@@ -10,9 +10,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../HelperUI/formatOutput.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMlI4F/x3Rgx31ZobM4uZ5dI6cuJg6RZ/aXjmD" crossorigin="anonymous">
 
     <title>Kinh doanh rượu</title>
 </head>
+<style>
+
+</style>
 
 <body>
 
@@ -96,7 +100,6 @@
 
 
 <script>
-
     // Lắng nghe sự kiện click vào Poster
     document
         .getElementById("poster")
@@ -143,21 +146,54 @@
                         }
                         var imageSrc = product.Image;
                         htmlContent += `
-                       <div class="col-md-4 col-sm-6 mb-4">
-                            <div class="product-card-content">
-                                <a href="ProductDetail.php?maSanPham=${product.Id}">
-                                    <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
-                                    <div class="product-card-details">
-                                        <h4 class="name-product">${product.ProductName}</h4>
-                                        <p class="price-tea text-center">${formatCurrency(product.UnitPrice)}</p>
-                                        <div class="buy-btn-container">
-                                            Mua ngay
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    `;
+    <div class="col-md-4 col-sm-6 mb-4">
+        <div class="product-card-content" style="position: relative;">
+            <a href="ProductDetail.php?maSanPham=${product.Id}">
+                <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
+                <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};  position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 100px;
+        height: auto;
+        z-index: 10;">
+                <div class="product-card-details">
+                    <h4 class="name-product">${product.ProductName}</h4>`;
+
+                        if (product.Sale === 0) {
+                            // Calculate the inflated and discounted prices
+                            const inflatedPrice = product.UnitPrice * 1.1;
+                            const discountPrice = inflatedPrice * 0.9;
+
+                            htmlContent += `
+        <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
+            <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
+        </p>
+        <p class="price-tea text-center" style="color: red; font-weight: bold;">
+            <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
+        </p>`;
+                        } else {
+                            // Calculate the sale price
+                            const salePrice = product.UnitPrice * (1 - product.Sale / 100);
+
+                            htmlContent += `
+        <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
+            <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
+        </p>
+        <p class="price-tea text-center" style="color: red; font-weight: bold;">
+            <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
+        </p>`;
+                        }
+
+                        htmlContent += `
+                    <div class="buy-btn-container">
+                        Mua ngay
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>`;
+
+
                         // Tăng biến đếm lên 1 sau mỗi sản phẩm được thêm vào
                         count++;
                     });
