@@ -350,25 +350,26 @@ class OrderModel
 
     public function createOrder($orderData)
     {
-        $orderId = $this->generateOrderId(); // Gọi hàm để tạo ID
 
-        $query = "INSERT INTO `Order` (`Id`, `OrderTime`, `TotalPrice`, `Note`, `AccountId`, `Payment`, `isPaid`, `VoucherId`)
-              VALUES (:orderId, :orderTime, :totalPrice, :note, :accountId, :payment, :isPaid, :voucherId)";
+        $query = "INSERT INTO `Order` (`Id`,  `TotalPrice`, `Note`, `AccountId`, `Payment`, `isPaid`, `VoucherId`)
+              VALUES (:orderId,  :totalPrice, :note, :accountId, :payment, :isPaid, :voucherId)";
 
         try {
             $statement = $this->connection->prepare($query);
 
-            // Lấy thời gian hiện tại cho `orderTime`
-            $currentDateTime = date("Y-m-d H:i:s");
-
             // Gán giá trị và kiểm tra nếu trống thì để là NULL
-            $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
-            $statement->bindValue(':orderTime', $currentDateTime, PDO::PARAM_STR);
+            $statement->bindValue(':orderId', $orderData['orderId'], PDO::PARAM_STR);
             $statement->bindValue(':totalPrice', $orderData['totalPrice'] ?? null, PDO::PARAM_INT);
             $statement->bindValue(':note', !empty($orderData['note']) ? $orderData['note'] : null, PDO::PARAM_STR);
             $statement->bindValue(':accountId', $orderData['accountId'] ?? null, PDO::PARAM_INT);
             $statement->bindValue(':payment', !empty($orderData['Payment']) ? $orderData['Payment'] : 'COD', PDO::PARAM_STR);
-            $statement->bindValue(':isPaid', $orderData['isPaid'] ?? false, PDO::PARAM_BOOL);
+            if ($orderData['Payment'] !== "COD"){
+                $statement->bindValue(':isPaid',  true, PDO::PARAM_BOOL);
+
+            }else{
+                $statement->bindValue(':isPaid',  false, PDO::PARAM_BOOL);
+
+            }
             $statement->bindValue(':voucherId', !empty($orderData['voucherId']) ? $orderData['voucherId'] : null, PDO::PARAM_INT);
 
             $statement->execute();
@@ -376,7 +377,7 @@ class OrderModel
             return (object) [
                 "status" => 201,
                 "message" => "Order created successfully",
-                "orderId" => $orderId
+                "orderId" => $orderData['orderId']
             ];
         } catch (PDOException $e) {
             return (object) [
@@ -385,22 +386,6 @@ class OrderModel
             ];
         }
     }
-
-    private function generateOrderId()
-    {
-        // Lấy số lượng đơn hàng hiện tại
-        $query = "SELECT COUNT(*) as count FROM `Order`";
-        $statement = $this->connection->prepare($query);
-        $statement->execute();
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-
-        $count = $result['count'] + 1; // Tăng số đếm lên 1
-        return 'ORD' . str_pad($count, 8, '0', STR_PAD_LEFT); // Tạo ID theo định dạng ORD00000030
-    }
-
-
-
-
 
 
     // Lấy tất cả đơn hàng của một tài khoản dựa trên AccountId

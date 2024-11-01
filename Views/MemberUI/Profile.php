@@ -54,6 +54,10 @@
                     var userInfo = response.data; // Lấy thông tin người dùng đầu tiên từ mảng dữ liệu
                     // Format thông tin hiển thị
                     var infoPage = document.getElementById("contentprofile");
+                    console.log(userInfo.Gender);
+                    
+                    console.log(userInfo.Birthday);
+
                     infoPage.innerHTML = `
                     <div class='col-xxl-8 mb-5 mb-xxl-0'>
                         <form name="profileForm" action="Profile.php?maTaiKhoan=${userInfo.Id}" method="POST" onsubmit="return validateForm()">

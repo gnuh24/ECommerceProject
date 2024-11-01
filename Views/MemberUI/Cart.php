@@ -50,7 +50,7 @@
                                 <p class="priceTotal fw-bold">0đ</p>
                             </div>
                             <button class="btn btn-danger w-100 my-3 hidden btnCheckout" style="background-color:rgb(146, 26, 26) !important;" onclick="toCreateOrder()">Tiến hành đặt hàng</button>
-                            <a href="SignedProduct.php">
+                            <a href="Product.php">
                                 <button class="btn btn-outline-danger w-100" style=" border:1px solid rgb(146, 26, 26) !important;color:rgb(146, 26, 26) ;">Tiếp tục mua hàng</button>
                             </a>
                         </div>

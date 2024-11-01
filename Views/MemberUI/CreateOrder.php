@@ -213,6 +213,7 @@
         diaChi = document.getElementById('address1').value;
         document.getElementById('spanDiaChi1').textContent = diaChi;
     }
+
     document.getElementById('createOrder').addEventListener('click', function() {
         const maTaiKhoan = sessionStorage.getItem("id");
         const hoTen = document.getElementById('username').value.trim(); // Lấy giá trị của trường Họ tên
@@ -244,18 +245,6 @@
             if (result.isConfirmed) {
                 updateInfor();
                 createDonHang(); // Gọi hàm tạo đơn hàng
-                Swal.fire({
-                    title: 'Đặt hàng thành công!',
-                    text: 'Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then((result1) => {
-                    localStorage.removeItem('cart');
-
-                    if (result1.isConfirmed) {
-                        window.location.href = 'HomePage.php'; // Chuyển hướng đến trang sản phẩm
-                    }
-                });
             }
         });
     });
@@ -275,7 +264,6 @@
             data: JSON.stringify(formData),
             contentType: "application/json",
             success: function(response) {
-                console.log("Update successful:", response);
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -285,13 +273,16 @@
 
 
 
+
     function createDonHang() {
         var userData = sessionStorage.getItem("id");
         var formData = new FormData();
+        var orderId = generateOrderId();
+        
         formData.append('totalPrice', totalpriceall);
         var diaChi = document.getElementById('address').value;
         const selectedPaymentMethod = document.querySelector('input[name="payment"]:checked').value;
-
+        formData.append('orderId', orderId);
         formData.append('accountId', userData);
         formData.append('note', diaChi);
         let listproduct = JSON.parse(localStorage.getItem("cart"));
@@ -307,23 +298,86 @@
             console.error("Dữ liệu giỏ hàng không hợp lệ");
         }
 
+        if (selectedPaymentMethod === "VNPAY"){
 
-        $.ajax({
-            url: "../../Controllers/OrderController.php",
-            method: "POST",
-            data: formData,
-            processData: false, // Ngăn jQuery xử lý dữ liệu
-            contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
+            // Lưu các trường cần thiết từ formData vào localStorage
+            const orderData = {};
+            formData.forEach((value, key) => {
+                orderData[key] = value; // Lưu trữ dữ liệu từ FormData vào đối tượng
+            });
 
-            success: function(response) {
-                // Xử lý phản hồi thành công
-                console.log("Đơn hàng đã được tạo:", response);
-            },
-            error: function(xhr, status, error) {
-                console.error("Lỗi:", error);
-            }
-        });
+            // Chỉ lưu trữ dưới dạng JSON những trường cần thiết
+            localStorage.setItem("donHangDangThanhToan", JSON.stringify(orderData));
+
+
+            thanhToanVNPay(orderId, totalpriceall);
+        }else{
+            $.ajax({
+                url: "../../Controllers/OrderController.php",
+                method: "POST",
+                data: formData,
+                processData: false, // Ngăn jQuery xử lý dữ liệu
+                contentType: false, // Ngăn jQuery thiết lập tiêu đề `Content-Type`
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Đặt hàng thành công!',
+                        text: 'Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result1) => {
+                        localStorage.removeItem('cart');
+                        if (result1.isConfirmed) {
+                            window.location.href = 'HomePage.php'; // Chuyển hướng đến trang sản phẩm
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Lỗi:", error);
+                }
+            });
+        }
+
+ 
     }
+
+    function thanhToanVNPay(orderId, totalpriceall) {
+        // Tạo form mới
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "./vnpay_payment/xuLyThanhToan_vnpay.php";
+
+        // Thêm các dữ liệu cần thiết vào form
+        const orderIdInput = document.createElement("input");
+        orderIdInput.type = "hidden";
+        orderIdInput.name = "order_id";
+        orderIdInput.value = orderId;
+        form.appendChild(orderIdInput);
+
+        const orderDescInput = document.createElement("input");
+        orderDescInput.type = "hidden";
+        orderDescInput.name = "order_desc";
+        orderDescInput.value = `Khách hàng ${document.getElementById('username').value} thanh toán đơn hàng ${orderId}`;
+        form.appendChild(orderDescInput);
+
+        const amountInput = document.createElement("input");
+        amountInput.type = "hidden";
+        amountInput.name = "amount";
+        amountInput.value = totalpriceall;
+        form.appendChild(amountInput);
+
+
+        // Tạo nút submit có name="redirect"
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.name = "redirect";
+        submitButton.style.display = "none"; // Ẩn nút
+        form.appendChild(submitButton);
+
+        // Thêm form vào body và submit
+        document.body.appendChild(form);
+        submitButton.click();  // Kích hoạt submit
+    }
+
 </script>
 
 </html>

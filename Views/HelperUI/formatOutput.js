@@ -95,3 +95,10 @@ function convertDateTimeFormat(dateString) {
 }
 
 
+// Auto Geneate Order Id
+function generateOrderId() {
+    const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
+    return `ORD${randomPart}`;
+}
+
+

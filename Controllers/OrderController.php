@@ -36,6 +36,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         var_dump($_POST);
 
         // Lấy dữ liệu từ request
+        $orderId = $_POST['orderId'] ?? null; // Lấy tổng giá trị
+        echo "OrderId đây nè: ", $orderId;
         $totalPrice = $_POST['totalPrice'] ?? null; // Lấy tổng giá trị
         $accountId = $_POST['accountId'] ?? null; // Lấy ID tài khoản
         $note = $_POST['note'] ?? null; // Lấy ghi chú
@@ -65,6 +67,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
             // Gọi hàm tạo đơn hàng
             $response = $controller->createOrder([
+                'orderId' => $orderId,
                 'totalPrice' => $totalPrice,
                 'accountId' => $accountId,
                 'note' => $note,
@@ -153,7 +156,7 @@ class OrderController
             $this->orderStatusModel->createOrderStatus($orderId, 'ChoDuyet');
 
             $db->commit();
-            return ['status' => 200, 'message' => 'Hóa đơn tạo thành công', 'orderId' => $orderId];
+            return ['status' => 201, 'message' => 'Hóa đơn tạo thành công', 'orderId' => $orderId];
         } catch (Exception $e) {
             // Rollback transaction nếu có lỗi
             $db->rollBack();

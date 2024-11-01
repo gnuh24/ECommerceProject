@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../AdminHome.css" />
     <link rel="stylesheet" href="./QLDonHang.css" />
     <link rel="stylesheet" href="./detail_donhang.css">
+    <script src="../../HelperUI/formatOutput.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Quản lý đơn hàng</title>
 </head>
@@ -82,12 +83,6 @@
 
     getOrderDetailsAndStatus(orderId);
 
-    function number_format_vnd(number) {
-        return Number(number).toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    }
 
     function getOrderDetailsAndStatus(orderId) {
         $.ajax({
@@ -116,7 +111,7 @@
                             </div>
                             <div class='item_info'>
                                 <p class='quantity'>${element.Quantity}</p>
-                                <p class='price'>${number_format_vnd(element.UnitPrice)}</p>
+                                <p class='price'>${formatCurrency(element.UnitPrice)}</p>
                             </div>
                         </div>
                     </div>
@@ -128,8 +123,8 @@
                 document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.info.Address}`;
                 document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.info.PhoneNumber}`;
                 document.getElementById("note").innerText = data.info.Note; // Added note
-                document.getElementById("totalPrice").innerText = number_format_vnd(data.info.TotalPrice);
-                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${data.info.OrderTime}`; // Added order time
+                document.getElementById("totalPrice").innerText = formatCurrency(data.info.TotalPrice);
+                document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${convertDateTimeFormat(data.info.OrderTime)}`; // Added order time
                 document.getElementById("tenphuongthuc").innerHTML = `<span>Phương thức thanh toán: </span>${data.info.Payment}`;
                 document.getElementById("tinhtrang").innerHTML = `<span>Tình trạng: </span>${data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}`;
 
@@ -138,13 +133,16 @@
                 var order_status_content = '';
 
                 data.orderStatuses.forEach(status => {
+                    let currentStatusText = fromEnumStatusToText(status.Status);
+                    let currentOrderTimeText = convertDateTimeFormat(status.UpdateTime);
+
                     if (status.Status === 'Huy') {
                         order_status_content += `<div class="order_status cancelled">
-                            <li>${getTenTrangThai(status.Status)}<br>${status.UpdateTime}</li>
+                            <li>${currentStatusText}<br>${currentOrderTimeText}</li>
                         </div>`;
                     } else {
                         order_status_content += `<div class="order_status completed">
-                            <li>${getTenTrangThai(status.Status)}<br>${status.UpdateTime}</li>
+                            <li>${currentStatusText}<br>${currentOrderTimeText}</li>
                         </div>`;
                     }
                 });
@@ -157,22 +155,7 @@
         });
     }
 
-    function getTenTrangThai(status) {
-        switch (status) {
-            case 'ChoDuyet':
-                return 'Chờ Duyệt';
-            case 'DaDuyet':
-                return 'Đã duyệt';
-            case 'DangGiao':
-                return 'Đang Giao';
-            case 'GiaoThanhCong':
-                return 'Giao Thành Công';
-            case 'Huy':
-                return 'Đã hủy';
-            default:
-                return 'Chưa rõ';
-        }
-    }
+
 </script>
 
 </html>
