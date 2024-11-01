@@ -33,9 +33,9 @@
                 <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
 
                 <!-- Google Login Button with correct icon -->
-                <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
+                <!-- <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
                     <i class="fab fa-google"></i> Đăng nhập bằng Google
-                </button>
+                </button> -->
             </form>
         </div>
 
@@ -271,16 +271,7 @@
     const tenDangNhap = document.getElementById("tenDangNhapLogin");
     const matKhau = document.getElementById("passwordLogin");
 
-    const googleSignInButton = document.getElementById('googleSignInButton');
-
-    // Add event listener to the button
-    googleSignInButton.addEventListener('click', function() {
-        // Your login logic here
-        const googleAuthUrl = "<?php echo $client->createAuthUrl(); ?>";
-
-        window.location.href = googleAuthUrl;
-
-    });
+   
 
     loginButton.addEventListener("click", (event) => {
         event.preventDefault();

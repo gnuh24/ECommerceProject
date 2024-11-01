@@ -147,8 +147,8 @@
                         discountedPrice = (price).toFixed(2); // Tính giá giảm 10%
                         originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: red;">${formatCurrency((price * 1.1).toFixed(2))}</p>`;
                     } else {
-                        discountedPrice = price; // Giá không giảm
-                        originalPriceDisplay = '';
+                        discountedPrice = price * (1 - product.sale / 100);
+                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: red;">${formatCurrency((price).toFixed(2))}</p>`;
                     }
 
                     let htmlContent = `
@@ -215,7 +215,7 @@
 
                     if (soLuongConLai > 0) {
                         htmlContent += `
-                    <button class="btn btn-secondary" onclick="addToCart(${product.id}, '${productName}', '${productImage}', ${price})">
+                    <button class="btn btn-secondary" onclick="addToCart(${product.id}, '${productName}', '${productImage}', ${discountedPrice})">
                         <span>Thêm vào giỏ hàng</span>
                     </button>`;
                     }

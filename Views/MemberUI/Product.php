@@ -260,25 +260,25 @@
 
                         if (product.Sale === 0) {
                             const inflatedPrice = product.UnitPrice * 1.1; // 110% of the original price
-                            const discountPrice = inflatedPrice * 0.9; // 90% of the inflated price
+                            const discountPrice = product.UnitPrice; 
 
                             htmlContent += `
-        <p class="price-tea" style="text-decoration: line-through; color: gray;">
-            <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
-        </p>
-        <p class="price-tea" style="color: red; font-weight: bold;">
-            <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
-        </p>`;
+                                            <p class="price-tea" style="text-decoration: line-through; color: gray;">
+                                                <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
+                                            </p>
+                                            <p class="price-tea" style="color: red; font-weight: bold;">
+                                                <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
+                                            </p>`;
                         } else {
                             const salePrice = product.UnitPrice * (1 - product.Sale / 100);
 
                             htmlContent += `
-        <p class="price-tea" style="text-decoration: line-through; color: gray;">
-            <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
-        </p>
-        <p class="price-tea" style="color: red; font-weight: bold;">
-            <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
-        </p>`;
+                                            <p class="price-tea" style="text-decoration: line-through; color: gray;">
+                                                <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
+                                            </p>
+                                            <p class="price-tea" style="color: red; font-weight: bold;">
+                                                <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
+                                            </p>`;
                         }
 
                         htmlContent += `
