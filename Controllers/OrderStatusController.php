@@ -1,7 +1,5 @@
 <?php
 require_once __DIR__ . "/../Models/OrderStatusModel.php";
-// require_once __DIR__ . "/../Models/ProductModel.php";
-// $productController = new ProductController();
 $controller = new OrderStatusController();
 
 switch ($_SERVER['REQUEST_METHOD']) {
