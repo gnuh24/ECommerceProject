@@ -41,6 +41,9 @@
     <a class="MenuItemSidebar_menuItem__56b1m" href="../QLThuongHieu/QLThuongHieu.php">
         <span class="MenuItemSidebar_title__LLBtx arial-bold">Thương hiệu</span>
     </a>
+    <a class="MenuItemSidebar_menuItem__56b1m" href="../QLKhuyenMai/QLKhuyenMai.php">
+        <span class="MenuItemSidebar_title__LLBtx arial-bold">Khuyến mãi</span>
+    </a>
     <a class="MenuItemSidebar_menuItem__56b1m" href="../QLDonHang/QLDonHang.php">
         <span class="MenuItemSidebar_title__LLBtx arial-bold">Đơn Hàng</span>
     </a>

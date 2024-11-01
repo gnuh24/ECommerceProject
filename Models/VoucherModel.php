@@ -12,6 +12,7 @@ class VoucherModel
 
     // Check if a voucher code exists, excluding a specific ID if provided
     public function isVoucherCodeExist($code, $id = null)
+
     {
         if ($id) {
             $query = "SELECT * FROM `Voucher` WHERE `Code` = :code AND `Id` != :id";
@@ -51,26 +52,58 @@ class VoucherModel
     }
 
     // Fetch vouchers with pagination and search by code
-    public function getAllVouchers($pageNumber = 1, $search = null, $pageSize = 5)
+    public function getAllVouchers($pageNumber = 1, $size = 10, $minNgayapdung = null, $maxNgayapdung = null, $status = null)
     {
-        $offset = ($pageNumber - 1) * $pageSize;
-        $query = "SELECT * FROM `Voucher` WHERE `Code` LIKE :search LIMIT :offset, :pageSize";
+        $offset = ($pageNumber - 1) * $size;
+        $conditions = [];
+        $params = [];
+        // Thêm điều kiện cho minNgayapdung nếu có
+        if ($minNgayapdung !== null && $minNgayapdung !== '') {
+            $conditions[] = "`ExpirationTime` >= :minNgayapdung";
+            $params[':minNgayapdung'] = $minNgayapdung;
+        }
+
+        // Thêm điều kiện cho maxNgayapdung nếu có
+        if ($maxNgayapdung !== null && $maxNgayapdung !== '') {
+            $conditions[] = "`ExpirationTime` <= :maxNgayapdung";
+            $params[':maxNgayapdung'] = $maxNgayapdung;
+        }
+
+        // Thêm điều kiện cho status nếu có
+        if ($status !== null && $status !== '') {
+            $conditions[] = "`IsPublic` = :status";
+            $params[':status'] = $status;
+        }
+
+
+        // Tạo chuỗi điều kiện cho câu lệnh SQL
+        $whereClause = "";
+        if (count($conditions) > 0) {
+            $whereClause = "WHERE " . implode(" AND ", $conditions);
+        }
+
+        $query = "SELECT * FROM `Voucher` $whereClause LIMIT :offset, :size";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+            foreach ($params as $param => $value) {
+                $statement->bindValue($param, $value);
+            }
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $statement->bindValue(':pageSize', $pageSize, PDO::PARAM_INT);
+            $statement->bindValue(':size', $size, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-            $totalQuery = "SELECT COUNT(*) as total FROM `Voucher` WHERE `Code` LIKE :search";
+            // Lấy tổng số phần tử thỏa mãn điều kiện
+            $totalQuery = "SELECT COUNT(*) as total FROM `Voucher` $whereClause";
             $totalStmt = $this->connection->prepare($totalQuery);
-            $totalStmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+            foreach ($params as $param => $value) {
+                $totalStmt->bindValue($param, $value);
+            }
             $totalStmt->execute();
             $totalResult = $totalStmt->fetch(PDO::FETCH_ASSOC);
             $totalElements = $totalResult['total'];
-            $totalPages = ceil($totalElements / $pageSize);
+            $totalPages = ceil($totalElements / $size);
 
             return (object) [
                 "status" => 200,
@@ -78,15 +111,25 @@ class VoucherModel
                 "data" => $result,
                 "totalPages" => $totalPages,
                 "totalElements" => $totalElements,
-                "size" => $pageSize
+                "size" => $size,
+                "params" => [
+                    "pageNumber" => $pageNumber,
+                    "size" => $size,
+                    "minNgayapdung" => $minNgayapdung,
+                    "maxNgayapdung" => $maxNgayapdung,
+                    "status" => $status
+                ]
             ];
         } catch (PDOException $e) {
             return (object) [
                 "status" => 400,
-                "message" => $e->getMessage()
+                "message" => "An error occurred: " . $e->getMessage()
             ];
         }
     }
+
+
+
 
     // Fetch a voucher by ID
     public function getVoucherById($id)
@@ -146,30 +189,57 @@ class VoucherModel
             ];
         }
     }
+    // Fetch a voucher by ID
+
 
     // Update a voucher
-    public function updateVoucher($id, $expirationTime, $code, $condition, $saleAmount, $isPublic)
+    public function updateVoucher($id, $expirationTime = null, $code = null, $condition = null, $saleAmount = null, $isPublic = null)
     {
-        if ($this->isVoucherCodeExist($code, $id)) {
+        // Kiểm tra xem mã code có tồn tại không, bỏ qua nếu không thay đổi
+        if ($code !== null && $this->isVoucherCodeExist($code, $id)) {
             return (object) [
                 "status" => 409,
                 "message" => "Voucher code already exists"
             ];
         }
 
-        $query = "UPDATE `Voucher` 
-                  SET `ExpirationTime` = :expirationTime, `Code` = :code, `Condition` = :condition, 
-                      `SaleAmount` = :saleAmount, `IsPublic` = :isPublic 
-                  WHERE `Id` = :id";
+        // Xây dựng câu truy vấn động
+        $query = "UPDATE `Voucher` SET ";
+        $params = [];
+
+        if ($expirationTime !== null) {
+            $query .= "`ExpirationTime` = :expirationTime, ";
+            $params[':expirationTime'] = $expirationTime;
+        }
+        if ($code !== null) {
+            $query .= "`Code` = :code, ";
+            $params[':code'] = $code;
+        }
+        if ($condition !== null) {
+            $query .= "`Condition` = :condition, ";
+            $params[':condition'] = $condition;
+        }
+        if ($saleAmount !== null) {
+            $query .= "`SaleAmount` = :saleAmount, ";
+            $params[':saleAmount'] = $saleAmount;
+        }
+        if ($isPublic !== null) {
+            $query .= "`IsPublic` = :isPublic, ";
+            $params[':isPublic'] = $isPublic;
+        }
+
+        // Xóa dấu phẩy cuối cùng và thêm điều kiện WHERE
+        $query = rtrim($query, ', ') . " WHERE `Id` = :id";
+        $params[':id'] = $id;
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':expirationTime', $expirationTime, PDO::PARAM_STR);
-            $statement->bindValue(':code', $code, PDO::PARAM_STR);
-            $statement->bindValue(':condition', $condition, PDO::PARAM_INT);
-            $statement->bindValue(':saleAmount', $saleAmount, PDO::PARAM_INT);
-            $statement->bindValue(':isPublic', $isPublic, PDO::PARAM_BOOL);
-            $statement->bindValue(':id', $id, PDO::PARAM_INT);
+
+            // Gán các tham số vào câu truy vấn
+            foreach ($params as $key => $value) {
+                $statement->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+
             $statement->execute();
 
             if ($statement->rowCount() > 0) {
@@ -190,6 +260,7 @@ class VoucherModel
             ];
         }
     }
+
 
     // Delete a voucher
     public function deleteVoucher($id)

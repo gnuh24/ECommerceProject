@@ -7,11 +7,29 @@ $controller = new VoucherController();
 // Kiểm tra phương thức HTTP
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        // Lấy danh sách voucher có phân trang và tìm kiếm
-        if (isset($_GET['page'])) {
-            $response = $controller->getAllVouchers($_GET['page'], $_GET['search']);
+        if (isset($_GET['Id'])) {
+            $response = $controller->getVoucherById($_GET['Id']);
             echo $response;
+        } elseif (isset($_GET['page'])) {
+            $pageNumber = $_GET['page'];
+            $pageSize = isset($_GET['pageSize']) ? $_GET['pageSize'] : 10;
+            $from = isset($_GET['from']) ? $_GET['from'] : null;
+            $to = isset($_GET['to']) ? $_GET['to'] : null;
+            $status = isset($_GET['status']) ? $_GET['status'] : null;
+
+            // Gọi hàm trong controller
+            $response = $controller->getAllVouchers(
+                $pageNumber,
+                $pageSize,
+                $from,
+                $to,
+                $status
+            );
+
+            // Trả về JSON hợp lệ
+            echo ($response);
         }
+
         // Lấy danh sách voucher không phân trang
         else {
             $response = $controller->getAllVouchersNoPaging();
@@ -27,9 +45,21 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $data = json_decode($inputData, true);
 
         // Kiểm tra nếu có ID và tên voucher trong request
-        if (isset($data['Id']) && isset($data['VoucherName'])) {
-            $response = $controller->updateVoucher($data['Id'], $data['VoucherName']);
-            echo $response;
+        if (isset($data['id'])) {
+            if (isset($data['action'])) {
+                $response =  $controller->updateVoucher(
+                    $data['id'],
+                    isset($data['ExpirationTime']) ? $data['ExpirationTime'] : null,
+                    isset($data['Code']) ? $data['Code'] : null,
+                    isset($data['maCondition']) ? $data['maCondition'] : null,
+                    isset($data['SaleAmount']) ? $data['SaleAmount'] : null,
+                    isset($data['IsPublic']) ? $data['IsPublic'] : null
+                );
+                echo $response;
+            } else {
+                $response = $controller->updateVoucher($data['id'], null, null, null, null, $data['isPublic']);
+                echo $response;
+            }
         } else {
             // Phản hồi lỗi nếu ID hoặc VoucherName không được cung cấp
             http_response_code(400);
@@ -55,7 +85,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }
 
         // Gọi hàm xử lý tạo voucher mới và trả về phản hồi
-        $response = $controller->createVoucher($decodedData['VoucherName']);
+        $response = $controller->createVoucher($decodedData['ExpirationTime'], $decodedData['Code'], $decodedData['maCondition'], $decodedData['SaleAmount'], $decodedData['IsPublic']);
 
         // Trả về dưới dạng JSON
         echo $response;
@@ -99,7 +129,11 @@ class VoucherController
     {
         $this->voucherModel = new VoucherModel();
     }
-
+    public function getVoucherById($id)
+    {
+        $result = $this->voucherModel->getVoucherById($id);
+        return $this->respond($result);
+    }
     // Lấy tất cả voucher không phân trang
     public function getAllVouchersNoPaging()
     {
@@ -108,10 +142,9 @@ class VoucherController
     }
 
     // Lấy tất cả voucher có phân trang và tìm kiếm
-    public function getAllVouchers($page, $search)
+    public function getAllVouchers($pageNumber = 1, $size = 10, $minNgayTao = null, $maxNgayTao = null, $status = null)
     {
-        $pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 5;
-        $result = $this->voucherModel->getAllVouchers($page, $search, $pageSize);
+        $result = $this->voucherModel->getAllVouchers($pageNumber, $size, $minNgayTao, $maxNgayTao, $status);
         return $this->respond($result);
     }
 
