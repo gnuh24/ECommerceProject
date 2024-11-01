@@ -17,12 +17,8 @@
         <div>
             <div class="App">
                 <div class="StaffLayout_wrapper__CegPk">
-                    <div class="StaffHeader_wrapper__IQw-U">
-                        <p class="StaffHeader_title__QxjW4">Dekanta</p>
-                        <button class="StaffHeader_signOut__i2pcu">
-                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right-from-bracket" class="svg-inline--fa fa-arrow-right-from-bracket" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 2rem; height: 2rem; color: white"></svg>
-                        </button>
-                    </div>
+                    <?php require_once "../ManagerHeader.php" ?>
+
                     <div>
                         <div>
                             <div class="Manager_wrapper__vOYy">
@@ -59,6 +55,10 @@
 
                                                         <p class="text">Thương hiệu</p>
                                                         <select id="thuongHieu" class="input" name="thuongHieu" style="width: 40rem"></select>
+                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
+
+                                                        <p class="text">Khuyến mãi</p>
+                                                        <select id="khuyenmai" class="input" name="khuyenmai" style="width: 40rem"></select>
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
                                                         <p class="text">Thể tích</p>
@@ -110,6 +110,7 @@
 <script>
     getCategories();
     getBrand();
+    getVoucher();
     anhMinhHoa = document.getElementById("anhMinhHoa");
     anhMinhHoa.addEventListener("change", function() {
 
@@ -149,6 +150,7 @@
         let anhMinhHoa = document.getElementById("anhMinhHoa");
         let moTa = document.getElementById("moTa");
         let soluong = document.getElementById("soluong");
+        let khuyenmai = document.getElementById("khuyenmai");
 
         if (!tenSanPham.value.trim()) {
             showErrorAlert('Lỗi!', 'Tên sản phẩm không được để trống');
@@ -235,7 +237,9 @@
             gia.value,
             soluong.value,
             anhMinhHoa.files[0],
-            moTa.value);
+            moTa.value,
+            khuyenmai.value
+        );
         //Sau khi tạo xong chuyển về trang QLSanPham
         showSuccessAlert('Thành công!', 'Tạo sản phẩm mới thành công !!', 'QLSanPham.php');
     });
@@ -277,7 +281,24 @@
         });
     }
 
-
+    function getVoucher() {
+        $.ajax({
+            url: "../../../Controllers/VoucherController.php",
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let voucherSelect = $('#khuyenmai');
+                voucherSelect.empty(); // Xóa các options cũ
+                voucherSelect.append(new Option('Không khuyến mãi', null));
+                data.data.forEach(function(voucher) {
+                    voucherSelect.append(new Option(voucher.Code, voucher.Id));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading brands:', error);
+            }
+        });
+    }
 
     function showErrorAlert(title, message) {
         Swal.fire({
@@ -305,7 +326,7 @@
 
 
 
-    function createSanPham(tenSanPham, maLoaiSanPham, xuatXu, thuongHieu, theTich, nongDoCon, gia, soluong, anhMinhHoa, moTa) {
+    function createSanPham(tenSanPham, maLoaiSanPham, xuatXu, thuongHieu, theTich, nongDoCon, gia, soluong, anhMinhHoa, moTa, khuyenmai) {
         var dataToSend = {
             productName: tenSanPham,
             categoryId: (maLoaiSanPham),
@@ -316,7 +337,8 @@
             abv: nongDoCon,
             description: moTa,
             price: gia,
-            image: anhMinhHoa
+            image: anhMinhHoa,
+            voucherId: khuyenmai
         };
         $.ajax({
             url: '../../../Controllers/ProductController.php', // Kiểm tra URL chính xác

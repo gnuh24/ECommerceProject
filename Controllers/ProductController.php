@@ -177,6 +177,8 @@ class ProductController
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
+            isset($parsedData['voucherId']) ? intval($parsedData['voucherId']) : null,
+
         );
 
         // Check the result and set the appropriate HTTP response

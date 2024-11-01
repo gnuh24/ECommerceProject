@@ -13,15 +13,13 @@ class OrderStatusModel
 
     public function createOrderStatus($orderId, $status)
     {
-        $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`, `UpdateTime`) 
-              VALUES (:orderId, :status, :UpdateTime)";
-        $currentDateTime = date("Y-m-d H:i:s");
+        $query = "INSERT INTO `OrderStatus` (`OrderId`, `Status`) 
+              VALUES (:orderId, :status)";
 
         try {
             $statement = $this->connection->prepare($query);
             $statement->bindValue(':orderId', $orderId, PDO::PARAM_STR);
             $statement->bindValue(':status', $status, PDO::PARAM_STR);
-            $statement->bindValue(':UpdateTime', $currentDateTime, PDO::PARAM_STR);
 
             $statement->execute();
             return (object) [

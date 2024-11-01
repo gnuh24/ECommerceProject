@@ -363,17 +363,15 @@ class ProductModel
         }
     }
 
-    public function createProduct($productName, $unitPrice, $image, $origin = null, $capacity = null, $quantity, $abv = null, $description = null, $brandId = null, $categoryId = null)
+    public function createProduct($productName, $unitPrice, $image, $origin = null, $capacity = null, $quantity, $abv = null, $description = null, $brandId = null, $categoryId = null, $voucherId = null)
     {
         $status = 1; // Default status
-        $createTime = date('Y-m-d H:i:s'); // Current date and time
 
-        $fields = ["`ProductName`", "`Status`", "`CreateTime`", "`Quantity`", "`UnitPrice`"];
-        $placeholders = [":productName", ":status", ":createTime", ":quantity", ":unitPrice"];
+        $fields = ["`ProductName`", "`Status`", "`Quantity`", "`UnitPrice`"];
+        $placeholders = [":productName", ":status", ":quantity", ":unitPrice"];
         $params = [
             ':productName' => $productName,
             ':status' => $status,
-            ':createTime' => $createTime,
             ':quantity' => $quantity,
             ':unitPrice' => $unitPrice
         ];
@@ -426,7 +424,11 @@ class ProductModel
             $placeholders[] = ":categoryId";
             $params[':categoryId'] = $categoryId;
         }
-
+        if ($voucherId !== null) {
+            $fields[] = "`CategoryId`";
+            $placeholders[] = ":categoryId";
+            $params[':categoryId'] = $categoryId;
+        }
         // Create SQL query
         $query = "INSERT INTO `Product` (" . implode(", ", $fields) . ") VALUES (" . implode(", ", $placeholders) . ")";
         $queryWithParams = $this->getSQLWithParams($query, $params);
