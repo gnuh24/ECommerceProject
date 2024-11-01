@@ -57,8 +57,8 @@
                                                         <select id="thuongHieu" class="input" name="thuongHieu" style="width: 40rem"></select>
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
-                                                        <p class="text">Khuyến mãi</p>
-                                                        <select id="khuyenmai" class="input" name="khuyenmai" style="width: 40rem"></select>
+                                                        <p class="text">Sale</p>
+                                                        <input id="khuyenmai" class="input" name="khuyenmai" style="width: 40rem"></input>
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
                                                         <p class="text">Thể tích</p>
@@ -110,7 +110,6 @@
 <script>
     getCategories();
     getBrand();
-    getVoucher();
     anhMinhHoa = document.getElementById("anhMinhHoa");
     anhMinhHoa.addEventListener("change", function() {
 
@@ -222,7 +221,11 @@
             event.preventDefault();
             return;
         }
-
+        if (parseFloat(khuyenmai.value) < 0 || parseFloat(khuyenmai.value) > 100 || isNaN(parseFloat(khuyenmai.value))) {
+            showErrorAlert('Lỗi!', 'Sale phải là số dương và có giá trị từ 0 đến 100');
+            khuyenmai.focus();
+            return;
+        }
         //Kiểm tra tên loại sản phẩm
 
 
@@ -281,24 +284,7 @@
         });
     }
 
-    function getVoucher() {
-        $.ajax({
-            url: "../../../Controllers/VoucherController.php",
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                let voucherSelect = $('#khuyenmai');
-                voucherSelect.empty(); // Xóa các options cũ
-                voucherSelect.append(new Option('Không khuyến mãi', null));
-                data.data.forEach(function(voucher) {
-                    voucherSelect.append(new Option(voucher.Code, voucher.Id));
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading brands:', error);
-            }
-        });
-    }
+
 
     function showErrorAlert(title, message) {
         Swal.fire({
@@ -338,7 +324,7 @@
             description: moTa,
             price: gia,
             image: anhMinhHoa,
-            voucherId: khuyenmai
+            sale: khuyenmai
         };
         $.ajax({
             url: '../../../Controllers/ProductController.php', // Kiểm tra URL chính xác

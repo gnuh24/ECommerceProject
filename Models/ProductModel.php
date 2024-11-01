@@ -425,9 +425,9 @@ class ProductModel
             $params[':categoryId'] = $categoryId;
         }
         if ($voucherId !== null) {
-            $fields[] = "`CategoryId`";
-            $placeholders[] = ":categoryId";
-            $params[':categoryId'] = $categoryId;
+            $fields[] = "`Sale`";
+            $placeholders[] = ":Sale";
+            $params[':Sale'] = $voucherId;
         }
         // Create SQL query
         $query = "INSERT INTO `Product` (" . implode(", ", $fields) . ") VALUES (" . implode(", ", $placeholders) . ")";
@@ -461,7 +461,7 @@ class ProductModel
         }
     }
 
-    public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status)
+    public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status, $sale)
     {
         $fieldsToUpdate = [];
         $params = [];
@@ -511,7 +511,10 @@ class ProductModel
             $fieldsToUpdate[] = "`Status` = :status";
             $params[':status'] = $status;
         }
-
+        if ($sale !== null) {
+            $fieldsToUpdate[] = "`Sale` = :Sale";
+            $params[':Sale'] = $sale;
+        }
         // Ensure there are fields to update
         if (empty($fieldsToUpdate)) {
             return (object)[

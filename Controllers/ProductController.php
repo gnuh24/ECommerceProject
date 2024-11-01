@@ -177,7 +177,7 @@ class ProductController
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
-            isset($parsedData['voucherId']) ? intval($parsedData['voucherId']) : null,
+            isset($parsedData['sale']) ? intval($parsedData['sale']) : null,
 
         );
 
@@ -216,7 +216,9 @@ class ProductController
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
-            isset($parsedData['status']) ? $parsedData['status'] : null
+            isset($parsedData['status']) ? $parsedData['status'] : null,
+            isset($parsedData['sale']) ? $parsedData['sale'] : null,
+
         );
 
         // Trả về phản hồi thành công

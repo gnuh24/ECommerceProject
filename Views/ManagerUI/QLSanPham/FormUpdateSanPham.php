@@ -60,6 +60,10 @@
                                                         </select>
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
+                                                        <p class="text">Sale</p>
+                                                        <input id="khuyenmai" class="input" name="khuyenmai" style="width: 40rem"></input>
+                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
+
                                                         <p class="text">Thể tích (ml)</p>
                                                         <input id="theTich" class="input" type="text" name="theTich" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
@@ -144,6 +148,7 @@
         let nongDoCon = document.getElementById("nongDoCon");
         let anhMinhHoa = document.getElementById("anhMinhHoa");
         let soluong = document.getElementById("soluong");
+        let khuyenmai = document.getElementById("khuyenmai");
 
         let moTa = document.getElementById("moTa");
 
@@ -165,7 +170,11 @@
             nongDoCon.focus();
             return;
         }
-
+        if (parseFloat(khuyenmai.value) < 0 || parseFloat(khuyenmai.value) > 100 || isNaN(parseFloat(khuyenmai.value))) {
+            showErrorAlert('Lỗi!', 'Sale phải là số dương và có giá trị từ 0 đến 100');
+            khuyenmai.focus();
+            return;
+        }
 
         // Nếu mọi kiểm tra hợp lệ, gọi hàm updateSanPham
         updateSanPham(
@@ -177,7 +186,8 @@
             thuongHieu.value,
             loaiSanPham.value,
             moTa.value,
-            soluong.value
+            soluong.value,
+            khuyenmai.value
         );
 
         //Sau khi tạo xong chuyển về trang QLSanPham
@@ -206,6 +216,7 @@
                 $('#createTime').val(data.data.createTime); // Thời gian tạo
                 $('#soluong').val(data.data.quantity); // Số lượng
                 $('#moTa').val(data.data.description); // Mô tả
+                $('#khuyenmai').val(data.data.sale); // Mô tả
 
                 // Cập nhật hình ảnh
                 $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.data.image);
@@ -279,7 +290,7 @@
         });
     }
 
-    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong) {
+    function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong, sale) {
         // Tạo đối tượng dữ liệu
         var dataToSend = {
             id: id,
@@ -289,7 +300,8 @@
             capacity: theTich,
             quanity: soluong,
             abv: nongDoCon,
-            description: moTa
+            description: moTa,
+            sale: sale
         };
 
         // Thêm file ảnh nếu có
