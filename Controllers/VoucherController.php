@@ -32,7 +32,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
         // Lấy danh sách voucher không phân trang
         else {
-            $response = $controller->getAllVouchersNoPaging();
+            $response = $controller->getAllVouchersNoPaging($_GET['condition']);
             echo $response;
         }
         break;
@@ -135,9 +135,9 @@ class VoucherController
         return $this->respond($result);
     }
     // Lấy tất cả voucher không phân trang
-    public function getAllVouchersNoPaging()
+    public function getAllVouchersNoPaging($condition)
     {
-        $result = $this->voucherModel->getAllVouchersNoPaging();
+        $result = $this->voucherModel->getAllVouchersNoPaging($condition);
         return $this->respond($result);
     }
 

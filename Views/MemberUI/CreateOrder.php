@@ -60,7 +60,10 @@
                                         <label for='paymentVNPAY'>VNPAY</label>
                                     </div>
                                 </div>
+                                <div class='voucher__wrapper'>
+                                    <label for='voucher'>Khuyến mãi: </label>
 
+                                </div>
 
 
 
@@ -107,6 +110,7 @@
         // fillOrderInfo();
         loadCart();
         loadUserInfoFromsessionStorage();
+
     });
     var listproduct = [];
     var totalpriceall = 0;
@@ -161,8 +165,60 @@
         $('#cartItems').html(cartHTML);
         $('#totalPrice').text(formatCurrency(totalPrice));
         totalpriceall = totalPrice;
+        renderVoucher(totalpriceall);
     }
 
+    function renderVoucher(totalpriceall) {
+        $.ajax({
+            url: "../../Controllers/VoucherController.php",
+            method: "GET",
+            data: {
+                condition: totalpriceall
+            },
+            dataType: "json",
+            success: function(response) {
+                let voucherContent = ""; // Khởi tạo nội dung voucher
+
+                response.data.forEach(voucher => {
+                    voucherContent += `
+                <div class="voucher__item">
+                    <input type="radio" name="voucher" id="voucher_${voucher.Id}" value="${voucher.Id}">
+                    <label for="voucher_${voucher.Id}">
+                        ${voucher.Code} - Giảm ${voucher.SaleAmount} (Áp dụng cho đơn từ ${voucher.Condition}đ)
+                    </label>
+                </div>
+                `;
+                });
+
+                // Hiển thị các voucher vào div.payment__wrapper
+                $(".voucher__wrapper").html(`
+                <label for="voucher">Khuyến mãi:</label>
+                ${voucherContent}
+            `);
+
+                // Gán sự kiện change sau khi nội dung đã được thêm vào DOM
+                document.querySelectorAll('input[name="voucher"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const selectedVoucherId = this.value;
+                        // Tìm voucher đã chọn và lấy SaleAmount
+                        const selectedVoucher = response.data.find(v => v.Id == selectedVoucherId);
+                        if (selectedVoucher) {
+                            updateTotalPrice(selectedVoucher.SaleAmount);
+                        }
+                    });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    function updateTotalPrice(saleAmount) {
+        totalpriceall = totalpriceall - saleAmount;
+        // Cập nhật hiển thị giá đã giảm trên giao diện
+        document.querySelector('#totalPrice').textContent = ` ${formatCurrency(totalpriceall)}`;
+    }
 
     document.getElementById('address').addEventListener('input', function() {
         fillOrderInfo();
@@ -263,8 +319,7 @@
             method: "PATCH",
             data: JSON.stringify(formData),
             contentType: "application/json",
-            success: function(response) {
-            },
+            success: function(response) {},
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
@@ -278,7 +333,7 @@
         var userData = sessionStorage.getItem("id");
         var formData = new FormData();
         var orderId = generateOrderId();
-        
+
         formData.append('totalPrice', totalpriceall);
         var diaChi = document.getElementById('address').value;
         const selectedPaymentMethod = document.querySelector('input[name="payment"]:checked').value;
@@ -298,7 +353,7 @@
             console.error("Dữ liệu giỏ hàng không hợp lệ");
         }
 
-        if (selectedPaymentMethod === "VNPAY"){
+        if (selectedPaymentMethod === "VNPAY") {
 
             // Lưu các trường cần thiết từ formData vào localStorage
             const orderData = {};
@@ -311,7 +366,7 @@
 
 
             thanhToanVNPay(orderId, totalpriceall);
-        }else{
+        } else {
             $.ajax({
                 url: "../../Controllers/OrderController.php",
                 method: "POST",
@@ -337,7 +392,7 @@
             });
         }
 
- 
+
     }
 
     function thanhToanVNPay(orderId, totalpriceall) {
@@ -375,9 +430,8 @@
 
         // Thêm form vào body và submit
         document.body.appendChild(form);
-        submitButton.click();  // Kích hoạt submit
+        submitButton.click(); // Kích hoạt submit
     }
-
 </script>
 
 </html>

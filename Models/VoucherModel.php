@@ -30,14 +30,21 @@ class VoucherModel
     }
 
     // Fetch all vouchers without pagination
-    public function getAllVouchersNoPaging()
+    public function getAllVouchersNoPaging($condition)
     {
-        $query = "SELECT * FROM `Voucher`";
+        // Cập nhật câu truy vấn để kiểm tra thêm `ExpirationTime` và `IsPublic`
+        $query = "SELECT * FROM `Voucher` 
+          WHERE `Condition` <= :condition 
+          AND `ExpirationTime` > NOW() 
+          AND `IsPublic` = 1";
+
 
         try {
             $statement = $this->connection->prepare($query);
+            $statement->bindParam(':condition', $condition, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
             return (object) [
                 "status" => 200,
                 "message" => "Vouchers fetched successfully",
@@ -50,6 +57,7 @@ class VoucherModel
             ];
         }
     }
+
 
     // Fetch vouchers with pagination and search by code
     public function getAllVouchers($pageNumber = 1, $size = 10, $minNgayapdung = null, $maxNgayapdung = null, $status = null)
