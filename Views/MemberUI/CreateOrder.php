@@ -142,7 +142,7 @@
                 <div class='radio__wrapper'>
                     <div>
                         <div class='cartItem' id='${cartProduct.idProductId}'>
-                            <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.image}' /></a>
+                            <a href='#' class='img'><img class='img' src='../img/${cartProduct.image}' /></a>
                             <div class='inforCart'>
                                 <div class='nameAndPrice'>
                                     <p class='priceCart'>${formatCurrency(cartProduct.unitPrice)}</p>

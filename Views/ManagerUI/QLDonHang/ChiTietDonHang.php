@@ -104,7 +104,7 @@
                 data.details.forEach(element => {
                     console.log(data)
                     items += `<div class='transaction_item'>
-                        <img src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${element.Image}' alt=''>
+                        <img src='../../img/${element.Image}' alt=''>
                         <div class='item_info__wrapper'>
                             <div class='item_info'>
                                 <p class='name'>${element.ProductName}</p>
@@ -154,8 +154,6 @@
             }
         });
     }
-
-
 </script>
 
 </html>

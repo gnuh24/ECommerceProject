@@ -218,7 +218,7 @@
                 $('#khuyenmai').val(data.data.sale); // Mô tả
 
                 // Cập nhật hình ảnh
-                $('#xuatAnh').attr('src', 'http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/' + data.data.image);
+                $('#xuatAnh').attr('src', '../../img/' + data.data.image);
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);

@@ -149,8 +149,8 @@
     <div class="col-md-4 col-sm-6 mb-4">
         <div class="product-card-content" style="position: relative;">
             <a href="ProductDetail.php?maSanPham=${product.Id}">
-                        
-                <img src="https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
+                       
+                <img src="../img/${product.Image}" alt="" style="height: 300px;">
                
                 <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};  position: absolute;
                                                                                                             top: 10px;
