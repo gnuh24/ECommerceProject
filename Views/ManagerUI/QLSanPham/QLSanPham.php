@@ -157,10 +157,8 @@
             url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
-
             data: data,
             success: function(response) {
-
                 var tableBody = document.getElementById("tableBody");
                 var tableContent = "";
 

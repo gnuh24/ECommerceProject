@@ -5,35 +5,76 @@ require_once __DIR__ . "/../Models/ProductModel.php";
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action']) && $_GET['action'] === 'getAllProductsCommonUser') {
         $productController = new ProductController();
-        $productController->getAllProductsCommonUser();
+        echo $productController->getAllProductsCommonUser();
     } elseif (isset($_GET['action']) && $_GET['action'] === 'getAllProductsAdmin') {
         $productController = new ProductController();
-        $productController->getAllProductsAdmin();
+        echo $productController->getAllProductsAdmin();
     } elseif (isset($_GET['Id'])) {
         if (isset($_GET['action']) && $_GET['action'] === 'getProductByIdAdmin') {
             $productController = new ProductController();
-            $productController->getProductByIdAdmin($_GET['Id']);
+            echo $productController->getProductByIdAdmin($_GET['Id']);
         } else {
             $productController = new ProductController();
-            $productController->getProductByIdCommonUser($_GET['Id']);
+            echo $productController->getProductByIdCommonUser($_GET['Id']);
         }
     } else {
         echo json_encode(["status" => 400, "message" => "Invalid action"]);
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $rawData = file_get_contents("php://input");
+    // Kiểm tra và ghi lại nội dung của $_POST và $_FILES để debug
+    error_log("POST Data: " . print_r($_POST, true));
+    error_log("FILES Data: " . print_r($_FILES, true));
+    if (isset($_POST['update'])) {
+        $parsedData = [
+            'id' => $_POST['id'] ?? null,
+            'productName' => $_POST['productName'] ?? null,
+            'categoryId' => $_POST['categoryId'] ?? null,
+            'origin' => $_POST['origin'] ?? null,
+            'brandId' => isset($_POST['brandId']) ? intval($_POST['brandId']) : null,
+            'capacity' => $_POST['capacity'] ?? null,
+            'quanity' => $_POST['quanity'] ?? null,
+            'abv' => $_POST['abv'] ?? null,
+            'description' => $_POST['description'] ?? null,
+            'price' => $_POST['price'] ?? null,
+            'sale' => $_POST['sale'] ?? null,
+        ];
 
-    error_log("Raw Data: " . $rawData); // Ghi nhận dữ liệu thô
+        // Kiểm tra nếu có file ảnh và thêm vào mảng `$parsedData`
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $parsedData['image'] = $_FILES['image'];
+        } else {
+            $parsedData['image'] = null; // Nếu không có ảnh, để null
+        }
 
-    $parsedData = json_decode($rawData, true);
+        // Khởi tạo đối tượng ProductController và gọi hàm createProduct
+        $productController = new ProductController();
+        echo $productController->updateProduct($_POST['id'], $parsedData);
+    } else {
+        // Tạo mảng chứa dữ liệu sau khi xử lý từ $_POST và $_FILES
+        $parsedData = [
+            'productName' => $_POST['productName'] ?? null,
+            'categoryId' => $_POST['categoryId'] ?? null,
+            'origin' => $_POST['origin'] ?? null,
+            'brandId' => isset($_POST['brandId']) ? intval($_POST['brandId']) : null,
+            'capacity' => $_POST['capacity'] ?? null,
+            'quanity' => $_POST['quanity'] ?? null,
+            'abv' => $_POST['abv'] ?? null,
+            'description' => $_POST['description'] ?? null,
+            'price' => $_POST['price'] ?? null,
+            'sale' => $_POST['sale'] ?? null,
+        ];
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode(["status" => 400, "message" => "Invalid JSON data"]);
-        exit;
+        // Kiểm tra nếu có file ảnh và thêm vào mảng `$parsedData`
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $parsedData['image'] = $_FILES['image'];
+        } else {
+            $parsedData['image'] = null; // Nếu không có ảnh, để null
+        }
+
+        // Khởi tạo đối tượng ProductController và gọi hàm createProduct
+        $productController = new ProductController();
+        echo $productController->createProduct($parsedData);
     }
-    $productController = new ProductController();
-    $productController->createProduct($parsedData);
 } elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
     $rawData = file_get_contents("php://input");
 
@@ -61,9 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $amount = $parsedData['amount'];
             // Gọi hàm updateProduct và truyền dữ liệu cần thiết
             $result = $productController->decreaseQuantity($id, $amount);
-        } else if ($parsedData['action'] == "update") {
-            // Gọi hàm updateProduct và truyền dữ liệu cần thiết
-            $result = $productController->updateProduct($id, $parsedData);
         }
     } else {
         http_response_code(400);
@@ -157,19 +195,41 @@ class ProductController
     public function createProduct($parsedData)
     {
         $image = null;
+        $targetDirectory = '../Views/img/';
 
-        // Kiểm tra xem có file ảnh được upload hay không
-        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
-            // Xử lý file upload (image)
-            $image = $parsedData['image']['name'];
-            // Di chuyển file đến thư mục mong muốn
-            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
+        // Kiểm tra xem thư mục đích có tồn tại và có quyền ghi không
+        if (!is_dir($targetDirectory) || !is_writable($targetDirectory)) {
+            echo json_encode(["error" => "Target directory does not exist or is not writable."]);
+            return;
         }
-        // Call the model's createProduct function
+
+        // Kiểm tra xem có file ảnh trong parsedData không
+        if (isset($parsedData['image']) && is_array($parsedData['image'])) {
+            if (isset($parsedData['image']['error']) && $parsedData['image']['error'] === UPLOAD_ERR_OK) {
+                $image = $parsedData['image']['name'];
+                $targetPath = $targetDirectory . basename($image); // Sử dụng basename để loại bỏ đường dẫn không mong muốn
+
+                // Kiểm tra đường dẫn đầy đủ
+                echo json_encode(["targetPath" => realpath($targetDirectory) . '/' . $image]);
+
+                // Di chuyển file đến thư mục mong muốn
+                if (move_uploaded_file($parsedData['image']['tmp_name'], $targetPath)) {
+                    echo json_encode(["success" => "File uploaded successfully to $targetPath"]);
+                } else {
+                    echo json_encode(["error" => "Failed to move uploaded file.", "details" => error_get_last()]);
+                }
+            } else {
+                echo json_encode(["error" => "Error uploading file: " . ($parsedData['image']['error'] ?? 'No file uploaded or an error occurred.')]);
+            }
+        } else {
+            echo json_encode(["error" => "No image data found."]);
+        }
+
+        // Gọi hàm createProduct của model (cần thiết lập thông tin sản phẩm ở đây)
         $result = $this->productModel->createProduct(
             isset($parsedData['productName']) && !empty($parsedData['productName']) ? $parsedData['productName'] : null,
             isset($parsedData['price']) && !empty($parsedData['price']) ? $parsedData['price'] : null,
-            $image, // Image may be null or an empty string
+            $image, // Đường dẫn ảnh (có thể là null hoặc chuỗi rỗng)
             isset($parsedData['origin']) && !empty($parsedData['origin']) ? $parsedData['origin'] : null,
             isset($parsedData['capacity']) && !empty($parsedData['capacity']) ? $parsedData['capacity'] : null,
             isset($parsedData['abv']) && !empty($parsedData['abv']) ? $parsedData['abv'] : null,
@@ -177,32 +237,48 @@ class ProductController
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
-            isset($parsedData['sale']) ? intval($parsedData['sale']) : null,
-
+            isset($parsedData['sale']) ? intval($parsedData['sale']) : null
         );
 
-        // Check the result and set the appropriate HTTP response
         if ($result->status == 201) {
-            http_response_code(201); // Created
+            http_response_code(201); // Đã tạo thành công
         } else {
-            http_response_code(500); // Internal Server Error
+            http_response_code(500); // Lỗi máy chủ nội bộ
         }
 
         echo json_encode($result);
     }
 
+
+
     public function updateProduct($id, $parsedData)
     {
-
         // Khởi tạo biến cho hình ảnh
         $image = null;
+        $targetDirectory = '../Views/img/';
+
+        // Kiểm tra xem thư mục đích có tồn tại và có quyền ghi không
+        if (!is_dir($targetDirectory) || !is_writable($targetDirectory)) {
+            echo json_encode(["error" => "Target directory does not exist or is not writable."]);
+            return;
+        }
 
         // Kiểm tra xem có file ảnh được upload hay không
-        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
-            // Xử lý file upload (image)
-            $image = $parsedData['image']['name'];
-            // Di chuyển file đến thư mục mong muốn
-            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
+        if (isset($parsedData['image']) && is_array($parsedData['image'])) {
+            if (isset($parsedData['image']['error']) && $parsedData['image']['error'] === UPLOAD_ERR_OK) {
+                // Xử lý file upload (image)
+                $image = $parsedData['image']['name'];
+                $targetPath = $targetDirectory . basename($image); // Sử dụng basename để loại bỏ đường dẫn không mong muốn
+
+                // Di chuyển file đến thư mục mong muốn
+                if (!move_uploaded_file($parsedData['image']['tmp_name'], $targetPath)) {
+                    echo json_encode(["error" => "Failed to move uploaded file.", "details" => error_get_last()]);
+                    return;
+                }
+            } else {
+                echo json_encode(["error" => "Error uploading file: " . ($parsedData['image']['error'] ?? 'No file uploaded or an error occurred.')]);
+                return;
+            }
         }
 
         // Gọi hàm cập nhật sản phẩm trong mô hình
@@ -216,15 +292,20 @@ class ProductController
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
-            isset($parsedData['status']) ? $parsedData['status'] : null,
-            isset($parsedData['sale']) ? $parsedData['sale'] : null,
-
+            isset($parsedData['status']) ? intval($parsedData['status']) : null, // Chuyển đổi status sang kiểu số nếu cần
+            isset($parsedData['sale']) ? intval($parsedData['sale']) : null // Chuyển đổi sale sang kiểu số nếu cần
         );
 
-        // Trả về phản hồi thành công
-        return $this->response($result); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
-
+        // Kiểm tra kết quả và trả về phản hồi thành công
+        if ($result->status == 200) {
+            http_response_code(200); // Cập nhật thành công
+            echo json_encode(["success" => "Product updated successfully", "data" => $result]);
+        } else {
+            http_response_code(500); // Lỗi máy chủ nội bộ
+            echo json_encode(["error" => "Failed to update product", "details" => $result]);
+        }
     }
+
 
     private function response($result)
     {

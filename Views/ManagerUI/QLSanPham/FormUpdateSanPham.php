@@ -187,8 +187,7 @@
             loaiSanPham.value,
             moTa.value,
             soluong.value,
-            khuyenmai.value
-        );
+            khuyenmai.value);
 
         //Sau khi tạo xong chuyển về trang QLSanPham
         showSuccessAlert('Thành công!', 'Cập nhật sản phẩm thành công !!', 'QLSanPham.php');
@@ -291,39 +290,42 @@
     }
 
     function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong, sale) {
-        // Tạo đối tượng dữ liệu
-        var dataToSend = {
-            id: id,
-            categoryId: Number(maLoaiSanPham),
-            origin: xuatXu,
-            brandId: Number(thuongHieu),
-            capacity: theTich,
-            quanity: soluong,
-            abv: nongDoCon,
-            description: moTa,
-            sale: sale
-        };
+        // Tạo đối tượng FormData
+        var formData = new FormData();
+
+        // Thêm các trường dữ liệu vào FormData
+        formData.append('id', id);
+        formData.append('update', id);
+        formData.append('categoryId', Number(maLoaiSanPham));
+        formData.append('origin', xuatXu);
+        formData.append('brandId', Number(thuongHieu));
+        formData.append('capacity', theTich);
+        formData.append('quanity', soluong);
+        formData.append('abv', nongDoCon);
+        formData.append('description', moTa);
+        formData.append('sale', sale);
+        formData.append('action', 'update');
 
         // Thêm file ảnh nếu có
         if (anhMinhHoa) {
-            // Chuyển đổi file ảnh thành base64 nếu cần
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                dataToSend.image = reader.result; // Lưu trữ ảnh dưới dạng base64
-                sendUpdateRequest(dataToSend);
-            }
-            reader.readAsDataURL(anhMinhHoa); // Đọc file ảnh
-        } else {
-            sendUpdateRequest(dataToSend);
+            formData.append('image', anhMinhHoa); // Thêm file ảnh vào FormData
         }
+
+        // Gọi hàm gửi yêu cầu cập nhật
+        sendUpdateRequest(formData);
     }
 
-    function sendUpdateRequest(data) {
+    function sendUpdateRequest(formData) {
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+        }
+
         $.ajax({
             url: "../../../Controllers/ProductController.php",
-            type: 'PATCH',
-            contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
-            data: JSON.stringify(data), // Chuyển đổi đối tượng thành chuỗi JSON
+            type: 'POST',
+            processData: false, // Để jQuery không xử lý dữ liệu
+            contentType: false, // Để jQuery không thiết lập kiểu nội dung
+            data: formData, // Gửi dữ liệu FormData
 
             success: function(data) {
                 console.log("Sản phẩm được cập nhật thành công!", data);
