@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `Product`(
     `Id`         INT UNSIGNED        PRIMARY KEY    AUTO_INCREMENT,
     `ProductName`       NVARCHAR(1000)      NOT NULL,
     `Status`            BOOLEAN            	NOT NULL,
-    `CreateTime`        DATETIME           	NOT NULL,
+    `CreateTime`        DATETIME           	NOT NULL	DEFAULT NOW(),
     `Image`             VARCHAR(255)        ,
 
     `Quantity`          INT UNSIGNED        NOT NULL,

@@ -293,6 +293,7 @@
     function updateSanPham(id, anhMinhHoa, xuatXu, theTich, nongDoCon, thuongHieu, maLoaiSanPham, moTa, soluong, sale) {
         // Tạo đối tượng dữ liệu
         var dataToSend = {
+            action: "update",
             id: id,
             categoryId: Number(maLoaiSanPham),
             origin: xuatXu,

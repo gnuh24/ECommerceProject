@@ -216,9 +216,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var dataToSend = {
+                    action: "update",
                     id: maSanPham,
                     status: newTrangThai
                 };
+                console.log("Status: " + JSON.parse.stringify(dataToSend));
                 // Gọi hàm updateTaiKhoan bằng Ajax
                 $.ajax({
                     url: "../../../Controllers/ProductController.php",

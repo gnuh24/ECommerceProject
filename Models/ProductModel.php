@@ -463,6 +463,7 @@ class ProductModel
 
     public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status, $sale)
     {
+        echo "Trạng thái Model: " . $status;
         $fieldsToUpdate = [];
         $params = [];
 

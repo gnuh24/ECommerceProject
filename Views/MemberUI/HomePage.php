@@ -100,6 +100,9 @@
 
 
 <script>
+
+
+
     // Lắng nghe sự kiện click vào Poster
     document
         .getElementById("poster")
@@ -117,7 +120,28 @@
 
     // Gọi hàm getAllLoaiSanPham khi trang được tải
     $(document).ready(function() {
-        getAllSanPham();
+        // Hiển thị hộp thoại xác nhận tuổi khi trang tải xong
+        Swal.fire({
+            title: 'Xác nhận tuổi',
+            text: "Bạn có trên 18 tuổi không?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có',
+            cancelButtonText: 'Không'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                getAllSanPham();
+            } else {
+                // Người dùng chọn "Không", chuyển hướng họ khỏi trang
+                Swal.fire({
+                    title: 'Thông báo',
+                    text: 'Bạn phải trên 18 tuổi để truy cập trang web này.',
+                    icon: 'error'
+                }).then(() => {
+                    window.location.href = "https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/chinh-sach-moi/30881/ban-bia-cho-nguoi-duoi-18-tuoi-se-bi-phat-tu-15-10"; // Điều hướng tới trang khác
+                });
+            }
+        });
     });
 
 

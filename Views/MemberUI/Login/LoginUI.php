@@ -33,9 +33,9 @@
                 <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
 
                 <!-- Google Login Button with correct icon -->
-                <!-- <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
+                <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
                     <i class="fab fa-google"></i> Đăng nhập bằng Google
-                </button> -->
+                </button>
             </form>
         </div>
 

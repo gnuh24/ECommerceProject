@@ -158,13 +158,13 @@ class ProductController
     {
         $image = null;
 
-        // Kiểm tra xem có file ảnh được upload hay không
-        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
-            // Xử lý file upload (image)
-            $image = $parsedData['image']['name'];
-            // Di chuyển file đến thư mục mong muốn
-            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
-        }
+        // // Kiểm tra xem có file ảnh được upload hay không
+        // if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
+        //     // Xử lý file upload (image)
+        //     $image = $parsedData['image']['name'];
+        //     // Di chuyển file đến thư mục mong muốn
+        //     move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
+        // }
         // Call the model's createProduct function
         $result = $this->productModel->createProduct(
             isset($parsedData['productName']) && !empty($parsedData['productName']) ? $parsedData['productName'] : null,
@@ -197,14 +197,15 @@ class ProductController
         // Khởi tạo biến cho hình ảnh
         $image = null;
 
-        // Kiểm tra xem có file ảnh được upload hay không
-        if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
-            // Xử lý file upload (image)
-            $image = $parsedData['image']['name'];
-            // Di chuyển file đến thư mục mong muốn
-            move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
-        }
+        // // Kiểm tra xem có file ảnh được upload hay không
+        // if (isset($parsedData['image']) && !empty($parsedData['image']['name'])) {
+        //     // Xử lý file upload (image)
+        //     $image = $parsedData['image']['name'];
+        //     // Di chuyển file đến thư mục mong muốn
+        //     move_uploaded_file($parsedData['image']['tmp_name'], 'path/to/save/' . $image);
+        // }
 
+        echo "Trạng thái controller: " . $parsedData['status'];
         // Gọi hàm cập nhật sản phẩm trong mô hình
         $result = $this->productModel->updateProduct(
             $id,
