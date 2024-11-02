@@ -579,7 +579,7 @@ class ProductModel
         $newQuantity = $currentQuantity + $amount;
 
         // Update quantity
-        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null);
+        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null, null);
     }
 
     public function decreaseQuantity($id, $amount)
@@ -601,26 +601,26 @@ class ProductModel
         }
 
         $currentQuantity = $productData['Quantity'];
-        $productName = $productData['Name'];
+        $productName = $productData['ProductName'];
 
         // Check if there is enough quantity in stock
         if ($currentQuantity < $amount) {
             return (object)[
                 "status" => 400,
-                "message" => "Not enough quantity in inventory for product: $productName"
+                "message" => "Tồn kho không đủ cho sản phẩm: $productName"
             ];
         }
 
         $newQuantity = $currentQuantity - $amount;
 
         // Update quantity
-        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null);
+        return $this->updateProduct($id, null, null, null, null, $newQuantity, null, null, null, null, null);
     }
 
     // Helper function to fetch product data including Quantity and Name
     private function getProductData($id)
     {
-        $query = "SELECT `Quantity`, `Name` FROM `product` WHERE `Id` = :id";
+        $query = "SELECT `Quantity`, `ProductName` FROM `product` WHERE `Id` = :id";
         $statement = $this->connection->prepare($query);
         $statement->bindValue(':id', intval($id), PDO::PARAM_INT);
         $statement->execute();
