@@ -157,10 +157,8 @@
             url: "../../../Controllers/ProductController.php",
             method: "GET",
             dataType: "json",
-
             data: data,
             success: function(response) {
-
                 var tableBody = document.getElementById("tableBody");
                 var tableContent = "";
 
@@ -171,23 +169,20 @@
                         var buttonClass = record.status ? "block" : "unlock";
                         var buttonData = record.status ? "block" : "unlock";
                         var trContent = `
-                    <tr>
-                        <td style="text-align: center;">${record.id}</td>
-                        <td><img style="height: 80px;" src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${record.image}"></td>
-                        <td>${record.productName}</td>
-                        <td style="text-align: center;">${record.price}</td>
-                                                <td style="text-align: center;">${trangThai}</td>
-
-                        <td style="text-align: center;">${record.category.categoryName}</td>
-
-                        <td style="text-align: center;">${record.brand.brandName}</td>
-                                               <td style="text-align: center;">${record.quantity}</td>
-
-                        <td>
-                            <button class="edit" onclick="toUpdate(${record.id})">Sửa</button>
-                            <button class="${buttonClass}" data-action="${buttonData}" onclick="handleLockUnlock(${record.id}, ${record.status})">${buttonText}</button>
-                        </td>
-                    </tr>`;
+                <tr>
+                    <td style="text-align: center;">${record.id}</td>
+                    <td><img style="width: 100%;height:auto;" src="../../img/${record.image}" alt="Product Image"></td>
+                    <td>${record.productName}</td>
+                    <td style="text-align: center;">${record.price}</td>
+                    <td style="text-align: center;">${trangThai}</td>
+                    <td style="text-align: center;">${record.category.categoryName}</td>
+                    <td style="text-align: center;">${record.brand.brandName}</td>
+                    <td style="text-align: center;">${record.quantity}</td>
+                    <td>
+                        <button class="edit" onclick="toUpdate(${record.id})">Sửa</button>
+                        <button class="${buttonClass}" data-action="${buttonData}" onclick="handleLockUnlock(${record.id}, ${record.status})">${buttonText}</button>
+                    </td>
+                </tr>`;
                         tableContent += trContent;
                     });
                 } else {
@@ -197,6 +192,7 @@
                 tableBody.innerHTML = tableContent;
                 setupPagination(response.totalElements, page);
             },
+
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);
             }

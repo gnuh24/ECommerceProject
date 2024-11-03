@@ -252,7 +252,7 @@
     <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
         <div class="row">
             <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block; position: relative;">
-                <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${product.Image}" alt="" style="height: 300px;">
+                <img src="../img/${product.Image}" alt="" style="height: 300px;">
                 <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};">
                 <div class="product-card-content">
                     <div class="price">
@@ -260,7 +260,7 @@
 
                         if (product.Sale === 0) {
                             const inflatedPrice = product.UnitPrice * 1.1; // 110% of the original price
-                            const discountPrice = product.UnitPrice; 
+                            const discountPrice = product.UnitPrice;
 
                             htmlContent += `
                                             <p class="price-tea" style="text-decoration: line-through; color: gray;">

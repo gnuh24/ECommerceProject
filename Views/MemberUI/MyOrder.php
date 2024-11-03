@@ -103,7 +103,7 @@
                     listCTDH.forEach(chiTiet => {
                         orderHtml += `
                         <tr class='orderManagement_order_detail'>
-                            <td class='anhMinhHoa'><img style='width: auto; height: 100px;' src='https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${chiTiet.Image}'></td>
+                            <td class='anhMinhHoa'><img style='width: auto; height: 100px;' src='../img/${chiTiet.Image}'></td>
                             <td class='tenSanPham'>${chiTiet.ProductName}</td>
                             <td class='donGia'>${formatCurrency(chiTiet.UnitPrice)}</td>
                             <td class='soLuong'>${chiTiet.Quantity}</td>

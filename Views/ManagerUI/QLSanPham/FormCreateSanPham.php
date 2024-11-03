@@ -227,7 +227,7 @@
             return;
         }
         //Kiểm tra tên loại sản phẩm
-
+        console.log(anhMinhHoa.files[0])
 
 
 
@@ -313,24 +313,30 @@
 
 
     function createSanPham(tenSanPham, maLoaiSanPham, xuatXu, thuongHieu, theTich, nongDoCon, gia, soluong, anhMinhHoa, moTa, khuyenmai) {
-        var dataToSend = {
-            productName: tenSanPham,
-            categoryId: (maLoaiSanPham),
-            origin: xuatXu,
-            brandId: Number(thuongHieu),
-            capacity: theTich,
-            quanity: soluong,
-            abv: nongDoCon,
-            description: moTa,
-            price: gia,
-            image: anhMinhHoa,
-            sale: khuyenmai
-        };
+        // Tạo một đối tượng FormData để chứa các dữ liệu cần gửi, bao gồm file ảnh
+        var formData = new FormData();
+        formData.append('productName', tenSanPham);
+        formData.append('categoryId', maLoaiSanPham);
+        formData.append('origin', xuatXu);
+        formData.append('brandId', Number(thuongHieu));
+        formData.append('capacity', theTich);
+        formData.append('quanity', soluong);
+        formData.append('abv', nongDoCon);
+        formData.append('description', moTa);
+        formData.append('price', gia);
+        formData.append('sale', khuyenmai);
+
+        // Thêm file ảnh vào FormData (kiểm tra nếu anhMinhHoa là một file)
+        if (anhMinhHoa instanceof File) {
+            formData.append('image', anhMinhHoa); // 'image' là tên trường bạn muốn dùng trong PHP
+        }
+
         $.ajax({
-            url: '../../../Controllers/ProductController.php', // Kiểm tra URL chính xác
+            url: '../../../Controllers/ProductController.php', // Kiểm tra URL để đảm bảo đúng đường dẫn
             type: 'POST',
-            contentType: 'application/json', // Thiết lập kiểu nội dung là JSON
-            data: JSON.stringify(dataToSend), // Chuyển đổi đối tượng thành chuỗi JSON
+            data: formData,
+            processData: false, // Tắt xử lý dữ liệu tự động của jQuery (vì đang gửi FormData)
+            contentType: false, // Đảm bảo content-type sẽ được tự động thiết lập là multipart/form-data
 
             success: function(data) {
                 console.log(data); // Log dữ liệu trả về để kiểm tra

@@ -154,7 +154,7 @@
                     let htmlContent = `
     <div class="product_images__wrapper">
         <div class="image" style="position: relative;">
-            <img src="http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${productImage}" alt="${productName}" class="product_img">
+            <img src="../img/${productImage}" alt="${productName}" class="product_img">
             <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.sale == 0 ? 'block' : 'none'};  position: absolute;
         top: 10px;
         right: 10px;

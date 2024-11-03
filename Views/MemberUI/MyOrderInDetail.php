@@ -229,7 +229,7 @@
                         <div class='radio__wrapper'>
                             <div>
                                 <div class='cartItem' id='${cartProduct.ProductId}'>
-                                    <a href='#' class='img'><img class='img' src='https://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${cartProduct.Image}' /></a>
+                                    <a href='#' class='img'><img class='img' src='../img/${cartProduct.Image}' /></a>
                                     <div class='inforCart'>
                                         <div class='nameAndPrice'>
                                             <a href='#' class='nameCart'>${cartProduct.ProductName}</a>

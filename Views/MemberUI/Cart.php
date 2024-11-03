@@ -191,7 +191,7 @@
         cart.forEach(function(item) {
             cartHTML += `
             <div class='cartItem' id='${item.productId}'>
-                <a href='#' class='img'><img class='img' src='http://res.cloudinary.com/djhoea2bo/image/upload/v1711511636/${item.image}' /></a>
+                <a href='#' class='img'><img class='img' src='../img/${item.image}' /></a>
                 <div class='inforCart' style="display:flex;">
                     <div class='productName' style="width: 60%;">
                         <label for='productName_${item.productId}' class='labelproductName'>Tên sản phẩm:</label>
