@@ -15,7 +15,19 @@
     <title>Kinh doanh rượu</title>
 </head>
 <style>
-
+    .sale-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgb(146, 26, 26);
+        color: white;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 14px;
+        /* Nghiêng tem nhãn */
+        z-index: 10;
+        border-radius: 3px;
+    }
 </style>
 
 <body>
@@ -100,9 +112,6 @@
 
 
 <script>
-
-
-
     // Lắng nghe sự kiện click vào Poster
     document
         .getElementById("poster")
@@ -187,13 +196,10 @@
                        
                 <img src="../img/${product.Image}" alt="" style="height: 300px;">
                
-                <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};  position: absolute;
-                                                                                                            top: 10px;
-                                                                                                            right: 10px;
-                                                                                                            width: 100px;
-                                                                                                            height: auto;
-                                                                                                            z-index: 10;">
-                <div class="product-card-details">
+<div class="sale-label" ">
+                                -${product.Sale === 0 ?"10":product.Sale}% 
+                            </div>   
+                                            <div class="product-card-details">
                     <h4 class="name-product">${product.ProductName}</h4>`;
 
                         if (product.Sale === 0) {
@@ -205,7 +211,7 @@
         <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
             <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
         </p>
-        <p class="price-tea text-center" style="color: red; font-weight: bold;">
+        <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
             <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
         </p>`;
                         } else {
@@ -216,7 +222,7 @@
         <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
             <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
         </p>
-        <p class="price-tea text-center" style="color: red; font-weight: bold;">
+        <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
             <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
         </p>`;
                         }

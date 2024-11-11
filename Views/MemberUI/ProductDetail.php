@@ -17,8 +17,22 @@
     <link rel="stylesheet" href="./login.css" />
     <title>Chi tiết sản phẩm</title>
     <style>
+        .sale-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgb(146, 26, 26);
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 14px;
+            /* Nghiêng tem nhãn */
+            z-index: 10;
+            border-radius: 3px;
+        }
+
         .quantity-available {
-            color: red;
+            color: rgb(146, 26, 26);
         }
 
         .product__wrapper {
@@ -131,7 +145,7 @@
                     const soLuongConLai = product.quantity;
                     const quantityMessage = soLuongConLai > 0 ?
                         `Còn ${soLuongConLai} sản phẩm` :
-                        `<span style='color: red;'>Sản phẩm đã hết hàng</span>`;
+                        `<span style='color: rgb(146, 26, 26);'>Sản phẩm đã hết hàng</span>`;
                     const productImage = product.image ? product.image : 'placeholder-image-url';
                     const productName = product.productName ? product.productName : 'Tên sản phẩm chưa cập nhật';
                     const origin = product.origin ? product.origin : 'Xuất xứ chưa cập nhật';
@@ -145,22 +159,19 @@
 
                     if (product.sale === 0) {
                         discountedPrice = (price).toFixed(2); // Tính giá giảm 10%
-                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: red;">${formatCurrency((price * 1.1).toFixed(2))}</p>`;
+                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: rgb(146, 26, 26);">${formatCurrency((price * 1.1).toFixed(2))}</p>`;
                     } else {
                         discountedPrice = price * (1 - product.sale / 100);
-                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: red;">${formatCurrency((price).toFixed(2))}</p>`;
+                        originalPriceDisplay = `<p class="original-price" style="text-decoration: line-through; color: rgb(146, 26, 26);">${formatCurrency((price).toFixed(2))}</p>`;
                     }
 
                     let htmlContent = `
     <div class="product_images__wrapper">
         <div class="image" style="position: relative;">
             <img src="../img/${productImage}" alt="${productName}" class="product_img">
-            <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.sale == 0 ? 'block' : 'none'};  position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 100px;
-        height: auto;
-        z-index: 10;">
+           <div class="sale-label" ">
+                                -${product.sale === 0 ?"10":product.sale}% 
+                            </div>   
         </div>
     </div>
     <div class="info__wrapper">

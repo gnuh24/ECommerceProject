@@ -1,0 +1,11 @@
+*~
+vendor
+composer.lock
+.cache
+.docs
+.gitmodules
+
+# IntelliJ
+.idea
+*.iml
+.php-cs-fixer.cache

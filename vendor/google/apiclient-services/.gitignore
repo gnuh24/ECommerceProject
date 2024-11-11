@@ -1,0 +1,13 @@
+vendor
+composer.lock
+
+# Ignore files with casing conflicts
+src/Compute/HTTPHealthCheck.php
+src/Compute/HTTPSHealthCheck.php
+
+# Python for generator
+*.pyc
+*.egg-info
+
+# When running synth.py
+.cache/

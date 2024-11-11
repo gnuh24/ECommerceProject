@@ -38,6 +38,20 @@
         /* Đảm bảo hình ảnh nằm trên các phần tử khác */
     }
 
+    .sale-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgb(146, 26, 26);
+        color: white;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 14px;
+        /* Nghiêng tem nhãn */
+        z-index: 10;
+        border-radius: 3px;
+    }
+
     .sale-banner {
         position: absolute;
         /* Position it relative to the parent */
@@ -67,58 +81,83 @@
         color: yellow;
         /* Color of the star icon */
     }
+
+    #filter-menu {
+        border-right: 1px solid #ddd;
+        /* Thêm đường viền để phân cách */
+        padding-right: 15px;
+        /* Tạo khoảng cách bên phải cho bộ lọc */
+    }
+
+    #product {
+        padding-left: 15px;
+        /* Tạo khoảng cách bên trái cho sản phẩm */
+    }
 </style>
 
 <body>
     <?php require_once "./Header.php"; ?>
+    <div class="container-fluid bg-white p-3 rounded mb-4">
+        <div class="row">
+            <!-- Cột cho filter menu -->
+            <div id="filter-menu" class="col-12 col-md-2 mb-4">
+                <div class="bg-white p-3 rounded">
+                    <label for="price-filter" class="form-label text-danger fw-bold">Giá:</label>
+                    <select id="price-filter" class="form-select form-select-sm bg-danger text-white mb-3">
+                        <option value="">Tất cả</option>
+                        <option value="low">Dưới 1 triệu</option>
+                        <option value="medium">Từ 1 đến 3 triệu</option>
+                        <option value="high">Trên 3 triệu</option>
+                    </select>
 
-    <!-- Thanh lọc menu -->
-    <div id="filter-menu" class="container-fluid bg-white p-3 rounded mb-4 d-flex align-items-end">
-        <div class="row d-flex justify-content-around" style="width:80%">
+                    <label for="brand-filter" class="form-label text-danger fw-bold">Thương hiệu:</label>
+                    <select id="brand-filter" class="form-select form-select-sm bg-danger text-white mb-3">
+                        <!----------------- Hiển thị menu Loại sản phẩm ------------------->
+                    </select>
 
-            <div class="col-12 col-md-3 mb-2 mb-md-0">
-                <label for="price-filter" class="form-label text-danger fw-bold">Giá:</label>
-                <select id="price-filter" class="form-select form-select-sm bg-danger text-white">
-                    <option value="">Tất cả</option>
-                    <option value="low">Dưới 1 triệu</option>
-                    <option value="medium">Từ 1 đến 3 triệu</option>
-                    <option value="high">Trên 3 triệu</option>
-                </select>
+                    <label for="category-filter" class="form-label text-danger fw-bold">Loại sản phẩm:</label>
+                    <select id="category-filter" class="form-select form-select-sm bg-danger text-white mb-3">
+                        <!----------------- Hiển thị menu Thương hiệu ------------------->
+                    </select>
+
+                    <!-- Bộ lọc Nồng Độ Cồn -->
+                    <label for="alcohol-content-filter" class="form-label text-danger fw-bold">Nồng độ cồn:</label>
+                    <select id="alcohol-content-filter" class="form-select form-select-sm bg-danger text-white mb-3">
+                        <option value="">Tất cả</option>
+                        <option value="1-15">1-15%</option>
+                        <option value="15-30">15-30%</option>
+                        <option value="30-50">30-50%</option>
+                        <option value="50-100">50-100%</option>
+                    </select>
+
+                    <!-- Bộ lọc Thể Tích -->
+                    <label for="volume-filter" class="form-label text-danger fw-bold">Thể tích:</label>
+                    <select id="volume-filter" class="form-select form-select-sm bg-danger text-white mb-3">
+                        <option value="">Tất cả</option>
+                        <option value="under-500">Dưới 500ml</option>
+                        <option value="500-1l">500ml đến 1l</option>
+                        <option value="above-1l">1l trở lên</option>
+                    </select>
+
+                    <button id="reset-button" class="btn btn-danger">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="col-12 col-md-3 mb-2 mb-md-0">
-                <label for="brand-filter" class="form-label text-danger fw-bold">Thương hiệu :</label>
-                <select id="brand-filter" class="form-select form-select-sm bg-danger text-white">
-                    <!----------------- Hiển thị menu Loại sản phẩm  ------------------->
-                </select>
-            </div>
 
-            <div class="col-12 col-md-3 mb-2 mb-md-0">
-                <label for="category-filter" class="form-label text-danger fw-bold">Loại sản phẩm:</label>
-                <select id="category-filter" class="form-select form-select-sm bg-danger text-white">
-                    <!----------------- Hiển thị menu Thương hiệu ------------------->
-                </select>
-            </div>
+            <!-- Cột cho phần sản phẩm -->
+            <div class="col-12 col-md-10">
+                <section id="product" style="padding: 0 5%;">
+                    <div class="products">
+                        <!-- Hiển thị vài sản phẩm nổi bật -->
+                    </div>
+                </section>
 
+                <div id="pagination-container"></div>
+            </div>
         </div>
-
-        <button id="reset-button" class="btn btn-danger mt-2 mt-md-0">
-            <i class="fa-solid fa-rotate-right"></i>
-        </button>
-
-
-
     </div>
-
-
-    <section id="product" style="padding: 0 5%;">
-        <div class="products">
-            <!-- Hiển thị vài sản phẩm nổi bật -->
-        </div>
-
-    </section>
-
-    <div id="pagination-container"></div>
 
     <?php require_once "./Footer.php" ?>
 
@@ -252,9 +291,11 @@
     <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
         <div class="row">
             <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block; position: relative;">
-                <img src="../img/${product.Image}" alt="" style="height: 300px;">
-                <img src="sale.jpg" alt="Sale" class="sale-badge" style="display: ${product.Sale == 0 ? 'block' : 'none'};">
-                <div class="product-card-content">
+                <img src="../img/${product.Image}" alt="" style="width:100%;height:300px;">
+                <div class="sale-label" ">
+                                -${product.Sale === 0 ?"10":product.Sale}% 
+                            </div>               
+             <div class="product-card-content">
                     <div class="price">
                         <h4 class="name-product">${product.ProductName}</h4>`;
 
@@ -266,7 +307,7 @@
                                             <p class="price-tea" style="text-decoration: line-through; color: gray;">
                                                 <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
                                             </p>
-                                            <p class="price-tea" style="color: red; font-weight: bold;">
+                                            <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
                                                 <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
                                             </p>`;
                         } else {
@@ -276,7 +317,7 @@
                                             <p class="price-tea" style="text-decoration: line-through; color: gray;">
                                                 <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
                                             </p>
-                                            <p class="price-tea" style="color: red; font-weight: bold;">
+                                            <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
                                                 <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
                                             </p>`;
                         }
