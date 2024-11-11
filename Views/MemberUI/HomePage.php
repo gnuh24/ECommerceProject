@@ -120,29 +120,40 @@
 
     // Gọi hàm getAllLoaiSanPham khi trang được tải
     $(document).ready(function() {
-        // Hiển thị hộp thoại xác nhận tuổi khi trang tải xong
-        Swal.fire({
-            title: 'Xác nhận tuổi',
-            text: "Bạn có trên 18 tuổi không?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Có',
-            cancelButtonText: 'Không'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                getAllSanPham();
-            } else {
-                // Người dùng chọn "Không", chuyển hướng họ khỏi trang
-                Swal.fire({
-                    title: 'Thông báo',
-                    text: 'Bạn phải trên 18 tuổi để truy cập trang web này.',
-                    icon: 'error'
-                }).then(() => {
-                    window.location.href = "https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/chinh-sach-moi/30881/ban-bia-cho-nguoi-duoi-18-tuoi-se-bi-phat-tu-15-10"; // Điều hướng tới trang khác
-                });
-            }
-        });
+        // Kiểm tra xem sessionStorage có chứa 'isFirstTime' không
+        if (!sessionStorage.getItem('isFirstTime') || sessionStorage.getItem('isFirstTime') === "true") {
+            // Hiển thị hộp thoại xác nhận tuổi nếu chưa có 'isFirstTime'
+            Swal.fire({
+                title: 'Xác nhận tuổi',
+                text: "Bạn có trên 18 tuổi không?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Người dùng chọn "Có"
+                    sessionStorage.setItem('isFirstTime', 'false'); // Đặt isFirstTime = false
+                    getAllSanPham(); // Gọi hàm để lấy dữ liệu sản phẩm
+                } else {
+                    // Người dùng chọn "Không"
+                    sessionStorage.setItem('isFirstTime', 'true'); // Hoặc không đặt gì nếu bạn muốn chỉ cảnh báo
+
+                    Swal.fire({
+                        title: 'Thông báo',
+                        text: 'Bạn phải trên 18 tuổi để truy cập trang web này.',
+                        icon: 'error'
+                    }).then(() => {
+                        window.location.href = "https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/chinh-sach-moi/30881/ban-bia-cho-nguoi-duoi-18-tuoi-se-bi-phat-tu-15-10"; // Điều hướng tới trang khác
+                    });
+                }
+            });
+        } else {
+            // Nếu 'isFirstTime' đã tồn tại, gọi hàm getAllSanPham() bình thường
+            getAllSanPham();
+        }
     });
+
 
 
     // Hàm getAllSanPham

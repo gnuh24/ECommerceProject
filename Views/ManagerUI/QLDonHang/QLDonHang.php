@@ -35,6 +35,10 @@
                             <p class="Admin_title__1Tk48">Quản lí đơn hàng</p>
                         </div>
                         <div class="Admin_boxFeature__ECXnm">
+
+                            <div style="position: relative;">
+                                <input id="searchInput" class="Admin_input__LtEE-" placeholder="Tìm kiếm mã đơn hàng">
+                            </div>
                             <label for=""> Lọc đơn hàng:</label>
                             <div style="position: relative">
                                 <input class="Admin_input__LtEE-" type="date" id="dateStart" />
@@ -86,9 +90,21 @@
     var filter_minOrderTime = null;
     var filter_maxOrderTime = null;
     var filter_status = null;
+    var filter_search = "";
 
     $(document).ready(function() {
         loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
+
+
+        $('#searchInput').on('keypress', function() {
+            if (event.key === 'Enter') {
+            // Lấy giá trị của input
+                filter_search = $(this).val().trim();
+                currentPage = 1;
+                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
+            }
+        });
+
 
         $("#dateStart").on("change", function() {
             let value = $(this).val();
@@ -123,7 +139,6 @@
         }).then((result) => {
             if (result.isConfirmed) {
 
-
                 $.ajax({
                     type: "GET",
                     url: "../../../Controllers/OrderDetailController.php", // Thêm orderId vào URL
@@ -136,8 +151,7 @@
                         response = JSON.stringify(response, null, 2);
                         const orderList  = JSON.parse(response).data;
                             nextStatus, currnetStatus
-                            console.log(nextStatus);
-                            console.log(currnetStatus);
+                       
                         // Tạo HTML cho mỗi đơn hàng và thêm vào phần tử
                         orderList.forEach(order => {
                             if (currnetStatus === "ChoDuyet" && nextStatus === "DaDuyet") {
@@ -297,6 +311,7 @@
                 from: minNgayTao,
                 to: maxNgayTao,
                 status: trangThai,
+                search: filter_search
             },
             success: function(response) {
                 renderTableBody(response.data);

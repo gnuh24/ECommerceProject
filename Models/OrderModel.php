@@ -11,7 +11,7 @@ class OrderModel
     }
 
     // Lấy tất cả các đơn hàng với phân trang và filter
-    public function getAllOrder($pageNumber, $pageSize, $minNgayTao, $maxNgayTao, $status)
+    public function getAllOrder($pageNumber, $pageSize, $minNgayTao, $maxNgayTao, $status, $search)
     {
         // Xác định phần sụt giảm và điều kiện cho truy vấn
         $offset = ($pageNumber - 1) * $pageSize;
@@ -38,6 +38,12 @@ class OrderModel
         // Điều kiện trạng thái đơn hàng nếu có
         if (!empty($status)) {
             $query .= " AND os.Status = :status";
+        }
+
+        // Điều kiện search
+        if (!empty($search)) {
+            $search = "%" . $search . "%";
+            $query .= " AND o.Id LIKE :search";
         }
 
         // Lọc ra đúng nh
@@ -72,6 +78,12 @@ class OrderModel
             $totalElementsQuery .= " AND os.Status = :status";
         }
 
+        // Điều kiện search
+        if (!empty($search)) {
+            $search = "%" . $search . "%";
+            $totalElementsQuery .= " AND o.Id LIKE :search ";
+        }
+
         $totalElementsQuery .=  "
                                     AND os.UpdateTime = (
                                         SELECT MAX(os2.UpdateTime)
@@ -95,6 +107,9 @@ class OrderModel
             if (!empty($status)) {
                 $totalElementsStatement->bindValue(':status', $status, PDO::PARAM_STR);
             }
+            if (!empty($search)) {
+                $totalElementsStatement->bindValue(':search', $search, PDO::PARAM_STR);
+            }
             $totalElementsStatement->execute();
             $totalElements = $totalElementsStatement->fetchColumn();
 
@@ -112,6 +127,9 @@ class OrderModel
             }
             if (!empty($status)) {
                 $statement->bindValue(':status', $status, PDO::PARAM_STR);
+            }
+            if (!empty($search)) {
+                $statement->bindValue(':search', $search, PDO::PARAM_STR);
             }
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
             $statement->bindValue(':pageSize', $pageSize, PDO::PARAM_INT);
