@@ -32,23 +32,23 @@
                 <button type="button" class="btn btn-danger" id="signInButton">Đăng nhập</button>
                 <button type="button" class="btn btn-link" id="forgotPasswordButton">Quên mật khẩu?</button>
 
-                <!-- Google Login Button with correct icon -->
+                <!-- Google Login Button with correct icon
                 <button type="button" class="btn btn-outline-danger" id="googleSignInButton">
                     <i class="fab fa-google"></i> Đăng nhập bằng Google
-                </button>
+                </button> -->
             </form>
         </div>
 
         <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
-                    <h1>Welcome Back!</h1>
-                    <p>Enter your personal details to use all of site features</p>
+                    <h1>Bạn đã có tài khoản ?</h1>
+                    <p>Hãy đăng nhập tại đây để bắt đầu trải nghiệm.</p>
                     <button type="button" class="btn btn-light" id="login">Đăng nhập</button>
                 </div>
                 <div class="toggle-panel toggle-right">
-                    <h1>Hello, Friend!</h1>
-                    <p>Register with your personal details to use all of site features</p>
+                    <h1>Xin chào, bạn là người mới ?</h1>
+                    <p>Hãy đăng ký tài khoản tại đây để có thể trải nghiệm các tính năng mới.</p>
                     <button type="button" class="btn btn-light" id="register">Đăng kí</button>
                 </div>
             </div>
