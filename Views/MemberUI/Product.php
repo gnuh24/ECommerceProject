@@ -83,7 +83,7 @@
     }
 
     #filter-menu {
-        border-right: 1px solid #ddd;
+        border-right: 5px solid #ddd;
         /* Thêm đường viền để phân cách */
         padding-right: 15px;
         /* Tạo khoảng cách bên phải cho bộ lọc */
@@ -172,7 +172,11 @@
         minPrice: 0,
         maxPrice: 1000000000,
         brandId: 0,
-        categoryId: 0
+        categoryId: 0,
+        minAlcohol: 0,
+        maxAlcohol: 0,
+        minVolume: 0,
+        maxVolume: 0
     };
 
     $(document).ready(function() {
@@ -183,22 +187,29 @@
 
     // Lắng nghe sự kiện click vào id "reset-button"
     document.getElementById("reset-button").addEventListener("click", function() {
-        // Reset tất cả các thanh lọc về giá trị mặc định
+        // Reset các giá trị của các bộ lọc trong giao diện
         document.getElementById("searchSanPham").value = "";
         document.getElementById("price-filter").value = "";
         document.getElementById("brand-filter").value = "";
         document.getElementById("category-filter").value = "";
+        document.getElementById("alcohol-content-filter").value = "";
+        document.getElementById("volume-filter").value = "";
 
-        // Reset the filters in currentFilters object
-        currentPage = 1;
+        // Reset các bộ lọc trong đối tượng currentFilters
         currentFilters.search = '';
         currentFilters.minPrice = 0;
         currentFilters.maxPrice = 1000000000;
         currentFilters.brandId = 0;
         currentFilters.categoryId = 0;
+        currentFilters.maxAlcohol = 0; // Nồng độ cồn
+        currentFilters.minAlcohol = 0; // Nồng độ cồn
 
-        // Gọi lại hàm filterProducts với các giá trị mặc định
-        getAllSanPham(currentPage);
+        currentFilters.maxVolume = 0; // Thể tích
+        currentFilters.minVolume = 0; // Thể tích
+
+        // Reset trang hiện tại về 1
+        currentPage = 1;
+        getAllSanPham(1);
     });
 
     // Lắng nghe sự kiện change cho thanh lọc giá
@@ -226,6 +237,21 @@
         getAllSanPham(currentPage);
 
     });
+    document.getElementById("volume-filter").addEventListener("change", function() {
+        currentPage = 1;
+        console.log(2)
+        const priceFilter = document.getElementById("volume-filter").value;
+        setVolume(priceFilter);
+        // Gọi lại hàm lọc sản phẩm khi giá trị thay đổi
+        getAllSanPham(currentPage);
+    });
+    document.getElementById("alcohol-content-filter").addEventListener("change", function() {
+        currentPage = 1;
+        const priceFilter = document.getElementById("alcohol-content-filter").value;
+        setAlcohol(priceFilter);
+        // Gọi lại hàm lọc sản phẩm khi giá trị thay đổi
+        getAllSanPham(currentPage);
+    });
 
     // Lắng nghe sự kiện change cho thanh lọc loại sản phẩm
     document.getElementById("category-filter").addEventListener("change", function() {
@@ -239,6 +265,52 @@
         getAllSanPham(currentPage);
 
     });
+
+    function setAlcohol(alcoholFilter) {
+        switch (alcoholFilter) {
+            case "1-15":
+                currentFilters.minAlcohol = 1;
+                currentFilters.maxAlcohol = 15;
+                break;
+            case "15-30":
+                currentFilters.minAlcohol = 15;
+                currentFilters.maxAlcohol = 30;
+                break;
+            case "30-50":
+                currentFilters.minAlcohol = 30;
+                currentFilters.maxAlcohol = 50;
+                break;
+            case "50-100":
+                currentFilters.minAlcohol = 50;
+                currentFilters.maxAlcohol = 100;
+                break;
+            default:
+                currentFilters.minAlcohol = '';
+                currentFilters.maxAlcohol = '';
+                break;
+        }
+    }
+
+    function setVolume(volumeFilter) {
+        switch (volumeFilter) {
+            case "under-500":
+                currentFilters.minVolume = 0;
+                currentFilters.maxVolume = 500;
+                break;
+            case "500-1l":
+                currentFilters.minVolume = 500;
+                currentFilters.maxVolume = 1000;
+                break;
+            case "above-1l":
+                currentFilters.minVolume = 1000;
+                currentFilters.maxVolume = null;
+                break;
+            default:
+                currentFilters.minVolume = '';
+                currentFilters.maxVolume = '';
+                break;
+        }
+    }
 
     function setPriceRange(priceFilter) {
         switch (priceFilter) {
@@ -280,7 +352,11 @@
                 minPrice: currentFilters.minPrice,
                 maxPrice: currentFilters.maxPrice,
                 brandId: brandId,
-                categoryId: categoryId
+                categoryId: categoryId,
+                minAlcohol: currentFilters.minAlcohol,
+                maxAlcohol: currentFilters.maxAlcohol,
+                minVolume: currentFilters.minVolume,
+                maxVolume: currentFilters.maxVolume
             },
             success: function(response) {
                 const productContainer = $('#product .products');
@@ -288,50 +364,50 @@
                     let htmlContent = '';
                     $.each(response.data, function(index, product) {
                         htmlContent += `
-    <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
-        <div class="row">
-            <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block; position: relative;">
-                <img src="../img/${product.Image}" alt="" style="width:100%;height:300px;">
-                <div class="sale-label" ">
-                                -${product.Sale === 0 ?"10":product.Sale}% 
-                            </div>               
-             <div class="product-card-content">
-                    <div class="price">
-                        <h4 class="name-product">${product.ProductName}</h4>`;
+                                        <form id="productForm_${product.Id}" method="post" action="ProductDetail.php?maSanPham=${product.Id}">
+                                            <div class="row">
+                                                <a href="ProductDetail.php?maSanPham=${product.Id}" class="text-center" style="display: block; position: relative;">
+                                                    <img src="../img/${product.Image}" alt="" style="width:100%;height:300px;">
+                                                    <div class="sale-label" ">
+                                                                    -${product.Sale === 0 ?"10":product.Sale}% 
+                                                                </div>               
+                                                <div class="product-card-content">
+                                                        <div class="price">
+                                                            <h4 class="name-product">${product.ProductName}</h4>`;
 
                         if (product.Sale === 0) {
                             const inflatedPrice = product.UnitPrice * 1.1; // 110% of the original price
                             const discountPrice = product.UnitPrice;
 
                             htmlContent += `
-                                            <p class="price-tea" style="text-decoration: line-through; color: gray;">
-                                                <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
-                                            </p>
-                                            <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
-                                                <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
-                                            </p>`;
+                                                                                <p class="price-tea" style="text-decoration: line-through; color: gray;">
+                                                                                    <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
+                                                                                </p>
+                                                                                <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
+                                                                                    <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
+                                                                                </p>`;
                         } else {
                             const salePrice = product.UnitPrice * (1 - product.Sale / 100);
 
                             htmlContent += `
-                                            <p class="price-tea" style="text-decoration: line-through; color: gray;">
-                                                <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
-                                            </p>
-                                            <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
-                                                <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
-                                            </p>`;
+                                                                                <p class="price-tea" style="text-decoration: line-through; color: gray;">
+                                                                                    <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
+                                                                                </p>
+                                                                                <p class="price-tea" style="color: rgb(146, 26, 26); font-weight: bold;">
+                                                                                    <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
+                                                                                </p>`;
                         }
 
                         htmlContent += `
-                    </div>
-                    <div class="buy-btn-container">
-                        MUA NGAY
-                    </div>
-                </div>
-            </a>
-        </div>
-    </form>
-`;
+                                                        </div>
+                                                        <div class="buy-btn-container">
+                                                            MUA NGAY
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </form>
+                                    `;
 
 
 

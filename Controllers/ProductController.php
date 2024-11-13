@@ -131,8 +131,11 @@ class ProductController
         $maxPrice = $_GET['maxPrice'] ?? null;
         $pageSize = $_GET['pageSize'] ?? 12;
         $pageNumber = $_GET['pageNumber'] ?? 1;
-
-        $result = $this->productModel->getAllProductsCommonUser($brandId, $categoryId, $search, $minPrice, $maxPrice, $pageSize, $pageNumber);
+        $minVolume = $_GET['minVolume'] ?? null;
+        $maxVolume = $_GET['maxVolume'] ?? null;
+        $minAlcohol = $_GET['minAlcohol'] ?? null;
+        $maxAlcohol = $_GET['maxAlcohol'] ?? null;
+        $result = $this->productModel->getAllProductsCommonUser($brandId, $categoryId, $search, $minPrice, $maxPrice, $minAlcohol, $maxAlcohol, $minVolume, $maxVolume, $pageSize, $pageNumber);
         http_response_code(200);
         echo json_encode($result);
     }

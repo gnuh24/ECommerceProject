@@ -17,10 +17,14 @@ class ProductModel
         $search = null,
         $minPrice = null,
         $maxPrice = null,
+        $minAlcohol = null,
+        $maxAlcohol = null,
+        $minVolume = null,
+        $maxVolume = null,
         $limit = 12,
-        $pageNumber = 0
+        $pageNumber = 1  // Mặc định là trang 1
     ) {
-        // Lưu trữ điều kiện WHERE
+        // Mảng để lưu điều kiện WHERE và tham số
         $conditions = [];
         $params = [];
 
@@ -37,42 +41,65 @@ class ProductModel
         if ($search !== null) {
             $conditions[] = "(p.ProductName LIKE :search OR p.Id = :searchId)";
             $params[':search'] = '%' . $search . '%';
-            $params[':searchId'] = $search;  // Thêm tham số cho tìm kiếm theo ID
+            $params[':searchId'] = $search;
         }
 
-        if ($minPrice !== null) {
+        if ($minPrice !== null && $minPrice !== 0) {
             $conditions[] = "p.UnitPrice >= :minPrice";
             $params[':minPrice'] = $minPrice;
         }
 
-        if ($maxPrice !== null) {
+        if ($maxPrice !== null && $maxPrice !== 0) {
             $conditions[] = "p.UnitPrice <= :maxPrice";
             $params[':maxPrice'] = $maxPrice;
         }
 
-        // Xây dựng điều kiện WHERE nếu có
+        if (
+            $minAlcohol !== null && $minAlcohol > 0
+        ) {
+            $conditions[] = "p.ABV >= :minAlcohol";
+            $params[':minAlcohol'] = $minAlcohol;
+        }
+
+        if ($maxAlcohol !== null && $maxAlcohol > 0) {
+            $conditions[] = "p.ABV <= :maxAlcohol";
+            $params[':maxAlcohol'] = $maxAlcohol;
+        }
+
+        if ($minVolume !== null && $minVolume > 0) {
+            $conditions[] = "p.Capacity >= :minVolume";
+            $params[':minVolume'] = $minVolume;
+        }
+
+        if (
+            $maxVolume !== null && $maxVolume > 0
+        ) {
+            $conditions[] = "p.Capacity <= :maxVolume";
+            $params[':maxVolume'] = $maxVolume;
+        }
+
+        // Xây dựng câu lệnh WHERE nếu có điều kiện
         $whereClause = '';
         if (!empty($conditions)) {
             $whereClause = 'WHERE ' . implode(' AND ', $conditions);
         }
 
-        // Truy vấn lấy sản phẩm
+        // Truy vấn để lấy sản phẩm
         $query = "
-                SELECT p.* FROM `Product` p
-                $whereClause
-                LIMIT :limit OFFSET :offset
-            ";
+        SELECT p.* FROM `Product` p
+        $whereClause
+        LIMIT :limit OFFSET :offset
+    ";
 
         try {
             $statement = $this->connection->prepare($query);
 
-            // Gán giá trị cho tham số LIMIT và OFFSET
-            $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
-
-            $offset = ($pageNumber - 1) * $limit;
+            // Gán giá trị LIMIT và OFFSET
+            $statement->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $offset = max(0, ($pageNumber - 1) * $limit);
             $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
 
-            // Gán các tham số khác nếu có
+            // Gán các tham số khác
             foreach ($params as $key => $value) {
                 $statement->bindValue($key, $value);
             }
@@ -80,8 +107,8 @@ class ProductModel
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-            // Lấy tổng số sản phẩm để hỗ trợ phân trang
-            $countQuery = "SELECT COUNT(*) AS total FROM `product` p $whereClause";
+            // Truy vấn để đếm tổng số sản phẩm
+            $countQuery = "SELECT COUNT(*) AS total FROM `Product` p $whereClause";
             $countStatement = $this->connection->prepare($countQuery);
             foreach ($params as $key => $value) {
                 $countStatement->bindValue($key, $value);
@@ -89,7 +116,7 @@ class ProductModel
             $countStatement->execute();
             $totalCount = $countStatement->fetchColumn();
 
-            // Tính số trang
+            // Tính tổng số trang
             $totalPages = ceil($totalCount / $limit);
 
             return (object) [
@@ -107,6 +134,7 @@ class ProductModel
             ];
         }
     }
+
 
 
 
