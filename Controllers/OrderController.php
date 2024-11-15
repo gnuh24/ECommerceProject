@@ -19,15 +19,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $response = $controller->getFullOrderById($_GET['idOrder']);
             echo $response;
         } else {
-            $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $pageSize = isset($_GET['pageSize']) ? (int)$_GET['pageSize'] : 5;
+
             $minNgayTao = isset($_GET['from']) ? urldecode($_GET['from']) : null;
             $maxNgayTao = isset($_GET['to']) ? urldecode($_GET['to']) : null;
             $status = $_GET['status'] ?? null;
             $search = isset($_GET['search']) && $_GET['search'] !== '' ? $_GET['search'] : null;
 
 
-            $response = $controller->getAllOrders($pageNumber, $pageSize, $minNgayTao, $maxNgayTao, $status, $search);
+            $response = $controller->getAllOrders($minNgayTao, $maxNgayTao, $status, $search);
 
             echo $response;
         }
@@ -118,12 +117,12 @@ class OrderController
     }
 
 
-    public function getAllOrders($pageNumber = 1, $size = 10, $minNgayTao = null, $maxNgayTao = null, $status = null, $search = null)
+    public function getAllOrders($minNgayTao = null, $maxNgayTao = null, $status = null, $search = null)
     {
-        $response = $this->orderModel->getAllOrder($pageNumber, $size, $minNgayTao, $maxNgayTao, $status, $search);
+        $response = $this->orderModel->getAllOrder($minNgayTao, $maxNgayTao, $status, $search);
         $this->response($response);
     }
-    
+
     public function getOrderById($orderId)
     {
         $response = $this->orderModel->getOrderById($orderId);
