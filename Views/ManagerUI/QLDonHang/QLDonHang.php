@@ -307,7 +307,7 @@
                     data: 'Id',
                     render: function(data, type, row) {
                         // Bao gồm cả Id và Status vào giá trị của checkbox, ngăn cách bởi dấu gạch dưới
-                        if (row.Status === "ChoDuyet" || row.Status === "DaDuyet") {
+                        if (row.Status === "ChoDuyet" || row.Status === "DaDuyet" || row.Status === "DangGiao") {
                             return `<input type="checkbox" class="select-row" value="${data}_${row.Status}_'${formatDateToHHMMSSDDMMYYYY(row.OrderTime)}'">`;
                         } else {
                             return `<input type="checkbox" class="select-row" value="${data}_${row.Status}_'${formatDateToHHMMSSDDMMYYYY(row.OrderTime)}'" disabled>`;
@@ -522,17 +522,14 @@
                     }
                 });
 
-                // Hiển thị thông báo thành công
-                await Swal.fire('Thành công!', `Đã cập nhật trạng thái đơn hàng ${orderId}.`, 'success');
             } catch (error) {
-                // Kiểm tra và hiển thị thông báo lỗi
                 const errorMessage = (error.responseJSON && error.responseJSON.details && error.responseJSON.details.message) ?
                     `Có lỗi xảy ra khi xử lý đơn hàng ${orderId}: ${error.responseJSON.details.message}` :
                     `Có lỗi xảy ra khi xử lý đơn hàng ${orderId}.`;
 
                 await Swal.fire('Thất bại!', errorMessage, 'error');
                 loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
-                return; // Ngưng toàn bộ quá trình nếu xảy ra lỗi
+                return;
             }
         }
 
