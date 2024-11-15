@@ -182,8 +182,8 @@
         });
     });
 
-    function updateStatus(orderId, nextStatus, currnetStatus) {
-        Swal.fire({
+    async function updateStatus(orderId, nextStatus, currnetStatus) {
+        const result = await Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: "Bạn muốn cập nhật trạng thái của đơn hàng này?",
             icon: 'warning',
@@ -191,94 +191,92 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Xác nhận'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        });
 
-                $.ajax({
+        if (result.isConfirmed) {
+            try {
+                // Lấy chi tiết đơn hàng
+                const response = await $.ajax({
                     type: "GET",
-                    url: "../../../Controllers/OrderDetailController.php", // Thêm orderId vào URL
+                    url: "../../../Controllers/OrderDetailController.php",
                     dataType: "json",
                     data: {
                         orderId: orderId,
                         action: "getOrderDetailById"
-                    },
-                    success: function(response) {
-                        response = JSON.stringify(response, null, 2);
-                        const orderList = JSON.parse(response).data;
-                        nextStatus, currnetStatus
-
-                        // Tạo HTML cho mỗi đơn hàng và thêm vào phần tử
-                        orderList.forEach(order => {
-                            if (currnetStatus === "ChoDuyet" && nextStatus === "DaDuyet") {
-                                let formData = {
-                                    action: "down",
-                                    id: order.ProductId,
-                                    amount: order.Quantity
-                                };
-
-                                $.ajax({
-                                    type: "PATCH",
-                                    url: "../../../Controllers/ProductController.php", // Thêm orderId vào URL
-                                    dataType: "json",
-                                    contentType: "application/json", // Đặt loại nội dung là JSON
-                                    data: JSON.stringify(formData), // Chuyển đổi formData thành chuỗi JSON
-                                    success: function(response) {},
-                                    error: function(error) {
-                                        Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                                    }
-                                });
-                            } else if (currnetStatus === "DaDuyet" && nextStatus === "Huy") {
-
-                                let formData = {
-                                    action: "up",
-                                    id: order.ProductId,
-                                    amount: order.Quantity
-                                };
-
-                                $.ajax({
-                                    type: "PATCH",
-                                    url: "../../../Controllers/ProductController.php", // Thêm orderId vào URL
-                                    dataType: "json",
-                                    contentType: "application/json", // Đặt loại nội dung là JSON
-                                    data: JSON.stringify(formData), // Chuyển đổi formData thành chuỗi JSON
-                                    success: function(response) {
-                                        console.log("Call API hủy thành công !");
-                                    },
-                                    error: function(error) {
-                                        Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                                    }
-                                });
-                            }
-                        });
-
-
-
-                        $.ajax({
-                            type: "POST",
-                            url: "../../../Controllers/OrderStatusController.php", // Thêm orderId vào URL
-                            dataType: "json",
-                            data: {
-                                orderId: orderId,
-                                status: nextStatus
-                            },
-                            success: function(response) {
-                                Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
-                                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
-                            },
-                            error: function(error) {
-                                Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                            }
-                        });
-                    },
-                    error: function(error) {
-                        Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
                     }
                 });
 
+                const orderList = response.data;
+
+                // Xử lý từng đơn hàng
+                for (const order of orderList) {
+                    try {
+                        if (currnetStatus === "ChoDuyet" && nextStatus === "DaDuyet") {
+                            let formData = {
+                                action: "down",
+                                id: order.ProductId,
+                                amount: order.Quantity
+                            };
+
+                            // Gọi API để cập nhật sản phẩm
+                            await $.ajax({
+                                type: "PATCH",
+                                url: "../../../Controllers/ProductController.php",
+                                dataType: "json",
+                                contentType: "application/json",
+                                data: JSON.stringify(formData),
+                                success: function(response) {
+                                    console.log(response)
+                                }
+                            });
+                        } else if (currnetStatus === "DaDuyet" && nextStatus === "Huy") {
+                            let formData = {
+                                action: "up",
+                                id: order.ProductId,
+                                amount: order.Quantity
+                            };
+
+                            // Gọi API để hủy cập nhật sản phẩm
+                            await $.ajax({
+                                type: "PATCH",
+                                url: "../../../Controllers/ProductController.php",
+                                dataType: "json",
+                                contentType: "application/json",
+                                data: JSON.stringify(formData)
+                            });
+                        }
+                    } catch (error) {
+                        // Hiển thị thông báo lỗi cho từng sản phẩm nhưng không dừng toàn bộ quá trình
+                        console.error(`Lỗi khi xử lý sản phẩm ${order.ProductId}:`, error);
+                        await Swal.fire('Lỗi!', `Có lỗi khi xử lý sản phẩm ${order.ProductId}.`, 'error');
+                    }
+                }
+
+                // Cập nhật trạng thái đơn hàng
+                await $.ajax({
+                    type: "POST",
+                    url: "../../../Controllers/OrderStatusController.php",
+                    dataType: "json",
+                    data: {
+                        orderId: orderId,
+                        status: nextStatus
+                    }
+                });
+
+                // Hiển thị thông báo thành công
+                await Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
+                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
+            } catch (error) {
+                // Kiểm tra và hiển thị thông báo lỗi an toàn
+                const errorMessage = (error.responseJSON && error.responseJSON.message) ? error.responseJSON.message : 'Có lỗi xảy ra.';
+                await Swal.fire('Thất bại!', errorMessage, 'error');
+                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
 
             }
-        });
+        }
     }
+
+
 
 
 
@@ -310,9 +308,9 @@
                     render: function(data, type, row) {
                         // Bao gồm cả Id và Status vào giá trị của checkbox, ngăn cách bởi dấu gạch dưới
                         if (row.Status === "ChoDuyet" || row.Status === "DaDuyet") {
-                            return `<input type="checkbox" class="select-row" value="${data}_${row.Status}">`;
+                            return `<input type="checkbox" class="select-row" value="${data}_${row.Status}_'${formatDateToHHMMSSDDMMYYYY(row.OrderTime)}'">`;
                         } else {
-                            return `<input type="checkbox" class="select-row" value="${data}_${row.Status}" disabled>`;
+                            return `<input type="checkbox" class="select-row" value="${data}_${row.Status}_'${formatDateToHHMMSSDDMMYYYY(row.OrderTime)}'" disabled>`;
                         }
                     }
 
@@ -393,10 +391,6 @@
 
     }
 
-
-
-
-
     $('#updateSelected').on('click', function() {
         var selectedRows = $('#orderTable tbody .select-row:checked'); // Lấy các checkbox đã chọn
         console.log('Số checkbox đã chọn: ', selectedRows.length); // Kiểm tra số lượng checkbox đã chọn
@@ -415,13 +409,23 @@
                     // Tạo một mảng để lưu các đối tượng Id và Status cần cập nhật
                     var orders = [];
                     selectedRows.each(function() {
-                        var [id, status] = $(this).val().split('_'); // Tách Id và Status từ giá trị của checkbox
+                        var [id, status, time] = $(this).val().split('_'); // Tách Id và Status từ giá trị của checkbox
                         orders.push({
                             Id: id,
                             currentStatus: status,
-                            nextStatus: fromCurrentStatusToNextStatus(status)
-                        }); // Thêm đối tượng vào mảng
+                            nextStatus: fromCurrentStatusToNextStatus(status),
+                            time: time
+                        });
                     });
+                    orders.sort((a, b) => {
+                        // Chuyển đổi chuỗi thời gian thành đối tượng Date
+                        const timeA = new Date(a.time.split(" ").reverse().join(" ")); // Định dạng lại thành "DD-MM-YYYY HH:mm:ss"
+                        const timeB = new Date(b.time.split(" ").reverse().join(" "));
+
+                        // So sánh thời gian
+                        return timeA - timeB; // Sắp xếp từ lâu nhất đến gần nhất
+                    });
+
                     updateStatusAll(orders);
                 }
             });
@@ -431,130 +435,112 @@
     });
 
 
-    function updateStatusAll(data) {
-        // Kiểm tra xem mảng có đơn hàng không
+    async function updateStatusAll(data) {
         if (data.length === 0) {
             Swal.fire('Không có đơn hàng nào được chọn', '', 'error');
             return;
         }
 
-        let totalRequests = 0; // Biến đếm tổng số yêu cầu AJAX
-        let successRequests = 0; // Biến đếm số yêu cầu thành công
-        let errorOccurred = false; // Biến để kiểm tra xem có lỗi xảy ra hay không
-
-        // Duyệt qua các đơn hàng
-        data.forEach(function(data) {
-            // Gửi yêu cầu lấy chi tiết đơn hàng
-            $.ajax({
-                type: "GET",
-                url: "../../../Controllers/OrderDetailController.php", // Thêm orderId vào URL
-                dataType: "json",
-                data: {
-                    orderId: data.Id,
-                    action: "getOrderDetailById"
-                },
-                success: function(response) {
-                    response = JSON.stringify(response, null, 2);
-                    const orderList = JSON.parse(response).data;
-
-                    orderList.forEach(order => {
-                        // Kiểm tra trạng thái đơn hàng và gọi API tương ứng
-                        if (data.currnetStatus === "ChoDuyet" && data.nextStatus === "DaDuyet") {
-                            let formData = {
-                                action: "down",
-                                id: order.ProductId,
-                                amount: order.Quantity
-                            };
-
-                            $.ajax({
-                                type: "PATCH",
-                                url: "../../../Controllers/ProductController.php", // Thêm orderId vào URL
-                                dataType: "json",
-                                contentType: "application/json", // Đặt loại nội dung là JSON
-                                data: JSON.stringify(formData), // Chuyển đổi formData thành chuỗi JSON
-                                success: function(response) {
-                                    console.log("Cập nhật thành công sản phẩm: " + order.ProductId);
-                                    successRequests++; // Tăng số yêu cầu thành công
-                                    checkAllRequestsCompleted();
-                                },
-                                error: function(error) {
-                                    errorOccurred = true; // Đánh dấu lỗi
-                                    Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                                    checkAllRequestsCompleted();
-                                }
-                            });
-                        } else if (data.currnetStatus === "DaDuyet" && data.nextStatus === "Huy") {
-
-                            let formData = {
-                                action: "up",
-                                id: order.ProductId,
-                                amount: order.Quantity
-                            };
-
-                            $.ajax({
-                                type: "PATCH",
-                                url: "../../../Controllers/ProductController.php", // Thêm orderId vào URL
-                                dataType: "json",
-                                contentType: "application/json", // Đặt loại nội dung là JSON
-                                data: JSON.stringify(formData), // Chuyển đổi formData thành chuỗi JSON
-                                success: function(response) {
-                                    console.log("Hủy thành công sản phẩm: " + order.ProductId);
-                                    successRequests++; // Tăng số yêu cầu thành công
-                                    checkAllRequestsCompleted();
-                                },
-                                error: function(error) {
-                                    errorOccurred = true; // Đánh dấu lỗi
-                                    Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                                    checkAllRequestsCompleted();
-                                }
-                            });
-                        }
-                    });
-
-                    // Cập nhật trạng thái đơn hàng
-                    $.ajax({
-                        type: "POST",
-                        url: "../../../Controllers/OrderStatusController.php", // Thêm orderId vào URL
-                        dataType: "json",
-                        data: {
-                            orderId: data.Id,
-                            status: data.nextStatus
-                        },
-                        success: function(response) {
-                            successRequests++; // Tăng số yêu cầu thành công
-                            checkAllRequestsCompleted();
-                        },
-                        error: function(error) {
-                            errorOccurred = true; // Đánh dấu lỗi
-                            Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra.', 'error');
-                            checkAllRequestsCompleted();
-                        }
-                    });
-
-                    totalRequests++; // Tăng số yêu cầu tổng cộng
-                },
-                error: function(error) {
-                    errorOccurred = true; // Đánh dấu lỗi
-                    Swal.fire('Thất bại!', error.responseJSON.message || 'Có lỗi xảy ra khi lấy chi tiết đơn hàng', 'error');
-                    totalRequests++; // Tăng số yêu cầu tổng cộng dù có lỗi
-                    checkAllRequestsCompleted();
-                }
-            });
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: `Bạn muốn cập nhật trạng thái của ${data.length} đơn hàng?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xác nhận'
         });
 
-        // Hàm kiểm tra khi tất cả các yêu cầu đã hoàn tất
-        function checkAllRequestsCompleted() {
-            // Kiểm tra nếu tổng số yêu cầu đã hoàn tất
-            if (totalRequests === data.length) {
-                if (errorOccurred) {
-                    Swal.fire('Thất bại!', 'Có lỗi xảy ra trong quá trình cập nhật trạng thái đơn hàng.', 'error');
-                } else {
-                    Swal.fire('Thành công!', 'Đã cập nhật trạng thái đơn hàng.', 'success');
-                    loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
+        if (!result.isConfirmed) {
+            return; // Bỏ qua nếu không xác nhận
+        }
+
+        for (const item of data) {
+            const {
+                Id: orderId,
+                nextStatus,
+                currentStatus
+            } = item;
+
+            try {
+                // Lấy chi tiết đơn hàng
+                const response = await $.ajax({
+                    type: "GET",
+                    url: "../../../Controllers/OrderDetailController.php",
+                    dataType: "json",
+                    data: {
+                        orderId: orderId,
+                        action: "getOrderDetailById"
+                    }
+                });
+
+                const orderList = response.data;
+
+                // Xử lý từng sản phẩm trong đơn hàng
+                for (const order of orderList) {
+                    if (currentStatus === "ChoDuyet" && nextStatus === "DaDuyet") {
+                        let formData = {
+                            action: "down",
+                            id: order.ProductId,
+                            amount: order.Quantity
+                        };
+
+                        // Gọi API để cập nhật sản phẩm
+                        await $.ajax({
+                            type: "PATCH",
+                            url: "../../../Controllers/ProductController.php",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(formData)
+                        });
+                    } else if (currentStatus === "DaDuyet" && nextStatus === "Huy") {
+                        let formData = {
+                            action: "up",
+                            id: order.ProductId,
+                            amount: order.Quantity
+                        };
+
+                        // Gọi API để hủy cập nhật sản phẩm
+                        await $.ajax({
+                            type: "PATCH",
+                            url: "../../../Controllers/ProductController.php",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(formData)
+                        });
+                    }
                 }
+
+                // Cập nhật trạng thái đơn hàng
+                await $.ajax({
+                    type: "POST",
+                    url: "../../../Controllers/OrderStatusController.php",
+                    dataType: "json",
+                    data: {
+                        orderId: orderId,
+                        status: nextStatus
+                    }
+                });
+
+                // Hiển thị thông báo thành công
+                await Swal.fire('Thành công!', `Đã cập nhật trạng thái đơn hàng ${orderId}.`, 'success');
+            } catch (error) {
+                // Kiểm tra và hiển thị thông báo lỗi
+                const errorMessage = (error.responseJSON && error.responseJSON.details && error.responseJSON.details.message) ?
+                    `Có lỗi xảy ra khi xử lý đơn hàng ${orderId}: ${error.responseJSON.details.message}` :
+                    `Có lỗi xảy ra khi xử lý đơn hàng ${orderId}.`;
+
+                await Swal.fire('Thất bại!', errorMessage, 'error');
+                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status); // Cập nhật lại bảng
+                return; // Ngưng toàn bộ quá trình nếu xảy ra lỗi
             }
         }
+
+        // Cập nhật lại bảng sau khi xử lý tất cả đơn hàng
+        loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
     }
+
+
 
 
 

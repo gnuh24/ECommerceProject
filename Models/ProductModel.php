@@ -158,7 +158,6 @@ class ProductModel
             $params[':search'] = '%' . $search . '%';
             $params[':searchId'] = $search;
         }
-        // Điều kiện cho trạng thái (boolean true/false)
         if ($trangthai !== null) {
             $conditions[] = "p.Status = :trangthai";
             $params[':trangthai'] = $trangthai ? TRUE : FALSE; // true = 1, false = 0
@@ -491,7 +490,6 @@ class ProductModel
 
     public function updateProduct($id, $image, $origin, $capacity, $abv, $quantity, $description, $brandId, $categoryId, $status, $sale)
     {
-        echo "Trạng thái Model: " . $status;
         $fieldsToUpdate = [];
         $params = [];
 

@@ -113,7 +113,7 @@
  }
 
  .product-card-content img {
-   /* width: 100%; */
+   width: 100%;
    height: auto;
    object-fit: cover;
    border-radius: 8px;

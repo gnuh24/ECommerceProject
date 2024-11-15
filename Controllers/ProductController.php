@@ -98,10 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $amount = $parsedData['amount'];
             // Gọi hàm updateProduct và truyền dữ liệu cần thiết
             $result = $productController->increaseQuantity($id, $amount);
+            echo $result;
         } else if ($parsedData['action'] == "down") {
             $amount = $parsedData['amount'];
             // Gọi hàm updateProduct và truyền dữ liệu cần thiết
             $result = $productController->decreaseQuantity($id, $amount);
+            echo $result;
         }
     } else {
         http_response_code(400);
@@ -341,7 +343,13 @@ class ProductController
         }
 
         $result = $this->productModel->increaseQuantity($id, $amount);
-        return $this->response($result);
+        if ($result->status == 200) {
+            http_response_code(200); // Cập nhật thành công
+            echo json_encode(["success" => "Product updated successfully", "data" => $result]);
+        } else {
+            http_response_code(500); // Lỗi máy chủ nội bộ
+            echo json_encode(["error" => "Failed to update product", "details" => $result]);
+        }
     }
 
     // Decrease product quantity
@@ -355,6 +363,12 @@ class ProductController
         }
 
         $result = $this->productModel->decreaseQuantity($id, $amount);
-        return $this->response($result);
+        if ($result->status == 200) {
+            http_response_code(200); // Cập nhật thành công
+            echo json_encode(["success" => "Product updated successfully", "data" => $result]);
+        } else {
+            http_response_code(500); // Lỗi máy chủ nội bộ
+            echo json_encode(["error" => "Failed to update product", "details" => $result]);
+        }
     }
 }
