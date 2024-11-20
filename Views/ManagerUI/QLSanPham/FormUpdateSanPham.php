@@ -84,7 +84,7 @@
 
 
                                                         <p class="text">Mô tả sản phẩm</p>
-                                                        <textarea id="moTa" class="input" name="moTa" style="width: 40rem; height: 8rem;"></textarea>
+                                                        <textarea id="moTa" class="input" name="moTa" style="width: 40rem; height: 8rem;" rows="4" cols="50"></textarea>
                                                     </div>
 
 

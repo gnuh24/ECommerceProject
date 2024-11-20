@@ -78,8 +78,8 @@
                                                         <input id="gia" class="input" name="gia" style="width: 40rem" />
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
                                                         <p class="text">Mô Tả</p>
-                                                        <input id="moTa" class="input" name="moTa" style="width: 40rem" />
-                                                        <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
+                                                        <textarea id="moTa" class="input" name="moTa" style="width: 40rem; height: 8rem;" rows="4" cols="50"></textarea>
+
                                                     </div>
 
                                                     <div style="    display: flex;
