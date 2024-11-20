@@ -54,7 +54,7 @@
                                                         <span style="margin-left: 1rem; font-weight: 700; color: rgb(150, 150, 150);">*</span>
 
                                                         <p class="text">Trạng thái</p>
-                                                        <select id="IsPublic" class="input" name="IsPublic" style="width: 40rem">
+                                                        <select id="IsPublic" class="input" name="IsPublic" style="width: 40rem" disabled>
                                                             <option value="">--Chọn trạng thái--</option>
                                                             <option value="1">Mở khóa</option>
                                                             <option value="0">Khóa</option>

@@ -85,9 +85,7 @@
                         </div>
                         <div class="Admin_boxFeature__ECXnm">
 
-                            <div style="position: relative;">
-                                <input id="searchInput" class="Admin_input__LtEE-" placeholder="Tìm kiếm mã đơn hàng">
-                            </div>
+
                             <label for=""> Lọc đơn hàng:</label>
                             <div style="position: relative">
                                 <input class="Admin_input__LtEE-" type="date" id="dateStart" />
@@ -151,14 +149,7 @@
         loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
 
 
-        $('#searchInput').on('keypress', function() {
-            if (event.key === 'Enter') {
-                // Lấy giá trị của input
-                filter_search = $(this).val().trim();
-                currentPage = 1;
-                loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
-            }
-        });
+
 
 
         $("#dateStart").on("change", function() {

@@ -104,6 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // Gọi hàm updateProduct và truyền dữ liệu cần thiết
             $result = $productController->decreaseQuantity($id, $amount);
             echo $result;
+        } else {
+            $result = $productController->updateProduct($id, $parsedData);
+            echo $result;
         }
     } else {
         http_response_code(400);
