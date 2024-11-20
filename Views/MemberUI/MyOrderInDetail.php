@@ -254,7 +254,7 @@
                             <div class="info__wrapper order_info2">
                                 <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.data.info.OrderId}</span></p>
                                 <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.data.info.OrderTime}</span></p>
-                                <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note}</span></p>
+                                <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note==null?'':response.data.info.Note}</span></p>
                                 <p><span class="span1">Tình trạng:</span><span class="span2" id="note">${response.data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}</span></p>
                                 <p><span class="span1">Phương thức thanh toán:</span><span class="span2" id="note">${response.data.info.Payment}</span></p>
 
