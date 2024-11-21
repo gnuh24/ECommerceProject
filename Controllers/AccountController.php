@@ -303,7 +303,7 @@ class AccountController
                     } else {
                         return (object)[
                             "status" => 401,
-                            "message" => "Mật khẩu không đúng"
+                            "message" => "Mật khẩu hoặc email không đúng"
                         ];
                     }
                 } else {
@@ -314,15 +314,15 @@ class AccountController
                 }
             } else {
                 return (object)[
-                    "status" => 403,
-                    "message" => "Tài khoản không phải là Admin"
+                    "status" => 401,
+                    "message" => "Mật khẩu hoặc email không đúng"
                 ];
             }
         }
         // Nếu không tìm thấy tài khoản
         return (object)[
-            "status" => 404,
-            "message" => "Không tìm thấy tài khoản Admin"
+            "status" => 401,
+            "message" => "Mật khẩu hoặc email không đúng"
         ];
     }
     // Hàm xử lý đăng nhập User
@@ -372,7 +372,7 @@ class AccountController
 
         $userInformationModel = new UserInformationModel();
 
-        $id = $userInformationModel->createUserInformation($email);
+        $id = $userInformationModel->createUser($email);
 
         if ($id->status === 201) {
             $response = $this->accountModel->createAccount($password, $id->data);

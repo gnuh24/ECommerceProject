@@ -40,6 +40,7 @@ class UserInformationModel
             ];
         }
     }
+
     function getUserById($id)
     {
         $query = "SELECT * FROM `UserInformation` WHERE `Id` = :email";
@@ -69,20 +70,17 @@ class UserInformationModel
             ];
         }
     }
+
     // Tạo người dùng mới
-    function createUser($form)
+    function createUser($email)
     {
-        $query = "INSERT INTO `UserInformation` (`Email`, `Address`, `Birthday`, `Fullname`, `Gender`, `PhoneNumber`) 
-                  VALUES (:email, :address, :birthday, :fullname, :gender, :phone_number)";
+        $query = "INSERT INTO `UserInformation` (`Email`) 
+                  VALUES (:email)";
 
         try {
             $statement = $this->connection->prepare($query);
-            $statement->bindValue(':email', $form->email, PDO::PARAM_STR);
-            $statement->bindValue(':address', $form->address, PDO::PARAM_STR);
-            $statement->bindValue(':birthday', $form->birthday, PDO::PARAM_STR);
-            $statement->bindValue(':fullname', $form->fullname, PDO::PARAM_STR);
-            $statement->bindValue(':gender', $form->gender, PDO::PARAM_STR);
-            $statement->bindValue(':phone_number', $form->phone_number, PDO::PARAM_STR);
+            $statement->bindValue(':email', $email, PDO::PARAM_STR);
+           
             $statement->execute();
             $id = $this->connection->lastInsertId();
             return (object) [
