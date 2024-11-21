@@ -48,11 +48,8 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
-
                 sessionStorage.removeItem('id');
-                sessionStorage.removeItem('email');
                 sessionStorage.removeItem('role');
-
 
                 // Chuyển hướng về trang đăng nhập
                 window.location.href = "../../MemberUI/Login/AdminLoginUI.php";
