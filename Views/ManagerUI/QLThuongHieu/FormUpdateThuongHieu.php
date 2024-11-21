@@ -36,7 +36,7 @@
                                 color: rgb(80, 80, 80);
                                 padding: 0.5rem 1rem; /* Giảm phần padding */
                                 border-radius: 0.4rem; /* Giảm độ bo tròn */
-                                cursor: pointer;" href="./QLThuongHieu.php">Hủy</a>
+                                cursor: pointer;" href="./QLThuongHieu.php">Quay lại</a>
                                 <button id="updateSupplier_save" style="
                                 margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
                                 font-family: Arial;
@@ -99,6 +99,16 @@
 
 
 <script>
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('updateSupplier_save');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
     document.getElementById("updateSupplier_save").addEventListener('click', function check(event) {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
 

@@ -56,8 +56,31 @@
 </div>
 
 <script>
+    const userRole1 = sessionStorage.getItem('role');
 
-    const roleSession = sessionStorage.getItem("role");
+    document.addEventListener('DOMContentLoaded', () => {
+        const QLTaiKhoan = document.getElementById('QLTaiKhoan');
+        const QLLoaiSanPham = document.getElementById('QLLoaiSanPham');
+        const QLSanPham = document.getElementById('QLSanPham');
+        const QLThuongHieu = document.getElementById('QLThuongHieu');
+        const QLKhuyenMai = document.getElementById('QLKhuyenMai');
+        const QLDonHang = document.getElementById('QLDonHang');
+        const ThongKeBanChay = document.getElementById('ThongKeBanChay');
+        const ThongKeDonHang = document.getElementById('ThongKeDonHang');
+
+        if (userRole1 == 'Employee') {
+            QLTaiKhoan.style.display = 'none';
+        } else if (userRole1 == 'Admin') {
+            QLLoaiSanPham.style.display = 'none';
+            QLSanPham.style.display = 'none';
+            QLThuongHieu.style.display = 'none';
+            QLKhuyenMai.style.display = 'none';
+            QLDonHang.style.display = 'none';
+            ThongKeBanChay.style.display = 'none';
+            ThongKeDonHang.style.display = 'none';
+
+        }
+    });
     const currentPath = window.location.pathname.replace("/ECommerceProject/Views/ManagerUI/", "");
     const menuItems = document.querySelectorAll('.MenuItemSidebar_menuItem__56b1m');
 

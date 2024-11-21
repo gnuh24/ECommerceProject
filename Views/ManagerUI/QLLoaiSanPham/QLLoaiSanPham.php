@@ -50,7 +50,7 @@
                                 padding: 1rem;
                                 border-radius: 0.6rem;
                                 cursor: pointer;
-                            ">
+                            " id="btnAddcategory">
                                 <a href="./FromCreateLoaiSanPham.php"> Thêm Loại Sản Phẩm</a>
                             </button>
                         </div>
@@ -90,6 +90,16 @@
     var currentPage = 1;
     var pageSizeGlobal = 5;
     var search = "";
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('btnAddcategory');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
 
     function clearTable() {
         var tableBody = document.querySelector('.Table_table__BWPy tbody');
@@ -101,11 +111,13 @@
     }
 
     function getAllLoaiSanPham(page, search) {
+        // Lấy userRole từ sessionStorage
+        const userRole = sessionStorage.getItem('role');
+
         $.ajax({
             url: "../../../Controllers/CategoryController.php",
             type: "GET",
             dataType: "json",
-
             data: {
                 page: page,
                 pageSize: pageSizeGlobal,
@@ -115,39 +127,49 @@
                 var data = response.data;
                 var tableBody = document.getElementById("tableBody");
                 var tableContent = "";
+
                 // Duyệt qua mảng dữ liệu và tạo các hàng mới cho tbody
                 if (data.length > 0) {
                     data.forEach(function(record, index) {
                         var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
 
                         var trContent = `
-                            <form id="updateForm" method="post" action="FormUpdateLoaiSanPham.php">
-                                <tr style="height: 20%"; max-height: 20%;>
-                                    <td class="${trClass}">${record.Id}</td>
-                                    <td class="${trClass}">${record.CategoryName}</td>
-                                    <td class="${trClass}">`;
+                        <form id="updateForm" method="post" action="FormUpdateLoaiSanPham.php">
+                            <tr style="height: 20%; max-height: 20%;">
+                                <td class="${trClass}">${record.Id}</td>
+                                <td class="${trClass}">${record.CategoryName}</td>
+                                <td class="${trClass}">`;
 
+                        // Logic hiển thị nút dựa vào userRole
                         if (record.Id == 1) {
                             trContent += `Mặc định`;
                         } else {
-                            trContent += `
+                            if (userRole === "Manager") {
+                                trContent += `
                                 <button class="edit" onclick="updateLoaiSanPham(${record.Id}, '${record.CategoryName}')">Sửa</button>
                                 <button class="delete" onclick="deleteLoaiSanPham(${record.Id}, '${record.CategoryName}')">Xoá</button>`;
+                            } else if (userRole === "Employee") {
+                                trContent += `
+                                <button class="edit" onclick="updateLoaiSanPham(${record.Id}, '${record.CategoryName}')">Xem chi tiết</button>`;
+                            }
                         }
-                        trContent += `</tr></form>`;
+
+                        trContent += `</td></tr></form>`;
+
                         // Nếu chỉ có ít hơn 5 phần tử và đã duyệt đến phần tử cuối cùng, thêm các hàng trống vào
                         if (data.length < 5 && index === data.length - 1) {
                             for (var i = data.length; i < 5; i++) {
                                 var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2";
                                 trContent += `
-                                    <tr style="height: 20%"; max-height: 20%;>
-                                        <td class="${emptyTrClass}" style="width: 130px;"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                        <td class="${emptyTrClass}"></td>
-                                    </tr>
-                                `;
+                                <tr style="height: 20%; max-height: 20%;">
+                                    <td class="${emptyTrClass}" style="width: 130px;"></td>
+                                    <td class="${emptyTrClass}"></td>
+                                    <td class="${emptyTrClass}"></td>
+                                </tr>
+                            `;
                             }
                         }
+
                         tableContent += trContent;
                     });
                 } else {
@@ -170,6 +192,7 @@
             }
         });
     }
+
 
     function fetchDataAndUpdateTable(page, search) {
         clearTable();
@@ -225,7 +248,7 @@
 
                     success: function(response) {
                         Swal.fire('Thành công!', 'Xóa loại sản phẩm thành công !!',
-                        'success');
+                            'success');
                         fetchDataAndUpdateTable(currentPage, search); // Refresh table after delete
                     },
                     error: function(xhr, status, error) {
@@ -238,7 +261,7 @@
     }
 
     const updateLoaiSanPham = (id, categoryName) => {
-      window.location.href = `FormUpdateLoaiSanPham.php?id=${id}&categoryName=${categoryName}`;
+        window.location.href = `FormUpdateLoaiSanPham.php?id=${id}&categoryName=${categoryName}`;
     }
 
     // Initial data fetch

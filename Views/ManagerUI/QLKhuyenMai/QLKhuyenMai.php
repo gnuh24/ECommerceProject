@@ -92,7 +92,16 @@
     var filter_minOrderTime = null;
     var filter_maxOrderTime = null;
     var filter_status = null;
+    const userRole = sessionStorage.getItem('role');
 
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('createProductBtn');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
     $(document).ready(function() {
         loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
 
@@ -124,16 +133,18 @@
     function renderTableBody(data) {
         var tableBody = document.getElementById("tableBody");
         var html = '';
+        const userRole = sessionStorage.getItem('role'); // Lấy thông tin vai trò người dùng từ sessionStorage
+
         if (data.length === 0) {
             html = '<tr><td colspan="7" style="text-align: center;">Không tồn tại khuyến mãi !</td></tr>';
         } else {
             $.each(data, function(index, record) {
                 let totalPriceFormat = formatCurrency(record.TotalPrice);
 
-                // Check if the index is even; if true, set background color to white
+                // Kiểm tra chỉ số hàng và thiết lập kiểu nền cho hàng
                 let rowStyle = (index % 2 !== 0) ? 'background-color: white;' : '';
 
-                html += `<tr style="${rowStyle}">`; // Apply row style
+                html += `<tr style="${rowStyle}">`; // Áp dụng kiểu cho hàng
                 html += '<td>' + record.Id + '</td>';
                 html += '<td>' + convertDateTimeFormat(record.CreateTime) + '</td>';
                 html += '<td>' + record.Code + '</td>';
@@ -142,15 +153,26 @@
                 html += '<td>' + (record.IsPublic == 1 ? "Đang áp dụng" : "Vô hiệu hóa") + '</td>';
 
                 html += '<td style="display: flex; gap: 5px;">';
-                html += '<a href="./ChiTietKhuyenMai.php?id=' + record.Id + '" class="edit">Sửa</a> '; // Nút Sửa
 
-                // Nút Vô hiệu hóa hoặc Mở khóa
-                if (record.IsPublic == 1) {
-                    html += `<button type="button" 
+                // Nếu là Manager: Hiển thị nút "Sửa" và "Khóa/Mở khóa"
+                if (userRole === "Manager") {
+                    html += '<a href="./ChiTietKhuyenMai.php?id=' + record.Id + '" class="edit">Sửa</a>';
+                    if (record.IsPublic == 1) {
+                        html += `<button type="button" 
                             class="update-status"  onclick="toggleVoucherStatus(${record.Id}, 0)" >Khóa</button>`;
-                } else {
-                    html += `<button type="button" 
+                    } else {
+                        html += `<button type="button" 
                             class="update-status" style="background-color:red;"  onclick="toggleVoucherStatus(${record.Id}, 1)" >Mở khóa</button>`;
+                    }
+                }
+                // Nếu là Employee: Thay thế nút "Sửa" và "Khóa/Mở khóa" thành nút "Xem chi tiết"
+                else if (userRole === "Employee") {
+                    html += `<a href="./ChiTietKhuyenMai.php?id=${record.Id}" class="edit">Chi tiết</a>`;
+                }
+                // Nếu không phải là Manager hay Employee, ẩn các nút
+                else {
+                    // Không hiển thị bất kỳ nút nào nếu không phải Manager hay Employee
+                    html += '';
                 }
 
                 html += '</td>';
@@ -158,9 +180,10 @@
             });
         }
 
-        // Update the inner HTML of the table body
+        // Cập nhật nội dung cho phần thân bảng
         tableBody.innerHTML = html;
     }
+
 
     function toggleVoucherStatus(voucherId, newStatus) {
         // Thiết lập nội dung cảnh báo dựa trên trạng thái mới

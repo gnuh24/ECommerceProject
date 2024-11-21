@@ -51,7 +51,7 @@
                             padding: 1rem;
                             border-radius: 0.6rem;
                             cursor: pointer;
-                        ">
+                        " id="btnAddBrand">
                             <a href="./FormCreateThuongHieu.php"> Thêm Thương Hiệu</a>
                         </button>
                     </div>
@@ -95,6 +95,16 @@
     var currentPage = 1;
     var pageSizeGlobal = 5;
     var search = "";
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('btnAddBrand');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
 
     function clearTable() {
         var tableBody = document.querySelector('.Table_table__BWPy tbody');
@@ -102,6 +112,9 @@
     }
 
     function getAllThuongHieu(page, search) {
+        // Lấy userRole từ sessionStorage
+        const userRole = sessionStorage.getItem('role');
+
         $.ajax({
             url: '../../../Controllers/BrandController.php',
             type: 'GET',
@@ -120,36 +133,40 @@
                     data.forEach(function(record, index) {
                         var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2";
                         var trContent = `
-                            <tr style="height: 20%"; max-height: 20%;>
-                                <td class="${trClass}">${record.Id}</td>
-                                <td class="${trClass}">${record.BrandName}</td>
-                                <td class="${trClass}">`;
+                        <tr style="height: 20%; max-height: 20%;">
+                            <td class="${trClass}">${record.Id}</td>
+                            <td class="${trClass}">${record.BrandName}</td>
+                            <td class="${trClass}">`;
 
+                        // Logic hiển thị nút dựa trên userRole
                         if (record.Id == 1) {
                             trContent += `Mặc định`;
                         } else {
-                            trContent += `
+                            if (userRole === "Manager") {
+                                trContent += `
                                 <button class="edit" onclick="updateThuongHieu(${record.Id}, '${record.BrandName}')">Sửa</button>
                                 <button class="delete" onclick="deleteThuongHieu(${record.Id}, '${record.BrandName}')">Xoá</button>`;
+                            } else if (userRole === "Employee") {
+                                trContent += `
+                                <button class="edit" onclick="updateThuongHieu(${record.Id}, '${record.BrandName}')">Xem chi tiết</button>`;
+                            }
                         }
-                        trContent += `</tr>`;
+
+                        trContent += `</td></tr>`;
+
+                        // Thêm các hàng trống nếu cần
                         if (data.length < 5 && index === data.length - 1) {
                             for (var i = data.length; i < 5; i++) {
                                 var emptyTrClass = (i % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2";
                                 trContent += `
-                                    <form id="emptyForm" method="post" action="FormUpdateThuongHieu.php">
-                                        <tr style="height: 20%"; max-height: 20%;>
-                                            <td class="${emptyTrClass}" style="width: 130px;"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                            <td class="${emptyTrClass}"></td>
-                                        </tr>
-                                    </form>`;
+                                <tr style="height: 20%; max-height: 20%;">
+                                    <td class="${emptyTrClass}" style="width: 130px;"></td>
+                                    <td class="${emptyTrClass}"></td>
+                                    <td class="${emptyTrClass}"></td>
+                                </tr>`;
                             }
                         }
+
                         tableContent += trContent;
                     });
                 } else {
@@ -179,7 +196,9 @@
         const totalPage = Math.ceil(totalElements / pageSizeGlobal);
         totalPage <= 1 ? $('#pagination-container').hide() : $('#pagination-container').show();
         $('#pagination-container').pagination({
-            dataSource: Array.from({ length: totalElements }, (_, i) => i + 1),
+            dataSource: Array.from({
+                length: totalElements
+            }, (_, i) => i + 1),
             pageSize: pageSizeGlobal,
             showPrevious: true,
             showNext: true,

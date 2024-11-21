@@ -31,7 +31,7 @@
                                                     <h2 style="font-size: 2.3rem">Update sản phẩm mới</h2>
                                                 </div>
                                                 <div>
-                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="QLSanPham.php">Hủy</a>
+                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="QLSanPham.php">Quay lại</a>
                                                     <button id="updateUser_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white; background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">Lưu</button>
                                                 </div>
                                             </div>
@@ -119,12 +119,19 @@
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
         getCategories();
         getBrand();
         fetchProductDetails(<?php echo $_GET['maSanPham'] ?>);
-    })
-
+        const adminButton = document.getElementById('updateUser_save');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
     anhMinhHoa = document.getElementById("anhMinhHoa");
 
     // Bắt sự kiện change trên input file

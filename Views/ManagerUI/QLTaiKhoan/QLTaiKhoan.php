@@ -91,6 +91,8 @@
 
 <script>
     // Khởi tạo trang hiện tại
+    const userRole = sessionStorage.getItem('role');
+
     var currentPage = 1;
     var pageSizeGlobal = 5;
     var search = "";
@@ -126,6 +128,9 @@
                 var tableBody = document.getElementById("tableBody1"); // Lấy thẻ tbody của bảng
                 var tableContent = ""; // Chuỗi chứa nội dung mới của tbody
 
+                // Lấy role của user hiện tại từ sessionStorage
+                const userRole = sessionStorage.getItem('role');
+
                 if (data.length > 0) {
                     data.forEach(function(record, index) {
                         var trClass = (index % 2 !== 0) ? "Table_data_quyen_1" : "Table_data_quyen_2"; // Xác định class của hàng
@@ -135,8 +140,7 @@
                         var buttonClass = (record.Status === 0) ? "unlock" : "block";
                         var buttonData = (record.Status === 0) ? "unlock" : "block";
                         var trContent = `
-                   
-                            <tr style="height: 20%; max-height: 20%;">
+                        <tr style="height: 20%; max-height: 20%;">
                             <td class="${trClass}" style="width: 130px;">${record.Id}</td>
                             <td class="${trClass}">${record.Email}</td>
                             <td class="${trClass}">${record.CreateTime}</td>
@@ -149,20 +153,25 @@
                         } else {
                             // Hiển thị thẻ select cho tài khoản không phải User hoặc Admin
                             trContent += `<td class="${trClass}">
-                                                <select class="role-select" id="roleSelect${record.Id}" 
-                                                     onchange="confirmRoleChange(${record.Id}, this.value, '${record.Role}')" 
-                                                        style="font-size: 14px; padding: 4px 8px; height: auto; min-height: 36px;">
-                                                        <option value="User" ${record.Role === "User" ? "selected" : ""}>User</option>
-                                                        <option value="Manager" ${record.Role === "Manager" ? "selected" : ""}>Manager</option>
-                                                        <option value="Employee" ${record.Role === "Employee" ? "selected" : ""}>Employee</option>
-                                                </select>
-                                            </td>`;
+                                            <select class="role-select" id="roleSelect${record.Id}" 
+                                                 onchange="confirmRoleChange(${record.Id}, this.value, '${record.Role}')" 
+                                                    style="font-size: 14px; padding: 4px 8px; height: auto; min-height: 36px;">
+                                                    <option value="User" ${record.Role === "User" ? "selected" : ""}>User</option>
+                                                    <option value="Manager" ${record.Role === "Manager" ? "selected" : ""}>Manager</option>
+                                                    <option value="Employee" ${record.Role === "Employee" ? "selected" : ""}>Employee</option>
+                                            </select>
+                                        </td>`;
 
-                            trContent += `<td class="${trClass}">
-                                                <button class="${buttonClass}" data-action="${buttonData}" onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
+                            // Chỉ hiển thị nút nếu userRole là Admin
+                            if (userRole === "Admin") {
+                                trContent += `<td class="${trClass}">
+                                                <button id="adminButton" class="${buttonClass}" data-action="${buttonData}" 
+                                                    onClick="handleLockUnlock(${record.Id}, ${record.Status})">${buttonText}</button>
                                             </td>`;
+                            } else {
+                                trContent += `<td class="${trClass}"></td>`;
+                            }
                         }
-
 
                         trContent += `</tr>`;
                         tableContent += trContent; // Thêm nội dung của hàng vào chuỗi tableContent
@@ -189,7 +198,6 @@
             }
         });
     }
-
 
 
     function confirmRoleChange(accountId, newRole, oldRole) {
@@ -289,6 +297,7 @@
             fetchDataAndUpdateTable(currentPage); // Gọi hàm với 4 tham số
         }
     });
+
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maTaiKhoan, trangThai) {

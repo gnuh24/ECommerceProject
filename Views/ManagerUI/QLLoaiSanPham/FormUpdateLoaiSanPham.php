@@ -33,7 +33,7 @@
                                 padding: 0.5rem 1rem; /* Giảm phần padding */
                                 border-radius: 0.4rem; /* Giảm độ bo tròn */
                                 cursor: pointer;"
-                                    href="./QLLoaiSanPham.php">Hủy</a>
+                                    href="./QLLoaiSanPham.php">Quay lại</a>
                                 <button id="updateLoaiSanPham_save" style="margin-left: 1rem; 
                                 margin-left: 0.5rem; /* Giảm khoảng cách bên trái */
                                 font-family: Arial;
@@ -87,6 +87,16 @@
 </body>
 
 <script>
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('updateLoaiSanPham_save');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
     document.getElementById("updateLoaiSanPham_save").addEventListener('click', function check(event) {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
 

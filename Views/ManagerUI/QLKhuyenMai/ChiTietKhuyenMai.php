@@ -32,7 +32,7 @@
                                                     <h2 style="font-size: 2.3rem">Tạo khuyến mãi mới</h2>
                                                 </div>
                                                 <div>
-                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="QLKhuyenMai.php">Hủy</a>
+                                                    <a style="font-family: Arial; font-size: 1.5rem; font-weight: 700; border: 1px solid rgb(140, 140, 140); background-color: white; color: rgb(80, 80, 80); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;" href="QLKhuyenMai.php">Quay lại</a>
                                                     <button id="updateUser_save" style="margin-left: 1rem; font-family: Arial; font-size: 1.5rem; font-weight: 700; color: white; background-color: rgb(65, 64, 64); padding: 1rem 2rem 1rem 2rem; border-radius: 0.6rem; cursor: pointer;">Lưu</button>
                                                 </div>
                                             </div>
@@ -83,6 +83,16 @@
 
 
 <script>
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('updateUser_save');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
     fetchVoucherDetails(<?php echo $_GET['id'] ?>);
 
     function fetchVoucherDetails(VoucherId) {

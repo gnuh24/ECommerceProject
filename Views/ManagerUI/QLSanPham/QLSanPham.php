@@ -63,13 +63,6 @@
                                 <input type="text" placeholder="Tìm kiếm theo tên sản phẩm" id="searchSanPham" name="searchSanPham">
                                 <button id="filter-button"><i class="fa-solid fa-magnifying-glass"></i></button>
 
-                                <!-- <label for="price-filter">Giá:</label>
-                                        <select id="price-filter">
-                                            <option value="">Tất cả</option>
-                                            <option value="low">Dưới 1 triệu</option>
-                                            <option value="medium">Từ 1 đến 3 triệu</option>
-                                            <option value="high">Trên 3 triệu</option>
-                                        </select> -->
 
                                 <label for="state-filter">Trạng thái:</label>
                                 <select id="state-filter">
@@ -127,6 +120,16 @@
 <script>
     var currentPage = 1; // Track the current page
     var pageSizeGlobal = 5;
+    const userRole = sessionStorage.getItem('role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminButton = document.getElementById('createProductBtn');
+        if (userRole != 'Manager') {
+            adminButton.style.display = 'none';
+        } else {
+            console.log('Phần tử adminButton không tồn tại.');
+        }
+    });
 
     function toCreateForm() {
         window.location.href = "FormCreateSanPham.php";
@@ -139,10 +142,11 @@
             search: search,
             action: 'getAllProductsAdmin'
         };
+
         if (trangThai !== 'all') {
             data.status = trangThai;
         }
-        // Only include categoryId if maLoaiSanPham is not 0
+
         if (maLoaiSanPham !== 0) {
             data.categoryId = maLoaiSanPham;
         }
@@ -151,6 +155,8 @@
             data.brandId = brandId;
         }
 
+        // Lấy userRole từ sessionStorage
+        const userRole = sessionStorage.getItem('role');
 
         // Gọi API để lấy dữ liệu sản phẩm
         $.ajax({
@@ -168,21 +174,37 @@
                         var buttonText = record.status ? "Khóa" : "Mở khóa";
                         var buttonClass = record.status ? "block" : "unlock";
                         var buttonData = record.status ? "block" : "unlock";
+
+                        // Nút sửa hoặc xem chi tiết dựa vào userRole
+                        let actionButton = "";
+                        if (userRole === "Manager") {
+                            actionButton = `<button class="edit" onclick="toUpdate(${record.id})">Sửa</button>`;
+                        } else if (userRole === "Employee") {
+                            actionButton = `<button class="edit" onclick="toUpdate(${record.id})">Xem chi tiết</button>`;
+                        }
+
+                        // Nút khóa/mở khóa chỉ hiển thị nếu userRole là Manager
+                        let lockUnlockButton = "";
+                        if (userRole === "Manager") {
+                            lockUnlockButton = `<button class="${buttonClass}" data-action="${buttonData}" 
+                            onclick="handleLockUnlock(${record.id}, ${record.status})">${buttonText}</button>`;
+                        }
+
                         var trContent = `
-                <tr>
-                    <td style="text-align: center;">${record.id}</td>
-                    <td><img style="width: 100%;height:auto;" src="../../img/${record.image}" alt="Product Image"></td>
-                    <td>${record.productName}</td>
-                    <td style="text-align: center;">${record.price}</td>
-                    <td style="text-align: center;">${trangThai}</td>
-                    <td style="text-align: center;">${record.category.categoryName}</td>
-                    <td style="text-align: center;">${record.brand.brandName}</td>
-                    <td style="text-align: center;">${record.quantity}</td>
-                    <td>
-                        <button class="edit" onclick="toUpdate(${record.id})">Sửa</button>
-                        <button class="${buttonClass}" data-action="${buttonData}" onclick="handleLockUnlock(${record.id}, ${record.status})">${buttonText}</button>
-                    </td>
-                </tr>`;
+                        <tr>
+                            <td style="text-align: center;">${record.id}</td>
+                            <td><img style="width: 100%;height:auto;" src="../../img/${record.image}" alt="Product Image"></td>
+                            <td>${record.productName}</td>
+                            <td style="text-align: center;">${record.price}</td>
+                            <td style="text-align: center;">${trangThai}</td>
+                            <td style="text-align: center;">${record.category.categoryName}</td>
+                            <td style="text-align: center;">${record.brand.brandName}</td>
+                            <td style="text-align: center;">${record.quantity}</td>
+                            <td>
+                                ${actionButton}
+                                ${lockUnlockButton}
+                            </td>
+                        </tr>`;
                         tableContent += trContent;
                     });
                 } else {
@@ -198,6 +220,7 @@
             }
         });
     }
+
 
     // Hàm xử lý sự kiện cho nút khóa / mở khóa
     function handleLockUnlock(maSanPham, trangThai) {
