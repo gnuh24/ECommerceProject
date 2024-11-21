@@ -147,6 +147,13 @@
 <script src=" https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
+    const urlParams1 = new URLSearchParams(window.location.search);
+
+    // Lấy giá trị của searchFromAnotherPage và gán vào search
+    const searchFromAnotherPage1 = urlParams1.get('searchFromAnotherPage');
+    if (searchFromAnotherPage1) {
+        document.getElementById("searchSanPham").value = searchFromAnotherPage1;
+    }
     // Kiểm tra xem 'role' có tồn tại trong Session Storage không
     if (sessionStorage.getItem('role')) {
         // Nếu role tồn tại, ẩn nút bằng cách thêm thuộc tính 'hidden'

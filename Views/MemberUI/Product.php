@@ -179,6 +179,15 @@
         maxVolume: 0
     };
 
+    // Lấy tham số từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Lấy giá trị của searchFromAnotherPage và gán vào search
+    const searchFromAnotherPage = urlParams.get('searchFromAnotherPage');
+    if (searchFromAnotherPage) {
+        currentFilters.search = searchFromAnotherPage;
+    }
+
     $(document).ready(function() {
         getCategories(); // Load categories from the server
         getBrands(); // Load brands from the server
@@ -187,30 +196,9 @@
 
     // Lắng nghe sự kiện click vào id "reset-button"
     document.getElementById("reset-button").addEventListener("click", function() {
-        // Reset các giá trị của các bộ lọc trong giao diện
-        document.getElementById("searchSanPham").value = "";
-        document.getElementById("price-filter").value = "";
-        document.getElementById("brand-filter").value = "";
-        document.getElementById("category-filter").value = "";
-        document.getElementById("alcohol-content-filter").value = "";
-        document.getElementById("volume-filter").value = "";
-
-        // Reset các bộ lọc trong đối tượng currentFilters
-        currentFilters.search = '';
-        currentFilters.minPrice = 0;
-        currentFilters.maxPrice = 1000000000;
-        currentFilters.brandId = 0;
-        currentFilters.categoryId = 0;
-        currentFilters.maxAlcohol = 0; // Nồng độ cồn
-        currentFilters.minAlcohol = 0; // Nồng độ cồn
-
-        currentFilters.maxVolume = 0; // Thể tích
-        currentFilters.minVolume = 0; // Thể tích
-
-        // Reset trang hiện tại về 1
-        currentPage = 1;
-        getAllSanPham(1);
+        window.location.href = "Product.php";
     });
+
 
     // Lắng nghe sự kiện change cho thanh lọc giá
     document.getElementById("price-filter").addEventListener("change", function() {
@@ -376,7 +364,7 @@
                                                             <h4 class="name-product">${product.ProductName}</h4>`;
 
                         if (product.Sale === 0) {
-                            const inflatedPrice = Math.ceil(product.UnitPrice / (90/100));
+                            const inflatedPrice = Math.ceil(product.UnitPrice / (90 / 100));
                             const discountPrice = product.UnitPrice;
 
                             htmlContent += `
