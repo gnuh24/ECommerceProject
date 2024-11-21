@@ -114,7 +114,7 @@
     });
     var listproduct = [];
     var totalpriceall = 0;
-
+    var totalpriceOrigin = 0;
 
     function loadCart() {
         var maTaiKhoan = sessionStorage.getItem("id");
@@ -165,6 +165,7 @@
         $('#cartItems').html(cartHTML);
         $('#totalPrice').text(formatCurrency(totalPrice));
         totalpriceall = totalPrice;
+        totalpriceOrigin = totalPrice
         renderVoucher(totalpriceall);
     }
 
@@ -215,7 +216,7 @@
     }
 
     function updateTotalPrice(saleAmount) {
-        totalpriceall = totalpriceall - saleAmount;
+        totalpriceall = totalpriceOrigin - saleAmount < 0 ? 0 : totalpriceOrigin - saleAmount;
         // Cập nhật hiển thị giá đã giảm trên giao diện
         document.querySelector('#totalPrice').textContent = ` ${formatCurrency(totalpriceall)}`;
     }
