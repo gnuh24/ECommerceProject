@@ -237,9 +237,12 @@
                             });
                         }
                     } catch (error) {
+                        console.log(error.responseJSON.details.message)
                         // Hiển thị thông báo lỗi cho từng sản phẩm nhưng không dừng toàn bộ quá trình
                         console.error(`Lỗi khi xử lý sản phẩm ${order.ProductId}:`, error);
-                        await Swal.fire('Lỗi!', `Có lỗi khi xử lý sản phẩm ${order.ProductId}.`, 'error');
+                        await Swal.fire('Cập nhật thất bại!',
+                            error.responseJSON.details.message, 'error');
+                        return;
                     }
                 }
 
