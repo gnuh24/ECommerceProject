@@ -190,41 +190,43 @@
                         }
                         var imageSrc = product.Image;
                         htmlContent += `
-    <div class="col-md-4 col-sm-6 mb-4">
-        <div class="product-card-content" style="position: relative;">
-            <a href="ProductDetail.php?maSanPham=${product.Id}">
-                       
-                <img src="../img/${product.Image}" alt="" style="height: 300px;">
-               
-<div class="sale-label" ">
-                                -${product.Sale === 0 ?"10":product.Sale}% 
-                            </div>   
-                                            <div class="product-card-details">
-                    <h4 class="name-product">${product.ProductName}</h4>`;
+                                <div class="col-md-4 col-sm-6 mb-4">
+                                    <div class="product-card-content" style="position: relative;">
+                                        <a href="ProductDetail.php?maSanPham=${product.Id}">
+                                                
+                                            <img src="../img/${product.Image}" alt="" style="height: 300px;">
+                                        
+                            <div class="sale-label" ">
+                                                            -${product.Sale === 0 ?"10":product.Sale}% 
+                                                        </div>   
+                                                                        <div class="product-card-details">
+                                                <h4 class="name-product">${product.ProductName}</h4>`;
 
                         if (product.Sale === 0) {
                             // Calculate the inflated and discounted prices
-                            const inflatedPrice = product.UnitPrice * 1.1;
+                            const inflatedPrice = Math.ceil(product.UnitPrice / (90/100));
                             const discountPrice = product.UnitPrice;
 
                             htmlContent += `
-        <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
-            <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
-        </p>
-        <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
-            <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
-        </p>`;
+                                                <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
+                                                    <i class="fas fa-tag"></i> ${formatCurrency(inflatedPrice)}
+                                                </p>
+                                                <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
+                                                    <i class="fas fa-percent"></i> ${formatCurrency(discountPrice)}
+                                                </p>
+                                            `;
                         } else {
                             // Calculate the sale price
                             const salePrice = product.UnitPrice * (1 - product.Sale / 100);
 
                             htmlContent += `
-        <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
-            <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
-        </p>
-        <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
-            <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
-        </p>`;
+                                                <p class="price-tea text-center" style="text-decoration: line-through; color: gray;">
+                                                    <i class="fas fa-tag"></i> ${formatCurrency(product.UnitPrice)}
+                                                </p>
+                                                <p class="price-tea text-center" style="color: rgb(146, 26, 26); font-weight: bold;">
+                                                    <i class="fas fa-percent"></i> ${formatCurrency(salePrice)}
+                                                </p>
+                                            `;
                         }
 
                         htmlContent += `

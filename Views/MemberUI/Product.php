@@ -376,7 +376,7 @@
                                                             <h4 class="name-product">${product.ProductName}</h4>`;
 
                         if (product.Sale === 0) {
-                            const inflatedPrice = product.UnitPrice * 1.1; // 110% of the original price
+                            const inflatedPrice = Math.ceil(product.UnitPrice / (90/100));
                             const discountPrice = product.UnitPrice;
 
                             htmlContent += `
