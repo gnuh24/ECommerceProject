@@ -20,6 +20,7 @@
     <!-- Pagination.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js"></script>
+    <script src="../../HelperUI/formatOutput.js"></script>
 
     <title>Quản lý sản phẩm</title>
 </head>
@@ -123,6 +124,10 @@
     const userRole = sessionStorage.getItem('role');
 
     document.addEventListener('DOMContentLoaded', () => {
+        filterProducts(currentPage);
+        getCategories();
+        getBrand()
+
         const adminButton = document.getElementById('createProductBtn');
         if (userRole != 'Manager') {
             adminButton.style.display = 'none';
@@ -195,7 +200,7 @@
                             <td style="text-align: center;">${record.id}</td>
                             <td><img style="width: 100%;height:auto;" src="../../img/${record.image}" alt="Product Image"></td>
                             <td>${record.productName}</td>
-                            <td style="text-align: center;">${record.price}</td>
+                            <td style="text-align: center;">${formatCurrency(record.price)}</td>
                             <td style="text-align: center;">${trangThai}</td>
                             <td style="text-align: center;">${record.category.categoryName}</td>
                             <td style="text-align: center;">${record.brand.brandName}</td>
@@ -259,12 +264,6 @@
         });
     }
 
-    var currentPage = 1;
-    document.addEventListener('DOMContentLoaded', function() {
-        filterProducts(currentPage);
-        getCategories();
-        getBrand()
-    });
 
 
     // Lắng nghe sự kiện click vào id "reset-button"
@@ -280,18 +279,6 @@
         getAllSanPham(currentPage, "", "", 0, 0);
 
     });
-
-    function formatCurrency(number) {
-        // Chuyển đổi số thành chuỗi và đảm bảo nó là số nguyên
-        number = parseInt(number);
-
-        // Sử dụng hàm toLocaleString() để định dạng số tiền
-        // và thêm đơn vị tiền tệ "đ" vào cuối chuỗi
-        return number.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    }
 
 
 
@@ -349,36 +336,14 @@
     document.getElementById("filter-button").addEventListener("click", function(event) {
         currentPage = 1;
         event.preventDefault();
-
-        // Lấy giá trị từ thanh tìm kiếm
-        var searchText = document.getElementById("searchSanPham").value;
-
-
-
-
-        // Lấy giá trị từ thanh lọc thể tích
-        var stateFilter = document.getElementById("state-filter").value;
-
-
-        // Lấy giá trị từ thanh lọc loại sản phẩm
-        var categoryFilter = document.getElementById("category-filter").value;
-        if (categoryFilter == "") {
-            categoryFilter = 0;
-        }
-
-        var brandFilter = document.getElementById("brand-filter").value;
-        if (brandFilter == "") {
-            brandFilter = 0;
-        }
-
-
-        getAllSanPham(currentPage, searchText, stateFilter, categoryFilter, brandFilter);
-
+        filterProducts(currentPage);
     });
+
     document.getElementById("searchSanPham").addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
+            currentPage = 1;
             event.preventDefault();
-            document.getElementById("filter-button").click();
+            filterProducts(currentPage);
         }
     });
 

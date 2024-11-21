@@ -76,9 +76,6 @@
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result) {
-                                console.log(response);
-                                console.log(response.data);
-                                console.log(response.data.id);
 
                                 // Lưu các thông tin vào sessionStorage
                                 sessionStorage.setItem('id', response.data.id);
