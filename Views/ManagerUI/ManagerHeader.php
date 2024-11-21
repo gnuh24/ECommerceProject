@@ -55,7 +55,7 @@
 
 
                 // Chuyển hướng về trang đăng nhập
-                window.location.href = "../../MemberUI/Login/LoginUI.php";
+                window.location.href = "../../MemberUI/Login/AdminLoginUI.php";
 
             }
         });

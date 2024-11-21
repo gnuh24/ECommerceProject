@@ -292,12 +292,12 @@ class AccountController
             $account = $accountExists->data[0];
 
             // Kiểm tra vai trò của tài khoản có phải là Admin không
-            if ($account['Role'] === "Admin") {
+            if ($account['Role'] === "Admin" || $account['Role'] === "Manager" || $account['Role'] === "Employee") {
                 // Kiểm tra mật khẩu
                 if (password_verify($password, $account['Password'])) {
                     return (object)[
                         "status" => 200,
-                        "message" => "Đăng nhập Admin thành công",
+                        "message" => "Đăng nhập thành công",
                         "data" => $account
                     ];
                 } else {

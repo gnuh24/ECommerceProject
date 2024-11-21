@@ -42,6 +42,16 @@
     function loadOrders() {
         var customerId = sessionStorage.getItem("id");
 
+        // Hiển thị hiệu ứng loading với SweetAlert2
+        Swal.fire({
+            title: 'Đang tải đơn hàng...',
+            text: 'Vui lòng chờ giây lát.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading(); // Hiện biểu tượng loading
+            }
+        });
+
         $.ajax({
             url: '../../Controllers/OrderController.php', // Đường dẫn API lấy đơn hàng
             type: 'GET',
@@ -50,6 +60,9 @@
             },
             dataType: 'json', // Đảm bảo rằng response được xử lý là JSON
             success: function(response) {
+                // Đóng hiệu ứng loading khi nhận được phản hồi
+                Swal.close();
+
                 // Kiểm tra kiểu dữ liệu của response
                 if (response.data && Array.isArray(response.data)) {
                     const orders = response.data;
@@ -65,10 +78,18 @@
                 }
             },
             error: function(xhr, status, error) {
+                // Đóng hiệu ứng loading và hiển thị thông báo lỗi
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Đã xảy ra lỗi khi tải đơn hàng. Vui lòng thử lại sau.',
+                });
                 console.error('Đã xảy ra lỗi khi tải đơn hàng:', error);
             }
         });
     }
+
 
     function displayOrders(orders) {
         const orderHistory = document.getElementById('orderHistory');
