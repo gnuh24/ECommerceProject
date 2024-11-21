@@ -375,6 +375,12 @@
         getAllSanPham(currentPage, searchText, stateFilter, categoryFilter, brandFilter);
 
     });
+    document.getElementById("searchSanPham").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("filter-button").click();
+        }
+    });
 
     function setupPagination(totalElements, currentPage) {
 

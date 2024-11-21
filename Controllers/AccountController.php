@@ -293,17 +293,23 @@ class AccountController
 
             // Kiểm tra vai trò của tài khoản có phải là Admin không
             if ($account['Role'] === "Admin" || $account['Role'] === "Manager" || $account['Role'] === "Employee") {
-                // Kiểm tra mật khẩu
-                if (password_verify($password, $account['Password'])) {
-                    return (object)[
-                        "status" => 200,
-                        "message" => "Đăng nhập thành công",
-                        "data" => $account
-                    ];
+                if ($account['Status'] === 1) {
+                    if (password_verify($password, $account['Password'])) {
+                        return (object)[
+                            "status" => 200,
+                            "message" => "Đăng nhập thành công",
+                            "data" => $account
+                        ];
+                    } else {
+                        return (object)[
+                            "status" => 401,
+                            "message" => "Mật khẩu không đúng"
+                        ];
+                    }
                 } else {
                     return (object)[
-                        "status" => 401,
-                        "message" => "Mật khẩu không đúng"
+                        "status" => 402,
+                        "message" => "Tài khoản đã bị khóa"
                     ];
                 }
             } else {
