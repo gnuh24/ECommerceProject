@@ -70,6 +70,8 @@
 
         if (userRole1 == 'Employee') {
             QLTaiKhoan.style.display = 'none';
+            ThongKeBanChay.style.display = 'none';
+            ThongKeDonHang.style.display = 'none';
         } else if (userRole1 == 'Admin') {
             QLLoaiSanPham.style.display = 'none';
             QLSanPham.style.display = 'none';
@@ -78,6 +80,9 @@
             QLDonHang.style.display = 'none';
             ThongKeBanChay.style.display = 'none';
             ThongKeDonHang.style.display = 'none';
+
+        } else {
+            QLTaiKhoan.style.display = 'none';
 
         }
     });
