@@ -144,8 +144,12 @@
     var filter_maxOrderTime = null;
     var filter_status = null;
     var filter_search = "";
+    document.getElementById("dateStart").value = "";
+    document.getElementById("dateEnd").value = "";
+    document.getElementById("TrangThai").value = "";
 
     $(document).ready(function() {
+
         loadDataToTable(currentPage, filter_minOrderTime, filter_maxOrderTime, filter_status);
 
 
@@ -291,6 +295,23 @@
         return dateString; // Nếu không hợp lệ, trả về giá trị gốc
     }
 
+    function formatDateToDDMMYYYYHHMMSS(dateString) {
+        // Kiểm tra nếu dateString không hợp lệ
+        if (!dateString) return dateString;
+
+        // Tách phần ngày giờ từ chuỗi (nếu có giờ)
+        const [datePart, timePart] = dateString.split(" "); // Tách phần ngày và phần giờ
+        const [year, month, day] = datePart.split("-"); // Tách ngày, tháng, năm từ phần ngày
+        const [hours, minutes, seconds] = timePart ? timePart.split(":") : ["00", "00", "00"]; // Tách giờ, phút, giây từ phần giờ
+
+        // Đảm bảo rằng tất cả các phần đều hợp lệ và trả về định dạng DD-MM-YYYY HH:MM:SS
+        if (year && month && day) {
+            return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year} ${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+        }
+
+        return dateString; // Nếu không hợp lệ, trả về giá trị gốc
+    }
+
     function renderTableBody(data) {
         $('#orderTable').DataTable({
             destroy: true, // Phá hủy bảng cũ nếu có
@@ -315,7 +336,7 @@
                 {
                     data: 'OrderTime',
                     render: function(data, type, row) {
-                        return formatDateToHHMMSSDDMMYYYY(data)
+                        return formatDateToDDMMYYYYHHMMSS(data)
                     }
                 },
                 {
