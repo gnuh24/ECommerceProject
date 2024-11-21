@@ -204,7 +204,7 @@
 
                         if (product.Sale === 0) {
                             // Calculate the inflated and discounted prices
-                            const inflatedPrice = Math.ceil(product.UnitPrice / (90/100));
+                            const inflatedPrice = Math.ceil(product.UnitPrice / (90 / 100));
                             const discountPrice = product.UnitPrice;
 
                             htmlContent += `
@@ -230,17 +230,18 @@
                         }
 
                         htmlContent += `
-                    <div class="buy-btn-container">
-                        Mua ngay
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>`;
+                                                <div class="buy-btn-container">
+                                                    Mua ngay
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>`;
+                        count++;
+
 
 
                         // Tăng biến đếm lên 1 sau mỗi sản phẩm được thêm vào
-                        count++;
                     });
                     // Thay đổi nội dung HTML của phần tử sản phẩm
                     productContainer.html(htmlContent);

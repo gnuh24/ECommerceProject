@@ -27,6 +27,7 @@ class ProductModel
         // Mảng để lưu điều kiện WHERE và tham số
         $conditions = [];
         $params = [];
+        $conditions[] = "p.status = 1";
 
         if ($brandId !== null) {
             $conditions[] = "p.brandId = :brandId";

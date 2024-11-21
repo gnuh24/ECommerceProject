@@ -240,8 +240,8 @@ class ProductController
             $image, // Đường dẫn ảnh (có thể là null hoặc chuỗi rỗng)
             isset($parsedData['origin']) && !empty($parsedData['origin']) ? $parsedData['origin'] : null,
             isset($parsedData['capacity']) && !empty($parsedData['capacity']) ? $parsedData['capacity'] : null,
-            isset($parsedData['abv']) && !empty($parsedData['abv']) ? $parsedData['abv'] : null,
             isset($parsedData['quanity']) && !empty($parsedData['quanity']) ? $parsedData['quanity'] : null,
+            isset($parsedData['abv']) && !empty($parsedData['abv']) ? $parsedData['abv'] : null,
             isset($parsedData['description']) && !empty($parsedData['description']) ? $parsedData['description'] : null,
             isset($parsedData['brandId']) ? intval($parsedData['brandId']) : null,
             isset($parsedData['categoryId']) ? intval($parsedData['categoryId']) : null,
