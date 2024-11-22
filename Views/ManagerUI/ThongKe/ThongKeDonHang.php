@@ -13,45 +13,37 @@
 </head>
 
 <body>
-    <div id="root">
-        <div>
-            <div class="App">
-                <div class="StaffLayout_wrapper__CegPk">
-                    <?php require_once "../ManagerHeader.php" ?>
-                    <div>
-                        <div>
-                            <div class="Manager_wrapper__vOYy">
-                                <?php require_once "../ManagerMenu.php" ?>
+    <div class="StaffLayout_wrapper__CegPk">
+        <?php require_once "../ManagerHeader.php" ?>
 
-                                <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
-                                    <div class="wrapper">
-                                        <div style="display: flex; padding-top: 1rem; padding-bottom: 1rem;">
-                                            <h2>Thống kê đơn hàng</h2>
-                                        </div>
-                                        <div class="boxFeature">
-                                            <span class="text">Ngày Bắt Đầu</span>
-                                            <input id="from" type="date" style="height: 3rem; padding: 0.3rem;">
-                                            <span class="text">Ngày Kết Thúc</span>
-                                            <input id="to" type="date" style="height: 3rem; padding: 0.3rem;">
-                                            <div id="thongKeButton" style="display: flex; justify-content: center; align-items: center; width: 50px; height: 3rem; padding: 0.3rem; color: white; font-weight: 700; background-color: white;"><i style="color: black; font-size: 20px;" class="fa-solid fa-magnifying-glass"></i></div>
-                                            <div id="resetButton" style="display: flex; justify-content: center; align-items: center; width: 50px; height: 3rem; padding: 0.3rem; color: white; font-weight: 700; background-color: white;"><i style="color: black; font-size: 20px;" class="fa-solid fa-rotate-right"></i></div>
+        <div class="Manager_wrapper__vOYy">
+            <?php require_once "../ManagerMenu.php" ?>
 
-                                            <p style="font-size: 1.3rem; margin-left: auto; color: rgb(100, 100, 100); font-weight: 700;">
-                                                Mặc định được thống kê từ ngày 01/01/2010
-                                            </p>
+            <div style="padding-left: 16%; width: 100%; padding-right: 2rem">
+                <div class="wrapper">
+                    <div style="display: flex; padding-top: 1rem; padding-bottom: 1rem;">
+                        <h2>Thống kê đơn hàng</h2>
+                    </div>
+                    <div class="boxFeature">
+                        <span class="text">Ngày Bắt Đầu</span>
+                        <input id="from" type="date" style="height: 3rem; padding: 0.3rem;">
+                        <span class="text">Ngày Kết Thúc</span>
+                        <input id="to" type="date" style="height: 3rem; padding: 0.3rem;">
+                        <div id="thongKeButton" style="display: flex; justify-content: center; align-items: center; width: 50px; height: 3rem; padding: 0.3rem; color: white; font-weight: 700; background-color: white;"><i style="color: black; font-size: 20px;" class="fa-solid fa-magnifying-glass"></i></div>
+                        <div id="resetButton" style="display: flex; justify-content: center; align-items: center; width: 50px; height: 3rem; padding: 0.3rem; color: white; font-weight: 700; background-color: white;"><i style="color: black; font-size: 20px;" class="fa-solid fa-rotate-right"></i></div>
 
-                                        </div>
-                                        <div class="boxTable">
+                        <p style="font-size: 1.3rem; margin-left: auto; color: rgb(100, 100, 100); font-weight: 700;">
+                            Mặc định được thống kê từ ngày 01/01/2010
+                        </p>
 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="boxTable">
+
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </body>
 
@@ -64,7 +56,6 @@
     thongKeButton.addEventListener("click", () => {
         fromValue = from.value !== "" ? from.value : "2010-01-01";
         toValue = to.value !== "" ? to.value : formattedDate;
-
         thongKeDonHang(fromValue, toValue);
     });
 
@@ -83,17 +74,10 @@
     var day = currentDate.getDate().toString().padStart(2, '0'); // Thêm số 0 phía trước nếu cần
 
     var formattedDate = year + '-' + month + '-' + day;
-
     thongKeDonHang("2010-01-01", formattedDate);
 
     function fetchTable(thongKe) {
-        // Thực hiện các phép tính thống kê dữ liệu ở đây, hoặc bạn có thể truyền các biến đã tính sẵn vào hàm này.
-        var totalHuy = 0;
-        var totalChoDuyet = 0;
-        var totalGiaoThanhCong = 0;
-        var totalDonHang = 0;
-        var totalDangGiao = 0;
-        var totalDaDuyet = 0;
+      
 
         var labels = [];
         var dataHuy = [];
@@ -113,27 +97,6 @@
 
         // Duyệt qua từng phần tử trong mảng thongKe
         thongKe.forEach(function(item) {
-            // Tính tổng số lượng đơn hàng
-            totalDonHang += item.quantity;
-
-            // Kiểm tra trạng thái của đơn hàng và cập nhật các tổng tương ứng
-            switch (item.status) {
-                case "Huy":
-                    totalHuy += item.quantity;
-                    break;
-                case "ChoDuyet":
-                    totalChoDuyet += item.quantity;
-                    break;
-                case "GiaoThanhCong":
-                    totalGiaoThanhCong += item.quantity;
-                    break;
-                case "DangGiao":
-                    totalDangGiao += item.quantity;
-                    break;
-                case "DaDuyet":
-                    totalDaDuyet += item.quantity;
-                    break;
-            }
 
             // Chuyển đổi ngày tháng từ dạng yyyy-MM-dd sang dd/MM/yyyy
             var ngayFormatted = item.updateDate;
@@ -219,52 +182,15 @@
         var boxTable = document.querySelector('.boxTable');
 
         // Tạo các phần tử HTML và thêm nội dung vào
-        var htmlContent = `
-                <div style="display: flex; gap: 1.5rem;">
-                <div class="dashboard-item canceled">
-                    <div>
-                        <p>Số đơn bị hủy</p>
-                        <p>${totalHuy}</p>
-                    </div>
-                </div>
-                <div class="dashboard-item waiting-approval">
-                    <div>
-                        <p>Số đơn chờ duyệt</p>
-                        <p>${totalChoDuyet}</p>
-                    </div>
-                </div>
-                <div class="dashboard-item approved">
-                    <div>
-                        <p>Số đơn đã duyệt</p>
-                        <p>${totalDaDuyet}</p>
-                    </div>
-                </div>
-                <div class="dashboard-item delivering">
-                    <div>
-                        <p>Số đơn đang giao</p>
-                        <p>${totalDangGiao}</p>
-                    </div>
-                </div>
-                <div class="dashboard-item delivered">
-                    <div>
-                        <p>Số đơn hoàn tất</p>
-                        <p>${totalGiaoThanhCong}</p>
-                    </div>
-                </div>
-                <div class="dashboard-item total">
-                    <div>
-                        <p>Tổng số đơn hàng</p>
-                        <p>${totalDonHang}</p>
-                    </div>
-                </div>
-                </div>
-                <div>
-                    <canvas id="myChart" width="400" height="120"></canvas>
-                </div>
-            `;
+        var htmlContent = 
+                        `
+                            <div>
+                                <canvas id="myChart" width="400" height="120"></canvas>
+                            </div>
+                        `;
 
         // Thêm nội dung vào boxTable
-        boxTable.innerHTML = htmlContent;
+        boxTable.innerHTML += htmlContent;
 
         // Lấy tham chiếu đến thẻ canvas
         var ctx = document.getElementById('myChart').getContext('2d');
@@ -339,6 +265,98 @@
     }
 
 
+    function thongKeTongQuat(from, to) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '../../../Controllers/StatisticController.php',
+                type: 'GET',
+                dataType: "json",
+                data: {
+                    type: 'general', // Thêm tham số type
+                    minDate: formatNgay(from),
+                    maxDate: formatNgay(to),
+                },
+                success: function(response) {
+                    var totalChoDuyet = 0;
+                    var totalDaDuyet = 0;
+                    var totalDangGiao = 0;
+                    var totalGiaoThanhCong = 0;
+                    var totalHuy = 0;
+                    var totalDonHang = 0;
+
+                    response.data.forEach((item) => {
+                        console.log(item.status + " - " + item.quantity);
+                        if (item.status === "ChoDuyet") {
+                            totalChoDuyet += item.quantity;
+                        } else if (item.status === "DaDuyet") {
+                            totalDaDuyet += item.quantity;
+                        } else if (item.status === "DangGiao") {
+                            totalDangGiao += item.quantity;
+                        } else if (item.status === "GiaoThanhCong") {
+                            totalGiaoThanhCong += item.quantity;
+                        } else if (item.status === "Huy") {
+                            totalHuy += item.quantity;
+                        }
+                        totalDonHang += item.quantity;
+                    });
+
+                    var boxTable = document.querySelector('.boxTable');
+
+                    // Tạo các phần tử HTML và thêm nội dung vào
+                    var htmlContent = `
+                        <div style="display: flex; gap: 1.5rem;">
+                            <div class="dashboard-item canceled">
+                                <div>
+                                    <p>Số đơn bị hủy</p>
+                                    <p>${totalHuy}</p>
+                                </div>
+                            </div>
+                            <div class="dashboard-item waiting-approval">
+                                <div>
+                                    <p>Số đơn chờ duyệt</p>
+                                    <p>${totalChoDuyet}</p>
+                                </div>
+                            </div>
+                            <div class="dashboard-item approved">
+                                <div>
+                                    <p>Số đơn đã duyệt</p>
+                                    <p>${totalDaDuyet}</p>
+                                </div>
+                            </div>
+                            <div class="dashboard-item delivering">
+                                <div>
+                                    <p>Số đơn đang giao</p>
+                                    <p>${totalDangGiao}</p>
+                                </div>
+                            </div>
+                            <div class="dashboard-item delivered">
+                                <div>
+                                    <p>Số đơn hoàn tất</p>
+                                    <p>${totalGiaoThanhCong}</p>
+                                </div>
+                            </div>
+                            <div class="dashboard-item total">
+                                <div>
+                                    <p>Tổng số đơn hàng</p>
+                                    <p>${totalDonHang}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Thêm nội dung vào boxTable
+                    boxTable.innerHTML = htmlContent;
+
+                    // Resolve the promise after work is done
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi gọi API: ', error);
+                    reject(error); // Reject the promise if there's an error
+                }
+            });
+        });
+    }
 
 
     //Call API Thống kê đơn hàng
@@ -353,8 +371,14 @@
                 maxDate: formatNgay(to),
             },
             success: function(response) {
-                // Xử lý dữ liệu trả về từ API ở đây
-                fetchTable(response.data);
+                thongKeTongQuat(from, to)
+                .then(() => {
+                    console.log("thongKeTongQuat has completed.");
+                    fetchTable(response.data);
+                })
+                .catch((error) => {
+                    console.error("Error in thongKeTongQuat:", error);
+                });
             },
             error: function(xhr, status, error) {
                 console.error('Lỗi khi gọi API: ', error);

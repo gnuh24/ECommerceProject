@@ -8,8 +8,14 @@ $controller = new StatisticController();
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         if (isset($_GET['type'])) {
+
             // Lấy tổng quan trạng thái đơn hàng
-            if ($_GET['type'] === 'orderStatusSummary') {
+            if ($_GET['type'] === 'general') {
+                $response = $controller->generalSumary($_GET['minDate'], $_GET['maxDate']);
+                echo $response;
+            }
+            // Lấy tổng quan trạng thái đơn hàng
+            else if ($_GET['type'] === 'orderStatusSummary') {
                 $response = $controller->getOrderStatusSummary($_GET['minDate'], $_GET['maxDate']);
                 echo $response;
             }
@@ -52,6 +58,14 @@ class StatisticController
     public function __construct()
     {
         $this->StatisticModel = new StatisticModel();
+    }
+
+    
+    // Lấy tổng quan trạng thái đơn hàng
+    public function generalSumary($minDate, $maxDate)
+    {
+        $result = $this->StatisticModel->generalSumary($minDate, $maxDate);
+        return $this->respond($result);
     }
 
     // Lấy tổng quan trạng thái đơn hàng

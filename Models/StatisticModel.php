@@ -10,18 +10,71 @@ class StatisticModel
         $this->connection = MysqlConfig::getConnection();
     }
 
+    public function generalSumary($minDate, $maxDate)
+    {
+    
+        $query =    "
+                        SELECT ot.Status AS status, COUNT(ot.Status) AS quantity
+                        FROM `Order` od
+                        JOIN `OrderStatus` ot ON od.Id = ot.OrderId
+                        WHERE ot.UpdateTime = (
+                            SELECT MAX(ot2.UpdateTime) FROM `OrderStatus` ot2 WHERE ot2.OrderId = od.Id
+                        )
+                        AND DATE(ot.UpdateTime) BETWEEN COALESCE(:minDate, '2010-01-01') AND COALESCE(:maxDate, CURRENT_DATE())
+                        GROUP BY ot.Status
+                    ";
+
+        try {
+            $stmt = $this->connection->prepare($query);
+            $stmt->bindValue(':minDate', $minDate ?: '2010-01-01');
+            $stmt->bindValue(':maxDate', $maxDate ?: date('Y-m-d'));
+
+            // Thực thi câu truy vấn
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Tạo câu truy vấn đã thay thế tham số
+            $finalQuery = $this->replacePlaceholders($query, [
+                ':minDate' => $minDate ?: '2010-01-01',
+                ':maxDate' => $maxDate ?: date('Y-m-d'),
+            ]);
+
+            return (object)[
+                "status" => 200,
+                "message" => "Truy vấn thành công",
+                "data" => $result,  // Trả về dữ liệu truy vấn
+                "query" => $finalQuery,  // Trả về câu truy vấn đã thay thế tham số
+            ];
+        } catch (PDOException $e) {
+            return (object)[
+                "status" => 400,
+                "message" => "Truy vấn cơ sở dữ liệu thất bại: " . $e->getMessage(),
+                "query" => $query,  // Trả về câu truy vấn gốc
+            ];
+        }
+    }
+
     public function findOrderStatusSummary($minDate, $maxDate)
     {
-        // Câu truy vấn để lấy tóm tắt trạng thái đơn hàng
-        $query = "SELECT ot.Status AS status, COUNT(ot.Status) AS quantity, DATE(ot.UpdateTime) AS updateDate
-              FROM `Order` od
-              JOIN `OrderStatus` ot ON od.Id = ot.OrderId
-              WHERE ot.UpdateTime = (
-                  SELECT MAX(ot2.UpdateTime) FROM `OrderStatus` ot2 WHERE ot2.OrderId = od.Id
-              )
-              AND DATE(ot.UpdateTime) BETWEEN COALESCE(:minDate, '2010-01-01') AND COALESCE(:maxDate, CURRENT_DATE())
-              GROUP BY ot.Status, DATE(ot.UpdateTime)
-              ORDER BY DATE(ot.UpdateTime)";
+        // // Câu truy vấn để lấy tóm tắt trạng thái đơn hàng
+        // $query = "SELECT ot.Status AS status, COUNT(ot.Status) AS quantity, DATE(ot.UpdateTime) AS updateDate
+        //       FROM `Order` od
+        //       JOIN `OrderStatus` ot ON od.Id = ot.OrderId
+        //       WHERE ot.UpdateTime = (
+        //           SELECT MAX(ot2.UpdateTime) FROM `OrderStatus` ot2 WHERE ot2.OrderId = od.Id
+        //       )
+        //       AND DATE(ot.UpdateTime) BETWEEN COALESCE(:minDate, '2010-01-01') AND COALESCE(:maxDate, CURRENT_DATE())
+        //       GROUP BY ot.Status, DATE(ot.UpdateTime)
+        //       ORDER BY DATE(ot.UpdateTime)";
+
+        $query =    "
+                        SELECT ot.Status AS status, COUNT(ot.Status) AS quantity, DATE(ot.UpdateTime) AS updateDate
+                        FROM `Order` od
+                        JOIN `OrderStatus` ot ON od.Id = ot.OrderId
+                        AND DATE(ot.UpdateTime) BETWEEN COALESCE(:minDate, '2010-01-01') AND COALESCE(:maxDate, CURRENT_DATE())
+                        GROUP BY ot.Status, DATE(ot.UpdateTime)
+                        ORDER BY DATE(ot.UpdateTime)
+                    ";
 
         try {
             $stmt = $this->connection->prepare($query);
