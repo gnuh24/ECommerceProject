@@ -100,10 +100,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="order_info__wrapper">
-                    <div class="order_info">
+                <div class="order_info__wrapper" style="height: 500px;">
+                    <div class="order_info" style="margin-top: 30px; padding: 0 20px;">
                         <p class="title" style="text-align: center;">Thông tin đơn hàng</p>
-                        <div class="divider"></div>
+                        <div class="wrap">
+
+                        </div>
 
                     </div>
 
@@ -215,6 +217,7 @@
                 idOrder: maOrder // Use 'Id' based on your response structure
             },
             success: function(response) {
+                console.log(response.data);
                 let totalPrice_Shipping = 0;
                 let productListHtml = '';
                 let html = '';
@@ -226,29 +229,31 @@
 
                     // Thêm sản phẩm vào danh sách HTML
                     productListHtml += `
-                        <div class='radio__wrapper'>
-                            <div>
-                                <div class='cartItem' id='${cartProduct.ProductId}'>
-                                    <a href='#' class='img'><img class='img' src='../img/${cartProduct.Image}' /></a>
-                                    <div class='inforCart'>
-                                        <div class='nameAndPrice'>
-                                            <a href='#' class='nameCart'>${cartProduct.ProductName}</a>
-                                            <p class='priceCart'>${formattedPrice}</p>
-                                        </div>
-                                        <div class='quantity'>
-                                            <div class='txtQuantity'>${cartProduct.Quantity}</div>
-                                        </div>
-                                    </div>
-                                    <div class='wrapTotalPriceOfCart'>
-                                        <div class='totalPriceOfCart'>
-                                            <p class='lablelPrice'>Thành tiền</p>
-                                            <p class='valueTotalPrice'>${formattedTotalPrice}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
+                                            <div class='radio__wrapper'>
+                                                <div>
+                                                    <div class='cartItem' id='${cartProduct.ProductId}'>
+                                                        <a href='#' class='img'><img class='img' src='../img/${cartProduct.Image}' /></a>
+                                                        <div class='inforCart'>
+                                                            <div class='nameAndPrice'>
+                                                                <a href='#' class='nameCart'>${cartProduct.ProductName}</a>
+                                                                <p class='priceCart'>${formattedPrice}</p>
+                                                            </div>
+                                                            <div class='quantity'>
+                                                                <div class='txtQuantity'>${cartProduct.Quantity}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class='wrapTotalPriceOfCart'>
+                                                            <div class='totalPriceOfCart'>
+                                                                <p class='lablelPrice'>Thành tiền</p>
+                                                                <p class='valueTotalPrice'>${formattedTotalPrice}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
                 });
+
                 html = `
                         <div class="container mt-4">
                             <div class="info__wrapper order_info2">
@@ -263,13 +268,25 @@
                             <div class="divider"></div>
 
                             <div class="total__info">
+                                <p>Tạm tính</p>
+                                <p id="totalPrice"></p>
+                            </div>
+
+                            <div class="total__info">
+                                <p>Giảm giá</p>
+                                <p id="totalPrice">${formatCurrency(totalPrice_Shipping - response.data.info.TotalPrice)}</p>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="total__info">
                                 <p>Tổng cộng</p>
-                                <p id="totalPrice">${response.data.info.TotalPrice}</p>
+                                <p id="totalPrice">${formatCurrency(response.data.info.TotalPrice)}</p>
                             </div>
                         </div>`
                 // Chèn danh sách sản phẩm vào phần tử HTML
                 $('#product-list').html(productListHtml);
-                $('.divider').html(html)
+                $('.wrap').html(html)
                 // Hiển thị tổng giá trị đơn hàng
                 $('#totalPrice').text(formatCurrency(totalPrice_Shipping));
                 var trangThaiDonHang = response.data.orderStatuses;

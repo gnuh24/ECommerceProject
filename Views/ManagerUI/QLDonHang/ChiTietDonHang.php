@@ -38,8 +38,6 @@
                                         <p id='gioitinh'></p>
                                         <p id="orderTime"></p>
                                         <p id="tinhtrang"></p>
-
-
                                     </div>
                                 </div>
                                 <div class="payment_method__wrapper">
@@ -63,6 +61,14 @@
                                 </div>
                             </div>
                             <div class="order_total__wrapper">
+                                <div>
+                                    <p>Tổng tiền hàng:</p>
+                                    <p id="tongTienHang"></p>
+                                </div>
+                                <div>
+                                    <p>Giảm giá:</p>
+                                    <p id="giamGia"></p>
+                                </div>
                                 <div>
                                     <p>Thành tiền:</p>
                                     <p id="totalPrice"></p>
@@ -100,7 +106,7 @@
                 var transaction_list = document.getElementById("transaction_list");
                 transaction_list.innerHTML = "";
                 var items = "";
-
+                var tongTienHang = 0;
                 data.details.forEach(element => {
                     console.log(data)
                     items += `<div class='transaction_item'>
@@ -111,11 +117,12 @@
                             </div>
                             <div class='item_info'>
                                 <p class='quantity'>${element.Quantity}</p>
-                                <p class='price'>${formatCurrency(element.UnitPrice)}</p>
+                                <p class='price'>${formatCurrency(element.UnitPrice*element.Quantity)}</p>
                             </div>
                         </div>
                     </div>
                     <div class='divider'></div>`;
+                    tongTienHang += element.UnitPrice*element.Quantity;
                 });
                 transaction_list.innerHTML = items;
 
@@ -123,7 +130,11 @@
                 document.getElementById("diachigiaohang").innerHTML = `<span>Địa chỉ: </span>${data.info.Address}`;
                 document.getElementById("sodienthoai").innerHTML = `<span>Số điện thoại: </span>${data.info.PhoneNumber}`;
                 document.getElementById("note").innerText = data.info.Note; // Added note
+
+                document.getElementById("tongTienHang").innerText = formatCurrency(tongTienHang);
+                document.getElementById("giamGia").innerText = formatCurrency(tongTienHang - data.info.TotalPrice);
                 document.getElementById("totalPrice").innerText = formatCurrency(data.info.TotalPrice);
+
                 document.getElementById("orderTime").innerHTML = `<span>Thời gian đặt: </span>${convertDateTimeFormat(data.info.OrderTime)}`; // Added order time
                 document.getElementById("tenphuongthuc").innerHTML = `<span>Phương thức thanh toán: </span>${data.info.Payment}`;
                 document.getElementById("tinhtrang").innerHTML = `<span>Tình trạng: </span>${data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}`;
