@@ -120,7 +120,7 @@
                                         <th style="text-align: center;">Khách hàng</th>
                                         <th style="text-align: center;">Số điện thoại</th>
                                         <th style="text-align: center;">Trạng thái</th>
-                                        <th style="text-align: center;">Hành động</th>
+                                        <th style="text-align: center; width: 30%;">Hành động</th>
                                     </tr>
 
                                 </thead>
