@@ -336,7 +336,7 @@
                 {
                     data: 'OrderTime',
                     render: function(data, type, row) {
-                        return formatDateToDDMMYYYYHHMMSS(data)
+                        return convertDateTimeFormat(data)
                     }
                 },
                 {

@@ -155,27 +155,27 @@
             case 'ChoDuyet':
                 $icon1.css("color", "green");
                 $circleContainer1.css("border-color", "green");
-                $thoiGian1.html(thoiGianValue);
+                $thoiGian1.html(convertDateTimeFormat(thoiGianValue));
                 break;
             case 'DaDuyet':
                 $icon2.css("color", "green");
                 $line1.css("color", "green");
                 $circleContainer2.css("border-color", "green");
-                $thoiGian2.html(thoiGianValue);
+                $thoiGian2.html(convertDateTimeFormat(thoiGianValue));
 
                 break;
             case 'DangGiao':
                 $icon3.css("color", "green");
                 $line2.css("color", "green");
                 $circleContainer3.css("border-color", "green");
-                $thoiGian3.html(thoiGianValue);
+                $thoiGian3.html(convertDateTimeFormat(thoiGianValue));
 
                 break;
             case 'GiaoThanhCong':
                 $icon4.css("color", "green");
                 $line3.css("color", "green");
                 $circleContainer4.css("border-color", "green");
-                $thoiGian4.html(thoiGianValue);
+                $thoiGian4.html(convertDateTimeFormat(thoiGianValue));
 
                 break;
             case 'Huy':
@@ -198,7 +198,7 @@
                 $icon5.css("color", "rgb(146, 26, 26)");
                 $line4.css("color", "rgb(146, 26, 26)");
                 $circleContainer5.css("border-color", "rgb(146, 26, 26)");
-                $thoiGian5.html(thoiGianValue);
+                $thoiGian5.html(convertDateTimeFormat(thoiGianValue));
 
                 break;
             default:
@@ -253,7 +253,7 @@
                         <div class="container mt-4">
                             <div class="info__wrapper order_info2">
                                 <p><span class="span1">Mã đơn hàng:</span><span class="span2" id="id">${response.data.info.OrderId}</span></p>
-                                <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${response.data.info.OrderTime}</span></p>
+                                <p><span class="span1">Thời gian đặt hàng:</span><span class="span2" id="orderTime">${convertDateTimeFormat(response.data.info.OrderTime)}</span></p>
                                 <p><span class="span1">Ghi chú:</span><span class="span2" id="note">${response.data.info.Note==null?'':response.data.info.Note}</span></p>
                                 <p><span class="span1">Tình trạng:</span><span class="span2" id="note">${response.data.info.isPaid==0?'Chưa thanh toán':'Đã thanh toán'}</span></p>
                                 <p><span class="span1">Phương thức thanh toán:</span><span class="span2" id="note">${response.data.info.Payment}</span></p>
