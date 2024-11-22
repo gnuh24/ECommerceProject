@@ -62,7 +62,7 @@ INSERT INTO `Product`
 VALUES
 (1,  'HaKu Vodka',                     TRUE,    '2024-07-03 10:00:00',     'hakuvodka.jpg',             'Japan',        700,        40,     'A smooth Japanese vodka.',           2,          2,          100,      100000,          0),
 (2,  'HaNoi VodKa',                    TRUE,    '2024-07-05 10:00:00',     'hanoiVodka.jpg',            'Vietnam',      500,        39,     'Classic Vietnamese vodka.',          3,          2,           50,      150000,          0),
-(3,  'Beluga Noble',                   TRUE,    '2024-07-05 10:00:00',     'belugaNoble.jpg',           'Russia',       700,        40,     'Premium Russian vodka.',             4,          2,           75,      220000,          0),
+(3,  'Beluga Noble',                   TRUE,    '2024-07-05 10:00:00',     'belugaNoble.jpg',           'Russia',       700,        40,     'Premium Russian vodka.',             4,          2,           0,      220000,          0),
 (4,  'Grey Goose',                     TRUE,    '2024-07-05 10:00:00',     'greyGoose.jpg',             'France',       750,        40,     'French luxury vodka.',               5,          2,           90,      450000,          0),
 (5,  'Beluga Allure',                  TRUE,    '2024-07-05 10:00:00',     'belugaAllure.jpg',          'Russia',       700,        40,     'Luxurious Russian vodka.',           4,          2,           60,      500000,          0),
 (6,  'King Robert',                    FALSE,   '2024-07-06 08:45:00',     'kingRobert.jpg',            'Scotland',     750,        43,     'Strong Scottish vodka.',             2,          2,           30,       90000,          0),
@@ -70,7 +70,7 @@ VALUES
 (8,  'Stolichnaya Vodka',              TRUE,    '2024-07-06 08:45:00',     'Stolichnaya.jpg',           'Russia',       700,        38,     'Famous Russian vodka.',              6,          2,          110,      175000,          0),
 (9,  'Vodka Danzka',                   TRUE,    '2024-07-06 08:45:00',     'vodkaDanzka.jpg',           'Denmark',      700,        40,     'Danish vodka.',                      7,          2,          100,      230000,          0),
 (10, "Glen'S Platinum",                TRUE,    '2024-07-06 08:45:00',     'glenPlatinum.jpg',          'Scotland',     700,        40,     'Scottish vodka.',                    8,          2,           85,      320000,          0),
-(11, 'Tequila Clase Azul Reposado',    TRUE, 	'2024-07-06 09:50:00',     'tequilaClaseAzuiReposado.jpg','Mexico', 	   750,			40, 	'Premium Reposado Tequila.', 		 9, 		 3, 		 100,     5000000,          0),
+(11, 'Tequila Clase Azul Reposado',    TRUE, 	'2024-07-06 09:50:00',     'tequilaClaseAzuiReposado.jpg','Mexico', 	750,		40, 	'Premium Reposado Tequila.', 		  9, 		 3, 		  100,     5000000,          0),
 (12, 'Don Julio 1942',                 TRUE,    '2024-07-06 09:50:00',     'donJulio.jpg',              'Mexico',       750,        40,     'Luxury Añejo Tequila.',              10,         3,           70,      750000,          0),
 (13, 'Patrón Silver',                  TRUE,    '2024-07-06 09:50:00',     'patronSilver.jpg',          'Mexico',       750,        40,     'Smooth Silver Tequila.',             11,         3,           60,      600000,          0),
 (14, 'Maestro Dobel Diamante',         FALSE,   '2024-07-06 09:50:00',     'maestroDobel.jpg',          'Mexico',       750,        40,     'Premium Cristalino Tequila.',        12,         3,           55,      900000,          0),
