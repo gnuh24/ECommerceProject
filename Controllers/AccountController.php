@@ -204,7 +204,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($Id && $Status !== null) {
                     $accountController = new AccountController();
-                    $response = json_decode($accountController->updateAccount());  // Giải mã JSON trả về
+                    $response = json_decode($accountController->updateState());  // Giải mã JSON trả về
 
                     // Kiểm tra xem $response có phải là đối tượng hay không trước khi truy cập thuộc tính
                     if (is_object($response) && isset($response->status)) {
@@ -334,7 +334,6 @@ class AccountController
         if ($accountExists->status === 200 && !empty($accountExists->data)) {
             // Lấy thông tin tài khoản
             $account = $accountExists->data[0];
-
             if ($account['Role'] === "User") {
                 if ($account['Status'] === 0) {
                     return (object)[
@@ -342,9 +341,7 @@ class AccountController
                         "message" => "Tài khoản đã bị cấm"
                     ];
                 }
-
-
-                // Kiểm tra mật khẩu
+                // Kiểm tra mật khẩu 
                 if (password_verify($password, $account['Password'])) {
                     return (object)[
                         "status" => 200,
@@ -352,13 +349,14 @@ class AccountController
                         "data" => $account
                     ];
                 }
+
             }
         }
 
         // Nếu không tìm thấy tài khoản hoặc mật khẩu không khớp
         return (object)[
-            "status" => 404,
-            "message" => "Không tìm thấy tài khoản"
+            "status" => 401,
+            "message" => "Đăng nhập thất bại, hãy kiểm tra lại tài khoản hoặc mật khẩu"
         ];
     }
 
@@ -437,12 +435,12 @@ class AccountController
             $mail->Port = 587;
 
             // Người gửi và người nhận
-            $mail->setFrom('automaticemail0204@gmail.com', 'Your Name');
+            $mail->setFrom('automaticemail0204@gmail.com', 'Website EC Nhom 10');
             $mail->addAddress($email);
 
             // Nội dung email
             $mail->isHTML(true);
-            $mail->Subject = 'Khôi phục mật khẩu';
+            $mail->Subject = 'Reset your password';
 
             // Truyền thêm tham số email vào URL khôi phục mật khẩu
             $mail->Body = 'Nhấn vào liên kết sau để khôi phục mật khẩu của bạn: <a href="http://localhost/ECommerceProject/Views/MemberUI/Login/ResetPasswordUI.php?token=' . $token . '&email=' . urlencode($email) . '">Khôi phục mật khẩu</a>';
@@ -467,32 +465,19 @@ class AccountController
     {
         // Khởi tạo model Account, Token và UserInformation
         $accountModel = new AccountModel();
-        $tokenModel = new TokenModel();
         $userInfoModel = new UserInformationModel();
 
         // 1. Kiểm tra xem email và token có hợp lệ không
         $accountResponse = $accountModel->getAccountByEmail($email);
-        $tokenResponse = $tokenModel->getTokenByValue($token);
 
         // Kiểm tra xem có tài khoản và token hợp lệ không
         if (
-            $accountResponse->status === 200 && !empty($accountResponse->data) &&
-            $tokenResponse->status === 200 && !empty($tokenResponse->data)
+            $accountResponse->status === 200 && !empty($accountResponse->data)
         ) {
 
             $account = $accountResponse->data[0];
-            $tokenData = $tokenResponse->data;
 
-            // Kiểm tra xem token có hết hạn không
-            $currentDate = new DateTime();
-            $expirationDate = new DateTime($tokenData['Expiration']);
-            if ($currentDate > $expirationDate) {
-                return (object)[
-                    'status' => 400,
-                    'message' => 'Token đã hết hạn.'
-                ];
-            }
-
+         
             // 2. Kiểm tra xem email có tồn tại trong bảng user_information không
             $userInfoResponse = $userInfoModel->isEmailExists($email);
             if (!$userInfoResponse->isExists) {
@@ -503,11 +488,9 @@ class AccountController
             }
 
             // 3. Cập nhật mật khẩu mới trong CSDL
-            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status'], $account['Active']);
+            $updateResponse = $accountModel->updateAccount($account['Id'], $newPassword, $account['Status']);
 
             if ($updateResponse->status === 200) {
-                // 4. Xoá token sau khi đã sử dụng
-                $tokenModel->deleteTokenByEmail($email);
 
                 // Phản hồi thành công
                 return (object)[
@@ -559,6 +542,41 @@ class AccountController
         );
         return $this->response($response); // Có thể trả về thông tin kết quả hoặc số dòng đã cập nhật
 
+    }
+
+    // Hàm cập nhật tài khoản
+    public function updateState()
+    {
+        // Nhận các tham số từ POST
+        $id = $_POST['Id'] ?? null;
+        $status = $_POST['Status'] ?? null;
+
+        // Kiểm tra xem các tham số có đầy đủ không
+        if (!$id || $status === null) {
+            return json_encode([
+                'status' => 400,
+                'message' => 'ID hoặc trạng thái không được cung cấp!'
+            ]);
+        }
+
+        // Gọi hàm updateAccount từ model với các tham số đã lấy được
+        $response = $this->accountModel->updateState($id,  $status);
+
+        // Kiểm tra kết quả trả về từ model
+        if ($response && $response->status === 200) {
+            // Nếu thành công, trả về kết quả dưới dạng JSON
+            return json_encode([
+                'status' => 200,
+                'message' => 'Cập nhật tài khoản thành công!',
+                'data' => $response->data ?? null
+            ]);
+        } else {
+            // Nếu có lỗi, trả về lỗi
+            return json_encode([
+                'status' => 400,
+                'message' => 'Không thể cập nhật tài khoản!'
+            ]);
+        }
     }
 
     // Hàm cập nhật tài khoản

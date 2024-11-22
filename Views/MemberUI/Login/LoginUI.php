@@ -174,7 +174,6 @@
 
         try {
             const emailExists = await checkEmail(email.value); // đợi kết quả
-            console.log(emailExists);
 
             if (emailExists.data.isExists === true) {
                 Swal.fire({
@@ -359,6 +358,7 @@
             }
         });
     }
+    
     sendEmailButton.addEventListener("click", async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định
 

@@ -321,7 +321,6 @@
                     url: '../../../Controllers/AccountController.php',
                     type: 'POST',
                     dataType: 'json',
-
                     data: formData,
                     processData: false,
                     contentType: false,

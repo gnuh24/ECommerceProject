@@ -293,6 +293,37 @@ class AccountModel
         }
     }
 
+    // Cập nhật thông tin tài khoản
+    function updateState($id,  $status)
+    {
+        $query = "UPDATE `account` SET 
+                    `Status` = :status
+                  WHERE `Id` = :id";
+
+        try {
+            $statement = $this->connection->prepare($query);
+            if ($statement !== false) {
+                $statement->bindValue(':id', $id, PDO::PARAM_INT);
+                $statement->bindValue(':status', $status, PDO::PARAM_BOOL);
+                $statement->execute();
+
+                if ($statement->rowCount() > 0) {
+                    return (object) [
+                        "status" => 200,
+                        "message" => "Tài khoản đã được cập nhật thành công",
+                    ];
+                } else {
+                    throw new PDOException("Không có bản ghi nào được cập nhật");
+                }
+            }
+        } catch (PDOException $e) {
+            return (object) [
+                "status" => 400,
+                "message" => $e->getMessage()
+            ];
+        }
+    }
+
     // Phương thức cập nhật quyền cho tài khoản
     public function updateRole($id, $newRole)
     {
